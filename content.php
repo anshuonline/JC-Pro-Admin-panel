@@ -63,10 +63,10 @@ include 'includes/header.php';
 
 <div class="mb-6 flex justify-between items-end">
     <div>
-        <h1 class="text-2xl font-bold text-white">Content Pages</h1>
-        <p class="text-gray-400 text-sm mt-1">Manage dynamic content for the app.</p>
+        <h1 class="text-2xl font-bold text-slate-900 tracking-tight">Content Pages</h1>
+        <p class="text-slate-500 text-sm mt-1 font-medium">Manage dynamic content for the app.</p>
     </div>
-    <button onclick="openForm()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors shadow-sm">
+    <button onclick="openForm()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-xl text-sm font-semibold transition-all shadow-sm hover:shadow-md">
         <i class="fa-solid fa-plus mr-2"></i> New Page
     </button>
 </div>
@@ -86,41 +86,41 @@ include 'includes/header.php';
 <?php endif; ?>
 
 <!-- Edit/Create Form (Hidden by default) -->
-<div id="pageFormContainer" class="hidden bg-gray-800 border border-gray-700 rounded-xl shadow-sm p-6 mb-8 relative">
-    <button onclick="closeForm()" class="absolute top-4 right-4 text-gray-400 hover:text-white">
+<div id="pageFormContainer" class="hidden bg-white/60 backdrop-blur-xl border border-white rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] p-6 mb-8 relative">
+    <button onclick="closeForm()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-800 transition-colors">
         <i class="fa-solid fa-times"></i>
     </button>
-    <h3 id="formTitle" class="text-lg font-medium text-white mb-4 border-b border-gray-700 pb-3">Create New Page</h3>
+    <h3 id="formTitle" class="text-lg font-bold text-slate-800 mb-4 border-b border-slate-100 pb-3">Create New Page</h3>
     <form method="POST" action="content.php" class="space-y-4">
         <input type="hidden" name="action" value="save">
         <input type="hidden" name="page_id" id="page_id" value="0">
         
         <div>
-            <label class="block text-sm font-medium text-gray-300 mb-1">Title</label>
+            <label class="block text-sm font-semibold text-slate-700 mb-1.5">Title</label>
             <input type="text" name="title" id="pageTitleInput" required
-                class="block w-full px-3 py-2 border border-gray-600 rounded-lg bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                class="block w-full px-3.5 py-2.5 border border-slate-200/60 rounded-xl bg-white/50 text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:bg-white shadow-sm transition-all">
         </div>
         
         <div>
-            <label class="block text-sm font-medium text-gray-300 mb-1">YouTube URL (Optional)</label>
+            <label class="block text-sm font-semibold text-slate-700 mb-1.5">YouTube URL (Optional)</label>
             <input type="url" name="youtube_url" id="pageYoutubeInput"
-                class="block w-full px-3 py-2 border border-gray-600 rounded-lg bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                class="block w-full px-3.5 py-2.5 border border-slate-200/60 rounded-xl bg-white/50 text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:bg-white shadow-sm transition-all"
                 placeholder="https://youtube.com/watch?v=...">
         </div>
         
         <div>
-            <label class="block text-sm font-medium text-gray-300 mb-1">HTML Content</label>
+            <label class="block text-sm font-semibold text-slate-700 mb-1.5">HTML Content</label>
             <textarea name="content_text" id="pageContentInput" rows="6" required
-                class="block w-full px-3 py-2 border border-gray-600 rounded-lg bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 font-mono text-sm"
+                class="block w-full px-3.5 py-2.5 border border-slate-200/60 rounded-xl bg-white/50 text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:bg-white shadow-sm transition-all font-mono text-sm"
                 placeholder="<h1>Heading</h1><p>Paragraph</p>"></textarea>
-            <p class="text-xs text-gray-500 mt-1">You can use basic HTML tags for formatting.</p>
+            <p class="text-xs text-slate-500 mt-1 font-medium">You can use basic HTML tags for formatting.</p>
         </div>
         
-        <div class="flex justify-end gap-3">
-            <button type="button" onclick="closeForm()" class="px-4 py-2 border border-gray-600 rounded-lg text-sm font-medium text-gray-300 hover:bg-gray-700 transition-colors">
+        <div class="flex justify-end gap-3 mt-6">
+            <button type="button" onclick="closeForm()" class="px-4 py-2 border border-slate-200 bg-white rounded-xl text-sm font-semibold text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors shadow-sm">
                 Cancel
             </button>
-            <button type="submit" class="px-4 py-2 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 transition-colors">
+            <button type="submit" class="px-4 py-2 border border-transparent rounded-xl shadow-sm text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 transition-colors">
                 Save Page
             </button>
         </div>
@@ -130,42 +130,42 @@ include 'includes/header.php';
 <!-- Pages List -->
 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
     <?php if(empty($pages)): ?>
-        <div class="col-span-full bg-gray-800 border border-gray-700 rounded-xl p-8 text-center text-gray-500">
+        <div class="col-span-full bg-white/60 backdrop-blur-xl border border-white rounded-2xl p-8 text-center text-slate-500 shadow-[0_4px_24px_rgb(0,0,0,0.02)]">
             <i class="fa-solid fa-file-lines text-5xl mb-4 block opacity-30"></i>
-            <p>No content pages found. Click 'New Page' to create one.</p>
+            <p class="font-medium">No content pages found. Click 'New Page' to create one.</p>
         </div>
     <?php else: ?>
         <?php foreach($pages as $page): ?>
-        <div class="bg-gray-800 border border-gray-700 rounded-xl shadow-sm overflow-hidden flex flex-col hover:border-gray-600 transition-colors group">
-            <div class="p-5 flex-1">
-                <div class="flex justify-between items-start mb-2">
-                    <h3 class="text-lg font-bold text-white line-clamp-1" title="<?php echo htmlspecialchars($page['title']); ?>">
+        <div class="bg-white/60 backdrop-blur-xl border border-white rounded-2xl shadow-[0_4px_24px_rgb(0,0,0,0.02)] overflow-hidden flex flex-col hover:shadow-[0_8px_30px_rgb(0,0,0,0.04)] transition-all group">
+            <div class="p-6 flex-1">
+                <div class="flex justify-between items-start mb-3">
+                    <h3 class="text-lg font-bold text-slate-800 line-clamp-1" title="<?php echo htmlspecialchars($page['title']); ?>">
                         <?php echo htmlspecialchars($page['title']); ?>
                     </h3>
-                    <span class="text-xs text-gray-500 bg-gray-700 px-2 py-1 rounded-md">ID: <?php echo $page['id']; ?></span>
+                    <span class="text-xs text-slate-600 font-bold bg-slate-100 border border-slate-200/60 px-2 py-1 rounded-md">ID: <?php echo $page['id']; ?></span>
                 </div>
                 
                 <?php if ($page['youtube_url']): ?>
-                <a href="<?php echo htmlspecialchars($page['youtube_url']); ?>" target="_blank" class="inline-flex items-center text-xs text-red-400 hover:text-red-300 mb-3 bg-red-400/10 px-2 py-1 rounded">
+                <a href="<?php echo htmlspecialchars($page['youtube_url']); ?>" target="_blank" class="inline-flex items-center text-xs font-semibold text-red-600 hover:text-red-700 mb-3 bg-red-50 border border-red-100 px-2.5 py-1 rounded-md transition-colors">
                     <i class="fa-brands fa-youtube mr-1.5"></i> Video Attached
                 </a>
                 <?php endif; ?>
                 
-                <div class="text-sm text-gray-400 line-clamp-3 overflow-hidden text-ellipsis mb-4 mt-2">
+                <div class="text-sm text-slate-600 line-clamp-3 overflow-hidden text-ellipsis mb-4 mt-2">
                     <?php echo strip_tags($page['content']); ?>
                 </div>
             </div>
             
-            <div class="px-5 py-3 border-t border-gray-700 bg-gray-800/50 flex justify-between items-center opacity-70 group-hover:opacity-100 transition-opacity">
-                <span class="text-xs text-gray-500"><i class="fa-regular fa-clock mr-1"></i> <?php echo date('M d, Y', strtotime($page['created_at'])); ?></span>
+            <div class="px-6 py-4 border-t border-slate-100 bg-white/40 flex justify-between items-center transition-opacity">
+                <span class="text-xs font-medium text-slate-500"><i class="fa-regular fa-clock mr-1.5"></i> <?php echo date('M d, Y', strtotime($page['created_at'])); ?></span>
                 <div class="flex gap-2">
-                    <button onclick='editPage(<?php echo json_encode($page); ?>)' class="text-indigo-400 hover:text-indigo-300 bg-indigo-400/10 hover:bg-indigo-400/20 p-1.5 rounded transition-colors" title="Edit">
+                    <button onclick='editPage(<?php echo json_encode($page); ?>)' class="text-blue-600 hover:text-blue-700 bg-blue-50 hover:bg-blue-100 border border-blue-100 p-2 rounded-lg transition-colors shadow-sm" title="Edit">
                         <i class="fa-solid fa-pen"></i>
                     </button>
                     <form method="POST" action="content.php" onsubmit="return confirm('Delete this page?');" class="inline">
                         <input type="hidden" name="action" value="delete">
                         <input type="hidden" name="page_id" value="<?php echo $page['id']; ?>">
-                        <button type="submit" class="text-red-400 hover:text-red-300 bg-red-400/10 hover:bg-red-400/20 p-1.5 rounded transition-colors" title="Delete">
+                        <button type="submit" class="text-red-500 hover:text-red-600 bg-red-50 hover:bg-red-100 border border-red-100 p-2 rounded-lg transition-colors shadow-sm" title="Delete">
                             <i class="fa-solid fa-trash"></i>
                         </button>
                     </form>

@@ -51,8 +51,8 @@ include 'includes/header.php';
 ?>
 
 <div class="mb-6">
-    <h1 class="text-2xl font-bold text-white">Challenges</h1>
-    <p class="text-gray-400 text-sm mt-1">Create and manage app challenges.</p>
+    <h1 class="text-2xl font-bold text-slate-900 tracking-tight">Challenges</h1>
+    <p class="text-slate-500 text-sm mt-1 font-medium">Create and manage app challenges.</p>
 </div>
 
 <?php if ($msg): ?>
@@ -72,48 +72,48 @@ include 'includes/header.php';
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
     <!-- Create Challenge Form -->
     <div class="lg:col-span-1">
-        <div class="bg-gray-800 border border-gray-700 rounded-xl shadow-sm p-6">
-            <h3 class="text-lg font-medium text-white mb-4 border-b border-gray-700 pb-3">Create New Challenge</h3>
+        <div class="bg-white/60 backdrop-blur-xl border border-white rounded-2xl shadow-[0_4px_24px_rgb(0,0,0,0.02)] p-6">
+            <h3 class="text-lg font-bold text-slate-800 mb-4 border-b border-slate-100 pb-3">Create New Challenge</h3>
             <form method="POST" action="challenges.php" class="space-y-4">
                 <input type="hidden" name="action" value="create">
                 
                 <div>
-                    <label class="block text-sm font-medium text-gray-300 mb-1">Title</label>
+                    <label class="block text-sm font-semibold text-slate-700 mb-1.5">Title</label>
                     <input type="text" name="title" required
-                        class="block w-full px-3 py-2 border border-gray-600 rounded-lg bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        class="block w-full px-3.5 py-2.5 border border-slate-200/60 rounded-xl bg-white/50 text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:bg-white shadow-sm transition-all">
                 </div>
                 
                 <div>
-                    <label class="block text-sm font-medium text-gray-300 mb-1">Description</label>
+                    <label class="block text-sm font-semibold text-slate-700 mb-1.5">Description</label>
                     <textarea name="description" rows="3"
-                        class="block w-full px-3 py-2 border border-gray-600 rounded-lg bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
+                        class="block w-full px-3.5 py-2.5 border border-slate-200/60 rounded-xl bg-white/50 text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:bg-white shadow-sm transition-all"></textarea>
                 </div>
                 
                 <div>
-                    <label class="block text-sm font-medium text-gray-300 mb-1">Target Count</label>
+                    <label class="block text-sm font-semibold text-slate-700 mb-1.5">Target Count</label>
                     <input type="number" name="target_count" required min="1"
-                        class="block w-full px-3 py-2 border border-gray-600 rounded-lg bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        class="block w-full px-3.5 py-2.5 border border-slate-200/60 rounded-xl bg-white/50 text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:bg-white shadow-sm transition-all">
                 </div>
                 
                 <div>
-                    <label class="block text-sm font-medium text-gray-300 mb-1">Start Date</label>
+                    <label class="block text-sm font-semibold text-slate-700 mb-1.5">Start Date</label>
                     <input type="date" name="start_date" required
-                        class="block w-full px-3 py-2 border border-gray-600 rounded-lg bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        class="block w-full px-3.5 py-2.5 border border-slate-200/60 rounded-xl bg-white/50 text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:bg-white shadow-sm transition-all">
                 </div>
                 
                 <div>
-                    <label class="block text-sm font-medium text-gray-300 mb-1">End Date</label>
+                    <label class="block text-sm font-semibold text-slate-700 mb-1.5">End Date</label>
                     <input type="date" name="end_date" required
-                        class="block w-full px-3 py-2 border border-gray-600 rounded-lg bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        class="block w-full px-3.5 py-2.5 border border-slate-200/60 rounded-xl bg-white/50 text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:bg-white shadow-sm transition-all">
                 </div>
                 
                 <div>
-                    <label class="block text-sm font-medium text-gray-300 mb-1">Visibility End Date</label>
+                    <label class="block text-sm font-semibold text-slate-700 mb-1.5">Visibility End Date</label>
                     <input type="date" name="visibility_end_date" required
-                        class="block w-full px-3 py-2 border border-gray-600 rounded-lg bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        class="block w-full px-3.5 py-2.5 border border-slate-200/60 rounded-xl bg-white/50 text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:bg-white shadow-sm transition-all">
                 </div>
                 
-                <button type="submit" class="w-full flex justify-center py-2.5 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 focus:ring-offset-gray-900 transition-colors">
+                <button type="submit" class="w-full mt-2 flex justify-center py-3 px-4 border border-transparent rounded-xl shadow-sm text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all hover:shadow-md">
                     Create Challenge
                 </button>
             </form>
@@ -122,57 +122,57 @@ include 'includes/header.php';
     
     <!-- Challenges List -->
     <div class="lg:col-span-2">
-        <div class="bg-gray-800 border border-gray-700 rounded-xl shadow-sm overflow-hidden">
-            <div class="px-6 py-4 border-b border-gray-700">
-                <h3 class="text-lg font-medium text-white">Existing Challenges</h3>
+        <div class="bg-white/60 backdrop-blur-xl border border-white rounded-2xl shadow-[0_4px_24px_rgb(0,0,0,0.02)] overflow-hidden">
+            <div class="px-6 py-5 border-b border-slate-100 bg-white/40">
+                <h3 class="text-lg font-bold text-slate-800">Existing Challenges</h3>
             </div>
             <div class="overflow-x-auto">
-                <table class="w-full text-left text-sm text-gray-400">
-                    <thead class="text-xs uppercase bg-gray-700/50 text-gray-300">
+                <table class="w-full text-left text-sm text-slate-600">
+                    <thead class="text-xs uppercase bg-slate-50/50 text-slate-500 border-b border-slate-100">
                         <tr>
-                            <th scope="col" class="px-6 py-3">Challenge</th>
-                            <th scope="col" class="px-6 py-3">Target</th>
-                            <th scope="col" class="px-6 py-3">Duration</th>
-                            <th scope="col" class="px-6 py-3">Creator</th>
-                            <th scope="col" class="px-6 py-3 text-right">Actions</th>
+                            <th scope="col" class="px-6 py-4 font-semibold">Challenge</th>
+                            <th scope="col" class="px-6 py-4 font-semibold">Target</th>
+                            <th scope="col" class="px-6 py-4 font-semibold">Duration</th>
+                            <th scope="col" class="px-6 py-4 font-semibold">Creator</th>
+                            <th scope="col" class="px-6 py-4 font-semibold text-right">Actions</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody class="divide-y divide-slate-100/60">
                         <?php if(empty($challenges)): ?>
-                        <tr class="border-b border-gray-700">
-                            <td colspan="5" class="px-6 py-8 text-center text-gray-500">
-                                <i class="fa-solid fa-trophy text-4xl mb-3 block opacity-50"></i>
-                                No challenges found.
+                        <tr>
+                            <td colspan="5" class="px-6 py-10 text-center text-slate-500">
+                                <i class="fa-solid fa-trophy text-4xl mb-3 block opacity-30"></i>
+                                <span class="font-medium">No challenges found.</span>
                             </td>
                         </tr>
                         <?php else: ?>
                             <?php foreach($challenges as $challenge): ?>
-                            <tr class="border-b border-gray-700 hover:bg-gray-700/30 transition-colors">
+                            <tr class="hover:bg-white/60 transition-colors">
                                 <td class="px-6 py-4">
-                                    <div class="font-medium text-white"><?php echo htmlspecialchars($challenge['title']); ?></div>
-                                    <div class="text-xs text-gray-500 mt-1 line-clamp-1" title="<?php echo htmlspecialchars($challenge['description']); ?>">
+                                    <div class="font-semibold text-slate-800"><?php echo htmlspecialchars($challenge['title']); ?></div>
+                                    <div class="text-xs text-slate-500 mt-1 line-clamp-1 font-medium" title="<?php echo htmlspecialchars($challenge['description']); ?>">
                                         <?php echo htmlspecialchars($challenge['description'] ?: 'No description'); ?>
                                     </div>
                                 </td>
-                                <td class="px-6 py-4 font-mono text-indigo-400 font-bold">
+                                <td class="px-6 py-4 font-mono text-blue-600 font-bold">
                                     <?php echo number_format($challenge['target_count']); ?>
                                 </td>
-                                <td class="px-6 py-4 text-xs">
-                                    <div class="text-gray-300"><?php echo date('M d', strtotime($challenge['start_date'])); ?> - <?php echo date('M d', strtotime($challenge['end_date'])); ?></div>
-                                    <div class="text-gray-500 mt-0.5">Vis: <?php echo date('M d', strtotime($challenge['visibility_end_date'])); ?></div>
+                                <td class="px-6 py-4 text-xs font-medium">
+                                    <div class="text-slate-700"><?php echo date('M d', strtotime($challenge['start_date'])); ?> - <?php echo date('M d', strtotime($challenge['end_date'])); ?></div>
+                                    <div class="text-slate-500 mt-0.5">Vis: <?php echo date('M d', strtotime($challenge['visibility_end_date'])); ?></div>
                                 </td>
                                 <td class="px-6 py-4">
                                     <?php if ($challenge['created_by_admin']): ?>
-                                        <span class="bg-indigo-500/20 text-indigo-400 py-1 px-2 rounded text-xs border border-indigo-500/30">Admin</span>
+                                        <span class="bg-blue-50 text-blue-700 py-1 px-2.5 rounded-md text-xs font-bold border border-blue-200/50 shadow-sm">Admin</span>
                                     <?php else: ?>
-                                        <span class="bg-gray-700 text-gray-300 py-1 px-2 rounded text-xs border border-gray-600">User</span>
+                                        <span class="bg-slate-100 text-slate-600 py-1 px-2.5 rounded-md text-xs font-bold border border-slate-200/60 shadow-sm">User</span>
                                     <?php endif; ?>
                                 </td>
                                 <td class="px-6 py-4 text-right">
                                     <form method="POST" action="challenges.php" onsubmit="return confirm('Delete this challenge?');" class="inline">
                                         <input type="hidden" name="action" value="delete">
                                         <input type="hidden" name="challenge_id" value="<?php echo $challenge['id']; ?>">
-                                        <button type="submit" class="text-red-400 hover:text-red-300 bg-red-400/10 hover:bg-red-400/20 p-2 rounded transition-colors" title="Delete">
+                                        <button type="submit" class="text-red-500 hover:text-red-600 bg-red-50 hover:bg-red-100 p-2.5 rounded-lg transition-colors border border-transparent hover:border-red-200 shadow-sm" title="Delete">
                                             <i class="fa-solid fa-trash"></i>
                                         </button>
                                     </form>
