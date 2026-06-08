@@ -14,13 +14,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $username = $_POST['username'] ?? '';
     $password = $_POST['password'] ?? '';
 
-    $stmt = $conn->prepare("SELECT * FROM admins WHERE username = ? AND password_md5 = ?");
     $pass_md5 = md5($password);
+    $stmt = $conn->prepare("SELECT id FROM admins WHERE username = ? AND password_md5 = ?");
     $stmt->bind_param("ss", $username, $pass_md5);
     $stmt->execute();
-    $result = $stmt->get_result();
+    $stmt->store_result();
 
-    if ($result->num_rows > 0) {
+    if ($stmt->num_rows > 0) {
         $_SESSION['admin_logged_in'] = true;
         header("Location: dashboard.php");
         exit();
