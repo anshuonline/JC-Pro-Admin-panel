@@ -15,7 +15,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $password = $_POST['password'] ?? '';
 
     $pass_md5 = md5($password);
-    $stmt = $conn->prepare("SELECT id FROM admins WHERE username = ? AND password = ?");
+    $stmt = $conn->prepare("SELECT id FROM admins WHERE username = ? AND password_md5 = ?");
     
     if (!$stmt) {
         $error = "Database Error: " . $conn->error;
