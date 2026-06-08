@@ -15,19 +15,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $password = $_POST['password'] ?? '';
 
     $pass_md5 = md5($password);
-    $stmt = $conn->prepare("SELECT id FROM admins WHERE username = ? AND password_md5 = ?");
-    $stmt->bind_param("ss", $username, $pass_md5);
-    $stmt->execute();
-    $stmt->store_result();
-
-    if ($stmt->num_rows > 0) {
-        $_SESSION['admin_logged_in'] = true;
-        header("Location: dashboard.php");
-        exit();
+    $stmt = $conn->prepare("SELECT id FROM admins WHERE username = ? AND password = ?");
+    
+    if (!$stmt) {
+        $error = "Database Error: " . $conn->error;
     } else {
-        $error = 'Invalid credentials!';
+        $stmt->bind_param("ss", $username, $pass_md5);
+        $stmt->execute();
+        $stmt->store_result();
+
+        if ($stmt->num_rows > 0) {
+            $_SESSION['admin_logged_in'] = true;
+            header("Location: dashboard.php");
+            exit();
+        } else {
+            $error = 'Invalid credentials!';
+        }
+        $stmt->close();
     }
-    $stmt->close();
 }
 ?>
 <!DOCTYPE html>
