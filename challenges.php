@@ -38,9 +38,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     $stmt->close();
 }
 
-// Fetch challenges
+// Fetch challenges with joined counts
 $challenges = [];
-$res = $conn->query("SELECT * FROM challenges ORDER BY id DESC");
+$res = $conn->query("SELECT c.*, 
+    (SELECT COUNT(*) FROM user_challenges WHERE challenge_id = c.id) as joined_count,
+    (SELECT COUNT(*) FROM user_challenges WHERE challenge_id = c.id AND status = 'completed') as completed_count
+    FROM challenges c ORDER BY c.id DESC");
 if ($res) {
     while ($row = $res->fetch_assoc()) {
         $challenges[] = $row;
@@ -134,13 +137,14 @@ include 'includes/header.php';
                             <th scope="col" class="px-6 py-4 font-semibold">Target</th>
                             <th scope="col" class="px-6 py-4 font-semibold">Duration</th>
                             <th scope="col" class="px-6 py-4 font-semibold">Creator</th>
+                            <th scope="col" class="px-6 py-4 font-semibold text-center">Participants</th>
                             <th scope="col" class="px-6 py-4 font-semibold text-right">Actions</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-slate-100/60">
                         <?php if(empty($challenges)): ?>
                         <tr>
-                            <td colspan="5" class="px-6 py-10 text-center text-slate-500">
+                            <td colspan="6" class="px-6 py-10 text-center text-slate-500">
                                 <i class="fa-solid fa-trophy text-4xl mb-3 block opacity-30"></i>
                                 <span class="font-medium">No challenges found.</span>
                             </td>
@@ -166,6 +170,18 @@ include 'includes/header.php';
                                         <span class="bg-blue-50 text-blue-700 py-1 px-2.5 rounded-md text-xs font-bold border border-blue-200/50 shadow-sm">Admin</span>
                                     <?php else: ?>
                                         <span class="bg-slate-100 text-slate-600 py-1 px-2.5 rounded-md text-xs font-bold border border-slate-200/60 shadow-sm">User</span>
+                                    <?php endif; ?>
+                                </td>
+                                <td class="px-6 py-4 text-center">
+                                    <div class="inline-flex items-center gap-1.5 bg-indigo-50/50 px-3 py-1.5 rounded-lg border border-indigo-100/50">
+                                        <i class="fa-solid fa-users text-indigo-400 text-xs"></i>
+                                        <span class="font-bold text-indigo-700"><?php echo number_format($challenge['joined_count'] ?? 0); ?></span>
+                                    </div>
+                                    <?php if(($challenge['completed_count'] ?? 0) > 0): ?>
+                                    <div class="text-[10px] font-medium text-emerald-600 mt-1 flex items-center justify-center gap-1">
+                                        <i class="fa-solid fa-check-circle"></i>
+                                        <?php echo number_format($challenge['completed_count']); ?> finished
+                                    </div>
                                     <?php endif; ?>
                                 </td>
                                 <td class="px-6 py-4 text-right">
