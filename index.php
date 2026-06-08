@@ -14,22 +14,45 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $username = $_POST['username'] ?? '';
     $password = $_POST['password'] ?? '';
 
-    $pass_md5 = md5($password);
-    $stmt = $conn->prepare("SELECT id FROM admins WHERE username = ? AND password_md5 = ?");
+    $stmt = $conn->prepare("SELECT password_md5 FROM admins WHERE username = ?");
     
     if (!$stmt) {
         $error = "Database Error: " . $conn->error;
     } else {
-        $stmt->bind_param("ss", $username, $pass_md5);
+        $stmt->bind_param("s", $username);
         $stmt->execute();
-        $stmt->store_result();
+        $result = $stmt->get_result();
 
-        if ($stmt->num_rows > 0) {
-            $_SESSION['admin_logged_in'] = true;
-            header("Location: dashboard.php");
-            exit();
+        if ($result && $row = $result->fetch_assoc()) {
+            $dbPass = $row['password_md5'];
+            // Check if it matches md5, or plain text, or password_verify
+            if (md5($password) === $dbPass || $password === $dbPass || password_verify($password, $dbPass)) {
+                $_SESSION['admin_logged_in'] = true;
+                header("Location: dashboard.php");
+                exit();
+            } else {
+                $error = 'Invalid credentials!';
+            }
         } else {
-            $error = 'Invalid credentials!';
+            // Handle if get_result fails (fallback for some Hostinger servers without mysqlnd)
+            if (!$result) {
+                $stmt->store_result();
+                if ($stmt->num_rows > 0) {
+                    $stmt->bind_result($dbPass);
+                    $stmt->fetch();
+                    if (md5($password) === $dbPass || $password === $dbPass || password_verify($password, $dbPass)) {
+                        $_SESSION['admin_logged_in'] = true;
+                        header("Location: dashboard.php");
+                        exit();
+                    } else {
+                        $error = 'Invalid credentials!';
+                    }
+                } else {
+                    $error = 'Invalid credentials!';
+                }
+            } else {
+                $error = 'Invalid credentials!';
+            }
         }
         $stmt->close();
     }
