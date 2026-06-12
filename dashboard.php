@@ -50,7 +50,7 @@ if ($res) {
 include 'includes/header.php';
 ?>
 
-<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+<div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-6 mb-8">
     <!-- Stat Card 1 -->
     <div class="bg-white/60 backdrop-blur-xl rounded-2xl p-6 border border-white shadow-[0_4px_24px_rgb(0,0,0,0.02)] relative overflow-hidden group hover:shadow-[0_8px_30px_rgb(0,0,0,0.04)] transition-all">
         <div class="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
@@ -75,17 +75,6 @@ include 'includes/header.php';
         </div>
     </div>
 
-    <!-- Stat Card 3 -->
-    <div class="bg-white/60 backdrop-blur-xl rounded-2xl p-6 border border-white shadow-[0_4px_24px_rgb(0,0,0,0.02)] relative overflow-hidden group hover:shadow-[0_8px_30px_rgb(0,0,0,0.04)] transition-all">
-        <div class="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
-            <i class="fa-solid fa-trophy text-6xl text-amber-500"></i>
-        </div>
-        <h3 class="text-slate-500 text-sm font-semibold mb-1">Active Challenges</h3>
-        <p class="text-3xl font-bold text-slate-800"><?php echo number_format($stats['challenges']); ?></p>
-        <div class="mt-4 flex items-center text-sm font-medium">
-            <a href="challenges.php" class="text-amber-600 hover:text-amber-700 transition-colors">View Challenges <i class="fa-solid fa-arrow-right ml-1 text-xs"></i></a>
-        </div>
-    </div>
 
     <!-- Stat Card 4 -->
     <div class="bg-white/60 backdrop-blur-xl rounded-2xl p-6 border border-white shadow-[0_4px_24px_rgb(0,0,0,0.02)] relative overflow-hidden group hover:shadow-[0_8px_30px_rgb(0,0,0,0.04)] transition-all">
