@@ -159,7 +159,7 @@ include 'includes/header.php';
             <div class="px-6 py-4 border-t border-slate-100 bg-white/40 flex justify-between items-center transition-opacity">
                 <span class="text-xs font-medium text-slate-500"><i class="fa-regular fa-clock mr-1.5"></i> <?php echo date('M d, Y', strtotime($page['created_at'])); ?></span>
                 <div class="flex gap-2">
-                    <button onclick='editPage(<?php echo json_encode($page); ?>)' class="text-blue-600 hover:text-blue-700 bg-blue-50 hover:bg-blue-100 border border-blue-100 p-2 rounded-lg transition-colors shadow-sm" title="Edit">
+                    <button onclick="editPage(<?php echo htmlspecialchars(json_encode($page), ENT_QUOTES, 'UTF-8'); ?>)" class="text-blue-600 hover:text-blue-700 bg-blue-50 hover:bg-blue-100 border border-blue-100 p-2 rounded-lg transition-colors shadow-sm" title="Edit">
                         <i class="fa-solid fa-pen"></i>
                     </button>
                     <form method="POST" action="content.php" onsubmit="return confirm('Delete this page?');" class="inline">
