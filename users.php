@@ -3,19 +3,6 @@
 require_once 'config.php';
 check_auth();
 
-// Handle Delete User
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_user_id'])) {
-    $id = intval($_POST['delete_user_id']);
-    // Due to ON DELETE CASCADE in db, this will also delete daily_counts and user_challenges
-    $stmt = $conn->prepare("DELETE FROM users WHERE id = ?");
-    $stmt->bind_param("i", $id);
-    if ($stmt->execute()) {
-        $msg = "User deleted successfully.";
-    } else {
-        $err = "Error deleting user.";
-    }
-    $stmt->close();
-}
 
 // Search and Pagination
 $search = $_GET['search'] ?? '';
@@ -86,13 +73,13 @@ include 'includes/header.php';
                     <th scope="col" class="px-6 py-4 font-semibold">Level</th>
                     <th scope="col" class="px-6 py-4 font-semibold">Total Counts</th>
                     <th scope="col" class="px-6 py-4 font-semibold">Last Active</th>
-                    <th scope="col" class="px-6 py-4 font-semibold text-right">Actions</th>
+
                 </tr>
             </thead>
             <tbody class="divide-y divide-slate-100/60">
                 <?php if(empty($users)): ?>
                 <tr>
-                    <td colspan="6" class="px-6 py-10 text-center text-slate-500">
+                    <td colspan="5" class="px-6 py-10 text-center text-slate-500">
                         <i class="fa-solid fa-users-slash text-4xl mb-3 block opacity-30"></i>
                         <span class="font-medium">No users found matching your criteria.</span>
                     </td>
@@ -118,14 +105,7 @@ include 'includes/header.php';
                         <td class="px-6 py-4 text-slate-500 text-xs font-medium">
                             <?php echo date('M d, Y H:i', strtotime($user['last_active'])); ?>
                         </td>
-                        <td class="px-6 py-4 text-right">
-                            <form method="POST" action="users.php" onsubmit="return confirm('Are you sure you want to delete this user? All their data will be lost.');" class="inline">
-                                <input type="hidden" name="delete_user_id" value="<?php echo $user['id']; ?>">
-                                <button type="submit" class="text-red-500 hover:text-red-600 bg-red-50 hover:bg-red-100 p-2.5 rounded-lg transition-colors border border-transparent hover:border-red-200 shadow-sm" title="Delete User">
-                                    <i class="fa-solid fa-trash"></i>
-                                </button>
-                            </form>
-                        </td>
+
                     </tr>
                     <?php endforeach; ?>
                 <?php endif; ?>
