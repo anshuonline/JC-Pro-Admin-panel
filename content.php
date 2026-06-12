@@ -159,9 +159,7 @@ include 'includes/header.php';
             <div class="px-6 py-4 border-t border-slate-100 bg-white/40 flex justify-between items-center transition-opacity">
                 <span class="text-xs font-medium text-slate-500"><i class="fa-regular fa-clock mr-1.5"></i> <?php echo date('M d, Y', strtotime($page['created_at'])); ?></span>
                 <div class="flex gap-2">
-                    <button onclick="editPage(<?php echo htmlspecialchars(json_encode($page), ENT_QUOTES, 'UTF-8'); ?>)" class="text-blue-600 hover:text-blue-700 bg-blue-50 hover:bg-blue-100 border border-blue-100 p-2 rounded-lg transition-colors shadow-sm" title="Edit">
-                        <i class="fa-solid fa-pen"></i>
-                    </button>
+
                     <form method="POST" action="content.php" onsubmit="return confirm('Delete this page?');" class="inline">
                         <input type="hidden" name="action" value="delete">
                         <input type="hidden" name="page_id" value="<?php echo $page['id']; ?>">
@@ -191,15 +189,7 @@ include 'includes/header.php';
         document.getElementById('pageFormContainer').classList.add('hidden');
     }
 
-    function editPage(page) {
-        document.getElementById('pageFormContainer').classList.remove('hidden');
-        document.getElementById('formTitle').textContent = 'Edit Page';
-        document.getElementById('page_id').value = page.id;
-        document.getElementById('pageTitleInput').value = page.title;
-        document.getElementById('pageYoutubeInput').value = page.youtube_url || '';
-        document.getElementById('pageContentInput').value = page.content;
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
+
 </script>
 
 <?php include 'includes/footer.php'; ?>
