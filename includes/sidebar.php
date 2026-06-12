@@ -27,11 +27,7 @@ $currentPage = basename($_SERVER['PHP_SELF']);
                 Users
             </a>
             
-            <a href="challenges.php" class="<?php echo $currentPage == 'challenges.php' ? 'bg-blue-50 text-blue-700 shadow-sm border border-blue-100' : 'text-slate-600 hover:bg-slate-100/80 hover:text-slate-900 border border-transparent'; ?> group flex items-center px-3 py-2.5 text-sm font-semibold rounded-xl transition-all duration-200">
-                <i class="fa-solid fa-trophy mr-3 w-5 text-center <?php echo $currentPage == 'challenges.php' ? 'text-blue-600' : 'text-slate-400 group-hover:text-blue-500'; ?>"></i>
-                Challenges
-            </a>
-            
+
             <a href="content.php" class="<?php echo $currentPage == 'content.php' ? 'bg-blue-50 text-blue-700 shadow-sm border border-blue-100' : 'text-slate-600 hover:bg-slate-100/80 hover:text-slate-900 border border-transparent'; ?> group flex items-center px-3 py-2.5 text-sm font-semibold rounded-xl transition-all duration-200">
                 <i class="fa-solid fa-file-lines mr-3 w-5 text-center <?php echo $currentPage == 'content.php' ? 'text-blue-600' : 'text-slate-400 group-hover:text-blue-500'; ?>"></i>
                 Content Pages
