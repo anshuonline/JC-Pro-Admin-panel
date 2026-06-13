@@ -148,7 +148,7 @@ body.theme-90s .btn-90s-toggle:active {
         <div class="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
             <i class="fa-solid fa-om text-6xl text-green-500"></i>
         </div>
-        <h3 class="text-slate-500 text-sm font-semibold mb-1">Total Mantras Counted</h3>
+        <h3 class="text-slate-500 text-sm font-semibold mb-1">Total Jaap Count</h3>
         <p class="text-3xl font-bold text-slate-800" id="dash-total"><?php echo number_format($stats['total_counts']); ?></p>
         <div class="mt-4 flex items-center text-sm font-medium">
             <span class="text-green-600 flex items-center"><i class="fa-solid fa-calendar-day mr-1.5"></i> <span id="dash-today" class="mx-1"><?php echo number_format($stats['today_counts']); ?></span> Today</span>
