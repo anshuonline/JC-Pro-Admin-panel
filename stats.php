@@ -205,8 +205,8 @@ include 'includes/header.php';
                 <p class="text-xs font-semibold text-slate-500 uppercase tracking-wide">Total Users</p>
                 <p class="text-3xl font-extrabold text-slate-800 mt-1" id="stat-total-users"><?php echo number_format($stats['total_users']); ?></p>
             </div>
-            <div class="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center">
-                <i class="fa-solid fa-users text-blue-600"></i>
+            <div class="w-10 h-10 bg-orange-100 rounded-xl flex items-center justify-center">
+                <i class="fa-solid fa-users text-orange-600"></i>
             </div>
         </div>
         <p class="text-xs text-slate-500 mt-2">All time registered</p>
@@ -217,10 +217,10 @@ include 'includes/header.php';
         <div class="flex justify-between items-start">
             <div>
                 <p class="text-xs font-semibold text-slate-500 uppercase tracking-wide">Today's Jaap</p>
-                <p class="text-3xl font-extrabold text-emerald-600 mt-1" id="stat-today-counts"><?php echo number_format($stats['today_counts']); ?></p>
+                <p class="text-3xl font-extrabold text-green-600 mt-1" id="stat-today-counts"><?php echo number_format($stats['today_counts']); ?></p>
             </div>
-            <div class="w-10 h-10 bg-emerald-100 rounded-xl flex items-center justify-center">
-                <i class="fa-solid fa-om text-emerald-600"></i>
+            <div class="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center">
+                <i class="fa-solid fa-om text-green-600"></i>
             </div>
         </div>
         <p class="text-xs text-slate-500 mt-2"><span id="stat-today-users"><?php echo $stats['today_active_users']; ?></span> active users today</p>
@@ -245,9 +245,9 @@ include 'includes/header.php';
         <div class="flex justify-between items-start">
             <div>
                 <p class="text-xs font-semibold text-slate-500 uppercase tracking-wide">Live Now</p>
-                <p class="text-3xl font-extrabold text-purple-600 mt-1" id="stat-live-count"><?php echo $live_count; ?></p>
+                <p class="text-3xl font-extrabold text-slate-600 mt-1" id="stat-live-count"><?php echo $live_count; ?></p>
             </div>
-            <div class="w-10 h-10 bg-purple-100 rounded-xl flex items-center justify-center">
+            <div class="w-10 h-10 bg-slate-100 rounded-xl flex items-center justify-center">
                 <span class="w-3 h-3 bg-green-500 rounded-full live-pulse"></span>
             </div>
         </div>
@@ -259,11 +259,11 @@ include 'includes/header.php';
 <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
     <div class="bg-white/60 backdrop-blur-xl rounded-2xl p-5 border border-white shadow-sm text-center">
         <p class="text-xs font-semibold text-slate-500 uppercase tracking-wide">This Month</p>
-        <p class="text-2xl font-extrabold text-blue-600 mt-1"><?php echo number_format($stats['this_month_counts']); ?></p>
+        <p class="text-2xl font-extrabold text-orange-600 mt-1"><?php echo number_format($stats['this_month_counts']); ?></p>
     </div>
     <div class="bg-white/60 backdrop-blur-xl rounded-2xl p-5 border border-white shadow-sm text-center">
         <p class="text-xs font-semibold text-slate-500 uppercase tracking-wide">This Year</p>
-        <p class="text-2xl font-extrabold text-purple-600 mt-1"><?php echo number_format($stats['this_year_counts']); ?></p>
+        <p class="text-2xl font-extrabold text-slate-600 mt-1"><?php echo number_format($stats['this_year_counts']); ?></p>
     </div>
     <div class="bg-white/60 backdrop-blur-xl rounded-2xl p-5 border border-white shadow-sm text-center">
         <p class="text-xs font-semibold text-slate-500 uppercase tracking-wide">All Time</p>
@@ -276,9 +276,9 @@ include 'includes/header.php';
     <!-- Daily Chart (2 cols) -->
     <div class="lg:col-span-2 bg-white/60 backdrop-blur-xl rounded-2xl p-6 border border-white shadow-sm">
         <div class="flex items-center justify-between mb-4">
-            <h3 class="text-lg font-bold text-slate-800"><i class="fa-solid fa-chart-column text-blue-500 mr-2"></i>Daily Jaap Counts</h3>
+            <h3 class="text-lg font-bold text-slate-800"><i class="fa-solid fa-chart-column text-orange-500 mr-2"></i>Daily Jaap Counts</h3>
             <div class="flex gap-1 bg-slate-100 rounded-lg p-0.5">
-                <button class="range-btn text-xs font-semibold px-3 py-1 rounded-md bg-blue-500 text-white" data-range="7">7D</button>
+                <button class="range-btn text-xs font-semibold px-3 py-1 rounded-md bg-orange-500 text-white" data-range="7">7D</button>
                 <button class="range-btn text-xs font-semibold px-3 py-1 rounded-md text-slate-600 hover:bg-white" data-range="14">14D</button>
                 <button class="range-btn text-xs font-semibold px-3 py-1 rounded-md text-slate-600 hover:bg-white" data-range="30">30D</button>
             </div>
@@ -303,7 +303,7 @@ include 'includes/header.php';
             <?php else: ?>
                 <?php foreach ($live_users as $lu): ?>
                 <div class="flex items-center gap-3 p-3 bg-green-50/60 border border-green-100 rounded-xl fade-in">
-                    <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-blue-500 to-indigo-500 flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
+                    <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-orange-500 to-indigo-500 flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
                         <?php echo strtoupper(substr($lu['username'], 0, 1)); ?>
                     </div>
                     <div class="flex-1 min-w-0">
@@ -321,7 +321,7 @@ include 'includes/header.php';
 <!-- Weekly & Monthly Charts Row -->
 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
     <div class="bg-white/60 backdrop-blur-xl rounded-2xl p-6 border border-white shadow-sm">
-        <h3 class="text-lg font-bold text-slate-800 mb-4"><i class="fa-solid fa-chart-line text-purple-500 mr-2"></i>Weekly Trend</h3>
+        <h3 class="text-lg font-bold text-slate-800 mb-4"><i class="fa-solid fa-chart-line text-slate-500 mr-2"></i>Weekly Trend</h3>
         <div class="chart-container">
             <canvas id="weeklyChart"></canvas>
         </div>
@@ -356,7 +356,7 @@ include 'includes/header.php';
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between p-4 bg-white/80 rounded-2xl border border-slate-100/50 shadow-sm hover:shadow-md transition-all gap-4">
                     <div class="flex items-center gap-4">
                         <div class="w-8 text-center text-xl font-bold text-slate-400"><?php echo $rankEmoji; ?></div>
-                        <div class="w-12 h-12 rounded-full bg-gradient-to-tr from-blue-500 to-indigo-500 text-white flex items-center justify-center text-lg font-bold shadow-inner flex-shrink-0">
+                        <div class="w-12 h-12 rounded-full bg-gradient-to-tr from-orange-500 to-indigo-500 text-white flex items-center justify-center text-lg font-bold shadow-inner flex-shrink-0">
                             <?php echo strtoupper(substr($u['username'], 0, 1)); ?>
                         </div>
                         <div>
@@ -366,7 +366,7 @@ include 'includes/header.php';
                     </div>
                     <div class="flex items-center justify-between sm:justify-end gap-6 sm:w-auto w-full pl-12 sm:pl-0">
                         <div class="text-left sm:text-right">
-                            <div class="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-emerald-500 to-teal-400">
+                            <div class="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-green-500 to-teal-400">
                                 <?php echo number_format((int)$u['today_count']); ?>
                             </div>
                             <div class="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Today</div>
@@ -474,10 +474,10 @@ document.querySelectorAll('.range-btn').forEach(btn => {
     btn.addEventListener('click', function(e) {
         e.preventDefault(); // Prevent any default action
         document.querySelectorAll('.range-btn').forEach(b => {
-            b.classList.remove('bg-blue-500', 'text-white');
+            b.classList.remove('bg-orange-500', 'text-white');
             b.classList.add('text-slate-600');
         });
-        this.classList.add('bg-blue-500', 'text-white');
+        this.classList.add('bg-orange-500', 'text-white');
         this.classList.remove('text-slate-600');
         updateDailyChart(parseInt(this.dataset.range));
     });
@@ -586,7 +586,7 @@ async function refreshLiveUsers() {
             } else {
                 list.innerHTML = data.users.map(u => `
                     <div class="flex items-center gap-3 p-3 bg-green-50/60 border border-green-100 rounded-xl fade-in">
-                        <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-blue-500 to-indigo-500 flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
+                        <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-orange-500 to-indigo-500 flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
                             ${u.username.charAt(0).toUpperCase()}
                         </div>
                         <div class="flex-1 min-w-0">
@@ -640,7 +640,7 @@ async function refreshFullStats() {
             window.appMonthlyTrend = data.monthly_trend || window.appMonthlyTrend;
             
             // Refresh Charts
-            const activeRangeBtn = document.querySelector('.range-btn.bg-blue-500');
+            const activeRangeBtn = document.querySelector('.range-btn.bg-orange-500');
             const range = activeRangeBtn ? parseInt(activeRangeBtn.dataset.range) : 7;
             updateDailyChart(range);
             updateWeeklyChart();
@@ -664,7 +664,7 @@ async function refreshFullStats() {
                     <div class="flex flex-col sm:flex-row sm:items-center justify-between p-4 bg-white/80 rounded-2xl border border-slate-100/50 shadow-sm hover:shadow-md transition-all gap-4">
                         <div class="flex items-center gap-4">
                             <div class="w-8 text-center text-xl font-bold text-slate-400">${rankEmoji}</div>
-                            <div class="w-12 h-12 rounded-full bg-gradient-to-tr from-blue-500 to-indigo-500 text-white flex items-center justify-center text-lg font-bold shadow-inner flex-shrink-0">
+                            <div class="w-12 h-12 rounded-full bg-gradient-to-tr from-orange-500 to-indigo-500 text-white flex items-center justify-center text-lg font-bold shadow-inner flex-shrink-0">
                                 ${u.username.charAt(0).toUpperCase()}
                             </div>
                             <div>
@@ -674,7 +674,7 @@ async function refreshFullStats() {
                         </div>
                         <div class="flex items-center justify-between sm:justify-end gap-6 sm:w-auto w-full pl-12 sm:pl-0">
                             <div class="text-left sm:text-right">
-                                <div class="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-emerald-500 to-teal-400">
+                                <div class="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-green-500 to-teal-400">
                                     ${new Intl.NumberFormat('en-IN').format(u.today_count)}
                                 </div>
                                 <div class="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Today</div>
@@ -700,3 +700,4 @@ setInterval(refreshFullStats, 5000);
 </script>
 
 <?php include 'includes/footer.php'; ?>
+

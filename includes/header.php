@@ -16,14 +16,14 @@
         
         body { 
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
-            background-color: #f8fafc;
-            background-image: radial-gradient(at 0% 0%, hsla(210,100%,93%,1) 0px, transparent 50%),
-                              radial-gradient(at 100% 0%, hsla(240,100%,93%,1) 0px, transparent 50%);
+            background-color: #fafaf9; /* Warm very light stone/orange-ish tint */
+            background-image: radial-gradient(at 0% 0%, hsla(28,100%,95%,1) 0px, transparent 50%),
+                              radial-gradient(at 100% 0%, hsla(140,100%,96%,1) 0px, transparent 50%);
             background-attachment: fixed;
         }
     </style>
 </head>
-<body class="text-slate-800 h-screen flex overflow-hidden selection:bg-blue-500 selection:text-white">
+<body class="text-slate-800 h-screen flex overflow-hidden selection:bg-orange-500 selection:text-white">
     <!-- Sidebar -->
     <?php include 'sidebar.php'; ?>
     
@@ -41,7 +41,7 @@
             <div class="flex items-center space-x-4">
                 <div class="relative">
                     <button class="flex items-center space-x-2 text-sm focus:outline-none bg-white/50 px-3 py-1.5 rounded-full border border-slate-200/60 shadow-sm hover:bg-white transition-colors">
-                        <img class="h-7 w-7 rounded-full" src="https://ui-avatars.com/api/?name=Admin&background=3b82f6&color=fff" alt="Admin Avatar">
+                        <img class="h-7 w-7 rounded-full" src="https://ui-avatars.com/api/?name=Admin&background=f97316&color=fff" alt="Admin Avatar">
                         <span class="hidden md:block font-medium text-slate-700">Admin</span>
                         <i class="fa-solid fa-chevron-down text-xs text-slate-400"></i>
                     </button>
