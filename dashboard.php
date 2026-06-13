@@ -59,6 +59,77 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == 1) {
 include 'includes/header.php';
 ?>
 
+<style>
+/* 90s Classic Theme Override */
+body.theme-90s {
+    background: #008080 !important;
+    font-family: 'Tahoma', 'MS Sans Serif', sans-serif !important;
+}
+body.theme-90s header {
+    background: #c0c0c0 !important;
+    border-bottom: 2px solid #000000 !important;
+}
+body.theme-90s aside {
+    background: #c0c0c0 !important;
+    border-right: 2px solid #000000 !important;
+}
+body.theme-90s .bg-white, body.theme-90s .bg-slate-50, body.theme-90s .bg-slate-100 {
+    background: #c0c0c0 !important;
+    border: 2px solid !important;
+    border-color: #ffffff #808080 #808080 #ffffff !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+}
+body.theme-90s .text-slate-800, body.theme-90s .text-slate-600, body.theme-90s .text-slate-500 {
+    color: #000000 !important;
+}
+body.theme-90s .text-orange-500, body.theme-90s .text-orange-600, body.theme-90s .text-green-500, body.theme-90s .text-green-600 {
+    color: #000080 !important;
+}
+body.theme-90s table {
+    background: #ffffff !important;
+    border: 2px solid #000000 !important;
+    border-collapse: collapse;
+}
+body.theme-90s th {
+    background: #c0c0c0 !important;
+    border: 2px solid !important;
+    border-color: #ffffff #808080 #808080 #ffffff !important;
+    color: #000000 !important;
+}
+body.theme-90s td {
+    background: #ffffff !important;
+    border: 1px solid #c0c0c0 !important;
+}
+body.theme-90s .rounded-lg, body.theme-90s .rounded-xl, body.theme-90s .rounded-2xl, body.theme-90s .rounded-full {
+    border-radius: 0 !important;
+}
+body.theme-90s .border-t-4 {
+    border-top: 2px solid #ffffff !important;
+}
+.btn-90s-toggle {
+    transition: all 0.2s;
+}
+body.theme-90s .btn-90s-toggle {
+    background: #c0c0c0 !important;
+    border: 2px solid !important;
+    border-color: #ffffff #808080 #808080 #ffffff !important;
+    color: #000000 !important;
+    font-weight: bold;
+    border-radius: 0 !important;
+    padding: 4px 12px;
+}
+body.theme-90s .btn-90s-toggle:active {
+    border-color: #808080 #ffffff #ffffff #808080 !important;
+}
+</style>
+
+<div class="flex justify-end mb-6">
+    <button id="themeToggleBtn" class="btn-90s-toggle bg-slate-800 text-white px-4 py-2 rounded-lg shadow-sm text-sm font-semibold hover:bg-slate-700">
+        <i class="fa-solid fa-desktop mr-2"></i>Switch to 90s Look
+    </button>
+</div>
+
 <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-6 mb-8">
     <!-- Stat Card 1 -->
     <div class="bg-white rounded-lg p-6 border-t-4 border-orange-500 shadow-sm relative overflow-hidden group hover:shadow-md transition-all">
@@ -194,6 +265,29 @@ async function refreshDashboard() {
         console.error('Dashboard live refresh failed:', e);
     }
 }
+
+// Theme toggling logic
+const themeToggleBtn = document.getElementById('themeToggleBtn');
+let is90sTheme = localStorage.getItem('theme-90s') === 'true';
+
+function updateTheme() {
+    if (is90sTheme) {
+        document.body.classList.add('theme-90s');
+        themeToggleBtn.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles mr-2"></i>Switch to New Look';
+    } else {
+        document.body.classList.remove('theme-90s');
+        themeToggleBtn.innerHTML = '<i class="fa-solid fa-desktop mr-2"></i>Switch to 90s Look';
+    }
+}
+
+themeToggleBtn.addEventListener('click', () => {
+    is90sTheme = !is90sTheme;
+    localStorage.setItem('theme-90s', is90sTheme);
+    updateTheme();
+});
+
+// Init theme on load
+updateTheme();
 
 // Fetch fresh data in the background every 5 seconds (no page reload)
 setInterval(refreshDashboard, 5000);
