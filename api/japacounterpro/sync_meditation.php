@@ -38,6 +38,7 @@ foreach ($sessions as $session) {
 }
 
 echo json_encode([
+    "success" => true,
     "status" => "success", 
     "message" => "$successCount sessions synced",
     "synced_count" => $successCount

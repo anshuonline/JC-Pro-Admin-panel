@@ -32,6 +32,11 @@ $currentPage = basename($_SERVER['PHP_SELF']);
                 Meditation
             </a>
             
+            <a href="stats.php" class="<?php echo $currentPage == 'stats.php' ? 'bg-blue-50 text-blue-700 shadow-sm border border-blue-100' : 'text-slate-600 hover:bg-slate-100/80 hover:text-slate-900 border border-transparent'; ?> group flex items-center px-3 py-2.5 text-sm font-semibold rounded-xl transition-all duration-200">
+                <i class="fa-solid fa-chart-bar mr-3 w-5 text-center <?php echo $currentPage == 'stats.php' ? 'text-blue-600' : 'text-slate-400 group-hover:text-blue-500'; ?>"></i>
+                Analytics
+                <span class="ml-auto bg-green-100 text-green-700 text-[10px] font-bold px-1.5 py-0.5 rounded-full">LIVE</span>
+            </a>
 
             <a href="content.php" class="<?php echo $currentPage == 'content.php' ? 'bg-blue-50 text-blue-700 shadow-sm border border-blue-100' : 'text-slate-600 hover:bg-slate-100/80 hover:text-slate-900 border border-transparent'; ?> group flex items-center px-3 py-2.5 text-sm font-semibold rounded-xl transition-all duration-200">
                 <i class="fa-solid fa-file-lines mr-3 w-5 text-center <?php echo $currentPage == 'content.php' ? 'text-blue-600' : 'text-slate-400 group-hover:text-blue-500'; ?>"></i>
