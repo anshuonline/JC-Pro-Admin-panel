@@ -61,7 +61,7 @@ include 'includes/header.php';
 
 <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-6 mb-8">
     <!-- Stat Card 1 -->
-    <div class="bg-white/60 backdrop-blur-xl rounded-2xl p-6 border border-white shadow-[0_4px_24px_rgb(0,0,0,0.02)] relative overflow-hidden group hover:shadow-[0_8px_30px_rgb(0,0,0,0.04)] transition-all">
+    <div class="bg-white rounded-lg p-6 border-t-4 border-orange-500 shadow-sm relative overflow-hidden group hover:shadow-md transition-all">
         <div class="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
             <i class="fa-solid fa-users text-6xl text-orange-500"></i>
         </div>
@@ -73,7 +73,7 @@ include 'includes/header.php';
     </div>
 
     <!-- Stat Card 2 -->
-    <div class="bg-white/60 backdrop-blur-xl rounded-2xl p-6 border border-white shadow-[0_4px_24px_rgb(0,0,0,0.02)] relative overflow-hidden group hover:shadow-[0_8px_30px_rgb(0,0,0,0.04)] transition-all">
+    <div class="bg-white rounded-lg p-6 border-t-4 border-green-600 shadow-sm relative overflow-hidden group hover:shadow-md transition-all">
         <div class="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
             <i class="fa-solid fa-om text-6xl text-green-500"></i>
         </div>
@@ -86,7 +86,7 @@ include 'includes/header.php';
 
 
     <!-- Stat Card 4 -->
-    <div class="bg-white/60 backdrop-blur-xl rounded-2xl p-6 border border-white shadow-[0_4px_24px_rgb(0,0,0,0.02)] relative overflow-hidden group hover:shadow-[0_8px_30px_rgb(0,0,0,0.04)] transition-all">
+    <div class="bg-white rounded-lg p-6 border-t-4 border-slate-500 shadow-sm relative overflow-hidden group hover:shadow-md transition-all">
         <div class="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
             <i class="fa-solid fa-file-lines text-6xl text-slate-500"></i>
         </div>
@@ -98,14 +98,14 @@ include 'includes/header.php';
     </div>
 </div>
 
-<div class="bg-white/60 backdrop-blur-xl border border-white rounded-2xl shadow-[0_4px_24px_rgb(0,0,0,0.02)] overflow-hidden">
-    <div class="px-6 py-5 border-b border-slate-100 flex justify-between items-center bg-white/40">
+<div class="bg-white border border-slate-200 rounded-lg shadow-sm overflow-hidden">
+    <div class="px-6 py-4 border-b border-slate-200 flex justify-between items-center bg-slate-50">
         <h3 class="text-lg font-bold text-slate-800">Recently Active Users</h3>
         <a href="users.php" class="text-sm font-semibold text-orange-600 hover:text-blue-700 transition-colors">View All</a>
     </div>
     <div class="overflow-x-auto">
         <table class="w-full text-left text-sm text-slate-600">
-            <thead class="text-xs uppercase bg-slate-50/50 text-slate-500 border-b border-slate-100">
+            <thead class="text-xs uppercase bg-slate-100 text-slate-600 border-b border-slate-200">
                 <tr>
                     <th scope="col" class="px-6 py-4 font-semibold">Username</th>
                     <th scope="col" class="px-6 py-4 font-semibold">Level</th>
@@ -113,14 +113,14 @@ include 'includes/header.php';
                     <th scope="col" class="px-6 py-4 font-semibold">Last Active</th>
                 </tr>
             </thead>
-            <tbody class="divide-y divide-slate-100/60" id="dash-recent-users">
+            <tbody class="divide-y divide-slate-200" id="dash-recent-users">
                 <?php if(empty($recent_users)): ?>
                 <tr>
                     <td colspan="4" class="px-6 py-6 text-center text-slate-500">No users found.</td>
                 </tr>
                 <?php else: ?>
                     <?php foreach($recent_users as $user): ?>
-                    <tr class="hover:bg-white/60 transition-colors">
+                    <tr class="hover:bg-slate-50 transition-colors">
                         <td class="px-6 py-4 font-semibold text-slate-800 flex items-center">
                             <div class="w-9 h-9 rounded-full bg-orange-100 text-orange-600 flex items-center justify-center mr-3 font-bold border border-blue-200/50 shadow-sm">
                                 <?php echo strtoupper(substr($user['username'], 0, 1)); ?>
@@ -166,7 +166,7 @@ async function refreshDashboard() {
                     const formattedDate = dateObj.toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: false });
                     
                     return `
-                    <tr class="hover:bg-white/60 transition-colors">
+                    <tr class="hover:bg-slate-50 transition-colors">
                         <td class="px-6 py-4 font-semibold text-slate-800 flex items-center">
                             <div class="w-9 h-9 rounded-full bg-orange-100 text-orange-600 flex items-center justify-center mr-3 font-bold border border-blue-200/50 shadow-sm">
                                 ${firstChar}
