@@ -457,7 +457,7 @@ const dailyChart = new Chart(dailyCtx, {
 });
 
 function updateDailyChart(range) {
-    const sliced = dailyTrend.slice(-range);
+    const sliced = window.appDailyTrend.slice(-range);
     const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
     dailyChart.data.labels = sliced.map(d => {
         const dt = new Date(d.date);
@@ -466,11 +466,11 @@ function updateDailyChart(range) {
     dailyChart.data.datasets[0].data = sliced.map(d => parseInt(d.counts) || 0);
     dailyChart.update('active');
 }
-updateDailyChart(7);
 
 // Range buttons
 document.querySelectorAll('.range-btn').forEach(btn => {
-    btn.addEventListener('click', function() {
+    btn.addEventListener('click', function(e) {
+        e.preventDefault(); // Prevent any default action
         document.querySelectorAll('.range-btn').forEach(b => {
             b.classList.remove('bg-blue-500', 'text-white');
             b.classList.add('text-slate-600');
@@ -481,18 +481,18 @@ document.querySelectorAll('.range-btn').forEach(btn => {
     });
 });
 
-// --- Weekly Chart ---
+// --- Weekly Chart (Last 7 Days with Day Names) ---
 const weeklyCtx = document.getElementById('weeklyChart').getContext('2d');
 const weeklyGradient = weeklyCtx.createLinearGradient(0, 0, 0, 300);
 weeklyGradient.addColorStop(0, 'rgba(139, 92, 246, 0.3)');
 weeklyGradient.addColorStop(1, 'rgba(139, 92, 246, 0)');
 
-new Chart(weeklyCtx, {
+const weeklyChart = new Chart(weeklyCtx, {
     type: 'line',
     data: {
-        labels: weeklyTrend.map(d => d.week),
+        labels: [],
         datasets: [{
-            data: weeklyTrend.map(d => parseInt(d.counts) || 0),
+            data: [],
             borderColor: '#8b5cf6',
             backgroundColor: weeklyGradient,
             borderWidth: 2.5,
@@ -508,6 +508,17 @@ new Chart(weeklyCtx, {
     options: { ...defaultOptions }
 });
 
+function updateWeeklyChart() {
+    const sliced = window.appDailyTrend.slice(-7);
+    const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    weeklyChart.data.labels = sliced.map(d => {
+        const dt = new Date(d.date);
+        return dayNames[dt.getDay()];
+    });
+    weeklyChart.data.datasets[0].data = sliced.map(d => parseInt(d.counts) || 0);
+    weeklyChart.update('active');
+}
+
 // --- Monthly Chart ---
 const monthlyCtx = document.getElementById('monthlyChart').getContext('2d');
 const monthlyGradient = monthlyCtx.createLinearGradient(0, 0, 0, 300);
@@ -516,15 +527,12 @@ monthlyGradient.addColorStop(1, 'rgba(245, 158, 11, 0)');
 
 const monthNames = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 
-new Chart(monthlyCtx, {
+const monthlyChart = new Chart(monthlyCtx, {
     type: 'line',
     data: {
-        labels: monthlyTrend.map(d => {
-            const [y, m] = d.month.split('-');
-            return monthNames[parseInt(m)-1] + ' ' + y.slice(-2);
-        }),
+        labels: [],
         datasets: [{
-            data: monthlyTrend.map(d => parseInt(d.counts) || 0),
+            data: [],
             borderColor: '#f59e0b',
             backgroundColor: monthlyGradient,
             borderWidth: 2.5,
@@ -539,6 +547,24 @@ new Chart(monthlyCtx, {
     },
     options: { ...defaultOptions }
 });
+
+function updateMonthlyChart() {
+    monthlyChart.data.labels = window.appMonthlyTrend.map(d => {
+        const [y, m] = (d.month || d.period_key).split('-');
+        return monthNames[parseInt(m)-1] + ' ' + y.slice(-2);
+    });
+    monthlyChart.data.datasets[0].data = window.appMonthlyTrend.map(d => parseInt(d.counts) || 0);
+    monthlyChart.update('active');
+}
+
+// Global variables to hold data
+window.appDailyTrend = dailyTrend;
+window.appMonthlyTrend = monthlyTrend;
+
+// Initial chart rendering
+updateDailyChart(7);
+updateWeeklyChart();
+updateMonthlyChart();
 
 // ====== AUTO-REFRESH LIVE DATA ======
 const API_LIVE = '<?php echo $api_base; ?>analytics/live.php';
@@ -585,8 +611,79 @@ function formatDuration(s) {
 // Refresh live users every 5 seconds
 setInterval(refreshLiveUsers, 5000);
 
-// Auto-reload full page every 60 seconds for fresh stats
-setInterval(() => { window.location.reload(); }, 60000);
+// ====== BACKGROUND FULL STATS REFRESH ======
+const API_STATS = '<?php echo $api_base; ?>analytics/stats.php';
+
+async function refreshFullStats() {
+    try {
+        const res = await fetch(API_STATS);
+        const data = await res.json();
+        if (data.success && data.overview) {
+            // Update Overview Cards
+            document.getElementById('stat-total-users').textContent = new Intl.NumberFormat('en-IN').format(data.overview.total_users || 0);
+            document.getElementById('stat-today-counts').textContent = new Intl.NumberFormat('en-IN').format(data.overview.today_counts || 0);
+            document.getElementById('stat-today-users').textContent = data.overview.today_active_users || 0;
+            document.getElementById('stat-week-counts').textContent = new Intl.NumberFormat('en-IN').format(data.overview.this_week_counts || 0);
+            
+            // Update Period Summary
+            const summaries = document.querySelectorAll('.grid-cols-3 .text-2xl');
+            if (summaries.length >= 3) {
+                summaries[0].textContent = new Intl.NumberFormat('en-IN').format(data.overview.this_month_counts || 0);
+                summaries[1].textContent = new Intl.NumberFormat('en-IN').format(data.overview.this_year_counts || 0);
+                summaries[2].textContent = new Intl.NumberFormat('en-IN').format(data.overview.total_counts || 0);
+            }
+
+            // Update Charts Data
+            window.appDailyTrend = data.daily_trend || window.appDailyTrend;
+            window.appMonthlyTrend = data.monthly_trend || window.appMonthlyTrend;
+            
+            // Refresh Charts
+            const activeRangeBtn = document.querySelector('.range-btn.bg-blue-500');
+            const range = activeRangeBtn ? parseInt(activeRangeBtn.dataset.range) : 7;
+            updateDailyChart(range);
+            updateWeeklyChart();
+            updateMonthlyChart();
+
+            // Update Top Users Table
+            const tbody = document.getElementById('topUsersBody');
+            if (data.top_users_today && data.top_users_today.length > 0) {
+                tbody.innerHTML = data.top_users_today.map((u, i) => {
+                    const rank = i + 1;
+                    const rankEmoji = rank === 1 ? '🥇' : (rank === 2 ? '🥈' : (rank === 3 ? '🥉' : rank));
+                    // Check if live
+                    let isLive = false;
+                    const liveCountEl = document.getElementById('liveActivityList');
+                    if (liveCountEl && liveCountEl.innerHTML.includes(u.username)) isLive = true;
+                    
+                    const statusBadge = isLive 
+                        ? `<span class="inline-flex items-center gap-1.5 bg-green-100 text-green-700 text-xs font-bold px-2.5 py-1 rounded-full"><span class="w-1.5 h-1.5 bg-green-500 rounded-full live-pulse"></span> Live</span>`
+                        : `<span class="inline-flex items-center gap-1.5 bg-slate-100 text-slate-500 text-xs font-bold px-2.5 py-1 rounded-full">● Offline</span>`;
+                        
+                    return `
+                    <tr class="hover:bg-white/60 transition-colors">
+                        <td class="px-6 py-4 font-bold text-slate-500">${rankEmoji}</td>
+                        <td class="px-6 py-4 font-semibold text-slate-800 flex items-center">
+                            <div class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center mr-3 text-xs font-bold">
+                                ${u.username.charAt(0).toUpperCase()}
+                            </div>
+                            ${u.username}
+                        </td>
+                        <td class="px-6 py-4 font-mono font-bold text-emerald-600">${new Intl.NumberFormat('en-IN').format(u.today_count)}</td>
+                        <td class="px-6 py-4 font-mono font-medium text-slate-700">${new Intl.NumberFormat('en-IN').format(u.total_counts)}</td>
+                        <td class="px-6 py-4">${statusBadge}</td>
+                    </tr>`;
+                }).join('');
+            } else {
+                tbody.innerHTML = `<tr><td colspan="5" class="px-6 py-8 text-center text-slate-400">No activity today yet</td></tr>`;
+            }
+        }
+    } catch (e) {
+        console.log('Background stats refresh failed:', e);
+    }
+}
+
+// Fetch fresh data in the background every 60 seconds (no page reload)
+setInterval(refreshFullStats, 60000);
 </script>
 
 <?php include 'includes/footer.php'; ?>
