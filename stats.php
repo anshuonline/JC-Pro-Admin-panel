@@ -1,6 +1,12 @@
 <?php
 // stats.php - Analytics & Live Stats Dashboard
 require_once 'config.php';
+
+// Set PHP Timezone to India
+date_default_timezone_set('Asia/Kolkata');
+// Set MySQL Timezone to India
+$conn->query("SET time_zone = '+05:30'");
+
 check_auth();
 
 // ====== FETCH ALL STATS ======
