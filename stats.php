@@ -695,8 +695,8 @@ async function refreshFullStats() {
     }
 }
 
-// Fetch fresh data in the background every 60 seconds (no page reload)
-setInterval(refreshFullStats, 60000);
+// Fetch fresh data in the background every 5 seconds (no page reload) to make the whole panel live
+setInterval(refreshFullStats, 5000);
 </script>
 
 <?php include 'includes/footer.php'; ?>
