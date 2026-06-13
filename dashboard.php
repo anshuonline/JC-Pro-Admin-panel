@@ -47,6 +47,15 @@ if ($res) {
     }
 }
 
+if (isset($_GET['ajax']) && $_GET['ajax'] == 1) {
+    header('Content-Type: application/json');
+    echo json_encode([
+        'stats' => $stats,
+        'recent_users' => $recent_users
+    ]);
+    exit;
+}
+
 include 'includes/header.php';
 ?>
 
@@ -57,7 +66,7 @@ include 'includes/header.php';
             <i class="fa-solid fa-users text-6xl text-blue-500"></i>
         </div>
         <h3 class="text-slate-500 text-sm font-semibold mb-1">Total Users</h3>
-        <p class="text-3xl font-bold text-slate-800"><?php echo number_format($stats['users']); ?></p>
+        <p class="text-3xl font-bold text-slate-800" id="dash-users"><?php echo number_format($stats['users']); ?></p>
         <div class="mt-4 flex items-center text-sm font-medium">
             <span class="text-blue-600 flex items-center"><i class="fa-solid fa-arrow-trend-up mr-1.5"></i> Registered</span>
         </div>
@@ -69,9 +78,9 @@ include 'includes/header.php';
             <i class="fa-solid fa-om text-6xl text-emerald-500"></i>
         </div>
         <h3 class="text-slate-500 text-sm font-semibold mb-1">Total Mantras Counted</h3>
-        <p class="text-3xl font-bold text-slate-800"><?php echo number_format($stats['total_counts']); ?></p>
+        <p class="text-3xl font-bold text-slate-800" id="dash-total"><?php echo number_format($stats['total_counts']); ?></p>
         <div class="mt-4 flex items-center text-sm font-medium">
-            <span class="text-emerald-600 flex items-center"><i class="fa-solid fa-calendar-day mr-1.5"></i> <?php echo number_format($stats['today_counts']); ?> Today</span>
+            <span class="text-emerald-600 flex items-center"><i class="fa-solid fa-calendar-day mr-1.5"></i> <span id="dash-today" class="mx-1"><?php echo number_format($stats['today_counts']); ?></span> Today</span>
         </div>
     </div>
 
@@ -82,7 +91,7 @@ include 'includes/header.php';
             <i class="fa-solid fa-file-lines text-6xl text-purple-500"></i>
         </div>
         <h3 class="text-slate-500 text-sm font-semibold mb-1">Content Pages</h3>
-        <p class="text-3xl font-bold text-slate-800"><?php echo number_format($stats['pages']); ?></p>
+        <p class="text-3xl font-bold text-slate-800" id="dash-pages"><?php echo number_format($stats['pages']); ?></p>
         <div class="mt-4 flex items-center text-sm font-medium">
             <a href="content.php" class="text-purple-600 hover:text-purple-700 transition-colors">Manage Content <i class="fa-solid fa-arrow-right ml-1 text-xs"></i></a>
         </div>
@@ -104,7 +113,7 @@ include 'includes/header.php';
                     <th scope="col" class="px-6 py-4 font-semibold">Last Active</th>
                 </tr>
             </thead>
-            <tbody class="divide-y divide-slate-100/60">
+            <tbody class="divide-y divide-slate-100/60" id="dash-recent-users">
                 <?php if(empty($recent_users)): ?>
                 <tr>
                     <td colspan="4" class="px-6 py-6 text-center text-slate-500">No users found.</td>
@@ -136,5 +145,58 @@ include 'includes/header.php';
         </table>
     </div>
 </div>
+
+<script>
+async function refreshDashboard() {
+    try {
+        const res = await fetch('dashboard.php?ajax=1');
+        const data = await res.json();
+        if (data.stats) {
+            document.getElementById('dash-users').textContent = new Intl.NumberFormat('en-IN').format(data.stats.users || 0);
+            document.getElementById('dash-total').textContent = new Intl.NumberFormat('en-IN').format(data.stats.total_counts || 0);
+            document.getElementById('dash-today').textContent = new Intl.NumberFormat('en-IN').format(data.stats.today_counts || 0);
+            document.getElementById('dash-pages').textContent = new Intl.NumberFormat('en-IN').format(data.stats.pages || 0);
+        }
+        if (data.recent_users) {
+            const tbody = document.getElementById('dash-recent-users');
+            if (data.recent_users.length > 0) {
+                tbody.innerHTML = data.recent_users.map(user => {
+                    const firstChar = user.username ? user.username.charAt(0).toUpperCase() : '?';
+                    const dateObj = new Date(user.last_active);
+                    const formattedDate = dateObj.toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: false });
+                    
+                    return `
+                    <tr class="hover:bg-white/60 transition-colors">
+                        <td class="px-6 py-4 font-semibold text-slate-800 flex items-center">
+                            <div class="w-9 h-9 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center mr-3 font-bold border border-blue-200/50 shadow-sm">
+                                ${firstChar}
+                            </div>
+                            ${user.username}
+                        </td>
+                        <td class="px-6 py-4">
+                            <span class="bg-slate-100 text-slate-600 py-1 px-3 rounded-full text-xs font-bold border border-slate-200/60">
+                                Lvl ${user.level}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 font-mono font-medium text-slate-700">
+                            ${new Intl.NumberFormat('en-IN').format(user.total_counts || 0)}
+                        </td>
+                        <td class="px-6 py-4 text-slate-500 text-xs font-medium">
+                            ${formattedDate}
+                        </td>
+                    </tr>`;
+                }).join('');
+            } else {
+                tbody.innerHTML = `<tr><td colspan="4" class="px-6 py-6 text-center text-slate-500">No users found.</td></tr>`;
+            }
+        }
+    } catch (e) {
+        console.error('Dashboard live refresh failed:', e);
+    }
+}
+
+// Fetch fresh data in the background every 5 seconds (no page reload)
+setInterval(refreshDashboard, 5000);
+</script>
 
 <?php include 'includes/footer.php'; ?>
