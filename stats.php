@@ -557,7 +557,7 @@ const monthlyChart = new Chart(monthlyCtx, {
 function updateMonthlyChart() {
     monthlyChart.data.labels = window.appMonthlyTrend.map(d => {
         const [y, m] = (d.month || d.period_key).split('-');
-        return monthNames[parseInt(m)-1] + ' ' + y.slice(-2);
+        return monthNames[parseInt(m)-1] + ' ' + y;
     });
     monthlyChart.data.datasets[0].data = window.appMonthlyTrend.map(d => parseInt(d.counts) || 0);
     monthlyChart.update('active');
