@@ -334,63 +334,59 @@ include 'includes/header.php';
     </div>
 </div>
 
-<!-- Top Users Table -->
+<!-- Top Users List -->
 <div class="bg-white/60 backdrop-blur-xl border border-white rounded-2xl shadow-sm overflow-hidden mb-6">
     <div class="px-6 py-5 border-b border-slate-100 flex justify-between items-center bg-white/40">
         <h3 class="text-lg font-bold text-slate-800"><i class="fa-solid fa-trophy text-amber-500 mr-2"></i>Top Users Today</h3>
         <span class="text-xs font-semibold text-slate-500"><?php echo date('d M Y'); ?></span>
     </div>
-    <div class="overflow-x-auto">
-        <table class="w-full text-left text-sm text-slate-600">
-            <thead class="text-xs uppercase bg-slate-50/50 text-slate-500 border-b border-slate-100">
-                <tr>
-                    <th class="px-6 py-4 font-semibold">Rank</th>
-                    <th class="px-6 py-4 font-semibold">Username</th>
-                    <th class="px-6 py-4 font-semibold">Today's Count</th>
-                    <th class="px-6 py-4 font-semibold">Total All Time</th>
-                    <th class="px-6 py-4 font-semibold">Status</th>
-                </tr>
-            </thead>
-            <tbody class="divide-y divide-slate-100/60" id="topUsersBody">
-                <?php if (empty($top_users)): ?>
-                <tr>
-                    <td colspan="5" class="px-6 py-8 text-center text-slate-400">No activity today yet</td>
-                </tr>
-                <?php else: ?>
-                    <?php foreach ($top_users as $i => $u): 
-                        $rank = $i + 1;
-                        $rankEmoji = $rank === 1 ? '🥇' : ($rank === 2 ? '🥈' : ($rank === 3 ? '🥉' : $rank));
-                        $isLive = false;
-                        foreach ($live_users as $lu) {
-                            if ($lu['username'] === $u['username']) { $isLive = true; break; }
-                        }
-                    ?>
-                    <tr class="hover:bg-white/60 transition-colors">
-                        <td class="px-6 py-4 font-bold text-slate-500"><?php echo $rankEmoji; ?></td>
-                        <td class="px-6 py-4 font-semibold text-slate-800 flex items-center">
-                            <div class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center mr-3 text-xs font-bold">
-                                <?php echo strtoupper(substr($u['username'], 0, 1)); ?>
+    <div class="p-4" id="topUsersBody">
+        <?php if (empty($top_users)): ?>
+            <div class="py-8 text-center text-slate-400 font-medium">No activity today yet</div>
+        <?php else: ?>
+            <div class="flex flex-col gap-3">
+                <?php foreach ($top_users as $i => $u): 
+                    $rank = $i + 1;
+                    $rankEmoji = $rank === 1 ? '🥇' : ($rank === 2 ? '🥈' : ($rank === 3 ? '🥉' : $rank));
+                    $isLive = false;
+                    foreach ($live_users as $lu) {
+                        if ($lu['username'] === $u['username']) { $isLive = true; break; }
+                    }
+                ?>
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between p-4 bg-white/80 rounded-2xl border border-slate-100/50 shadow-sm hover:shadow-md transition-all gap-4">
+                    <div class="flex items-center gap-4">
+                        <div class="w-8 text-center text-xl font-bold text-slate-400"><?php echo $rankEmoji; ?></div>
+                        <div class="w-12 h-12 rounded-full bg-gradient-to-tr from-blue-500 to-indigo-500 text-white flex items-center justify-center text-lg font-bold shadow-inner flex-shrink-0">
+                            <?php echo strtoupper(substr($u['username'], 0, 1)); ?>
+                        </div>
+                        <div>
+                            <div class="font-bold text-slate-800 text-base"><?php echo htmlspecialchars($u['username']); ?></div>
+                            <div class="text-xs font-medium text-slate-500">All Time: <span class="font-mono text-slate-700"><?php echo number_format((int)$u['total_counts']); ?></span></div>
+                        </div>
+                    </div>
+                    <div class="flex items-center justify-between sm:justify-end gap-6 sm:w-auto w-full pl-12 sm:pl-0">
+                        <div class="text-left sm:text-right">
+                            <div class="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-emerald-500 to-teal-400">
+                                <?php echo number_format((int)$u['today_count']); ?>
                             </div>
-                            <?php echo htmlspecialchars($u['username']); ?>
-                        </td>
-                        <td class="px-6 py-4 font-mono font-bold text-emerald-600"><?php echo number_format((int)$u['today_count']); ?></td>
-                        <td class="px-6 py-4 font-mono font-medium text-slate-700"><?php echo number_format((int)$u['total_counts']); ?></td>
-                        <td class="px-6 py-4">
+                            <div class="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Today</div>
+                        </div>
+                        <div class="w-24 text-right">
                             <?php if ($isLive): ?>
-                                <span class="inline-flex items-center gap-1.5 bg-green-100 text-green-700 text-xs font-bold px-2.5 py-1 rounded-full">
+                                <span class="inline-flex items-center justify-center gap-1.5 bg-green-100/80 text-green-700 text-xs font-bold px-3 py-1.5 rounded-full border border-green-200/50 w-full">
                                     <span class="w-1.5 h-1.5 bg-green-500 rounded-full live-pulse"></span> Live
                                 </span>
                             <?php else: ?>
-                                <span class="inline-flex items-center gap-1.5 bg-slate-100 text-slate-500 text-xs font-bold px-2.5 py-1 rounded-full">
-                                    ● Offline
+                                <span class="inline-flex items-center justify-center gap-1.5 bg-slate-100/80 text-slate-500 text-xs font-bold px-3 py-1.5 rounded-full border border-slate-200/50 w-full">
+                                    Offline
                                 </span>
                             <?php endif; ?>
-                        </td>
-                    </tr>
-                    <?php endforeach; ?>
-                <?php endif; ?>
-            </tbody>
-        </table>
+                        </div>
+                    </div>
+                </div>
+                <?php endforeach; ?>
+            </div>
+        <?php endif; ?>
     </div>
 </div>
 
@@ -650,37 +646,48 @@ async function refreshFullStats() {
             updateWeeklyChart();
             updateMonthlyChart();
 
-            // Update Top Users Table
+            // Update Top Users List
             const tbody = document.getElementById('topUsersBody');
             if (data.top_users_today && data.top_users_today.length > 0) {
-                tbody.innerHTML = data.top_users_today.map((u, i) => {
+                const listHtml = data.top_users_today.map((u, i) => {
                     const rank = i + 1;
                     const rankEmoji = rank === 1 ? '🥇' : (rank === 2 ? '🥈' : (rank === 3 ? '🥉' : rank));
-                    // Check if live
                     let isLive = false;
                     const liveCountEl = document.getElementById('liveActivityList');
                     if (liveCountEl && liveCountEl.innerHTML.includes(u.username)) isLive = true;
                     
                     const statusBadge = isLive 
-                        ? `<span class="inline-flex items-center gap-1.5 bg-green-100 text-green-700 text-xs font-bold px-2.5 py-1 rounded-full"><span class="w-1.5 h-1.5 bg-green-500 rounded-full live-pulse"></span> Live</span>`
-                        : `<span class="inline-flex items-center gap-1.5 bg-slate-100 text-slate-500 text-xs font-bold px-2.5 py-1 rounded-full">● Offline</span>`;
+                        ? `<span class="inline-flex items-center justify-center gap-1.5 bg-green-100/80 text-green-700 text-xs font-bold px-3 py-1.5 rounded-full border border-green-200/50 w-full"><span class="w-1.5 h-1.5 bg-green-500 rounded-full live-pulse"></span> Live</span>`
+                        : `<span class="inline-flex items-center justify-center gap-1.5 bg-slate-100/80 text-slate-500 text-xs font-bold px-3 py-1.5 rounded-full border border-slate-200/50 w-full">Offline</span>`;
                         
                     return `
-                    <tr class="hover:bg-white/60 transition-colors">
-                        <td class="px-6 py-4 font-bold text-slate-500">${rankEmoji}</td>
-                        <td class="px-6 py-4 font-semibold text-slate-800 flex items-center">
-                            <div class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center mr-3 text-xs font-bold">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between p-4 bg-white/80 rounded-2xl border border-slate-100/50 shadow-sm hover:shadow-md transition-all gap-4">
+                        <div class="flex items-center gap-4">
+                            <div class="w-8 text-center text-xl font-bold text-slate-400">${rankEmoji}</div>
+                            <div class="w-12 h-12 rounded-full bg-gradient-to-tr from-blue-500 to-indigo-500 text-white flex items-center justify-center text-lg font-bold shadow-inner flex-shrink-0">
                                 ${u.username.charAt(0).toUpperCase()}
                             </div>
-                            ${u.username}
-                        </td>
-                        <td class="px-6 py-4 font-mono font-bold text-emerald-600">${new Intl.NumberFormat('en-IN').format(u.today_count)}</td>
-                        <td class="px-6 py-4 font-mono font-medium text-slate-700">${new Intl.NumberFormat('en-IN').format(u.total_counts)}</td>
-                        <td class="px-6 py-4">${statusBadge}</td>
-                    </tr>`;
+                            <div>
+                                <div class="font-bold text-slate-800 text-base">${u.username}</div>
+                                <div class="text-xs font-medium text-slate-500">All Time: <span class="font-mono text-slate-700">${new Intl.NumberFormat('en-IN').format(u.total_counts)}</span></div>
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-between sm:justify-end gap-6 sm:w-auto w-full pl-12 sm:pl-0">
+                            <div class="text-left sm:text-right">
+                                <div class="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-emerald-500 to-teal-400">
+                                    ${new Intl.NumberFormat('en-IN').format(u.today_count)}
+                                </div>
+                                <div class="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Today</div>
+                            </div>
+                            <div class="w-24 text-right">
+                                ${statusBadge}
+                            </div>
+                        </div>
+                    </div>`;
                 }).join('');
+                tbody.innerHTML = `<div class="flex flex-col gap-3">${listHtml}</div>`;
             } else {
-                tbody.innerHTML = `<tr><td colspan="5" class="px-6 py-8 text-center text-slate-400">No activity today yet</td></tr>`;
+                tbody.innerHTML = `<div class="py-8 text-center text-slate-400 font-medium">No activity today yet</div>`;
             }
         }
     } catch (e) {
