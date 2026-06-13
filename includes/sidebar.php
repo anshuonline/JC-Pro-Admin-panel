@@ -3,9 +3,7 @@ $currentPage = basename($_SERVER['PHP_SELF']);
 ?>
 <aside class="w-64 bg-white/60 backdrop-blur-2xl border-r border-slate-200/60 hidden md:flex md:flex-col shadow-[4px_0_24px_rgb(0,0,0,0.02)] z-20 transition-transform duration-300" id="sidebar">
     <div class="h-16 flex items-center px-6 border-b border-slate-200/60">
-        <div class="w-8 h-8 bg-gradient-to-tr from-orange-500 to-orange-600 rounded-xl flex items-center justify-center mr-3 shadow-md shadow-orange-500/20">
-            <i class="fa-solid fa-om text-white text-sm"></i>
-        </div>
+        <img src="logo.png" alt="JC Pro Logo" class="w-8 h-8 mr-3 rounded-full shadow-sm border border-slate-200 bg-white">
         <span class="text-slate-800 text-lg font-bold tracking-tight">JC Pro</span>
         <button id="closeSidebar" class="ml-auto md:hidden text-slate-400 hover:text-slate-800">
             <i class="fa-solid fa-times"></i>
