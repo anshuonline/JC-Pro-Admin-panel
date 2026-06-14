@@ -3,8 +3,49 @@
 require_once 'config.php';
 check_auth();
 
+// Check Bot Password
+if (isset($_POST['bot_password']) && $_POST['bot_password'] === 'bots1234') {
+    $_SESSION['bots_unlocked'] = true;
+}
+if (isset($_GET['lock_bots'])) {
+    unset($_SESSION['bots_unlocked']);
+}
+
+if (!isset($_SESSION['bots_unlocked']) || $_SESSION['bots_unlocked'] !== true) {
+    include 'includes/header.php';
+    ?>
+    <div class="flex items-center justify-center min-h-[60vh]">
+        <div class="bg-white/60 backdrop-blur-xl p-8 rounded-2xl shadow-lg border border-white max-w-md w-full text-center">
+            <i class="fa-solid fa-robot text-4xl text-indigo-500 mb-4"></i>
+            <h2 class="text-2xl font-bold text-slate-800 mb-2">Bot Management Locked</h2>
+            <p class="text-slate-500 text-sm mb-6">Please enter the security password to manage bots.</p>
+            <form method="POST" action="bots.php">
+                <input type="password" name="bot_password" required placeholder="Enter Password" class="w-full px-4 py-3 border border-slate-200/60 rounded-xl mb-4 bg-white/60 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition-all text-center">
+                <button type="submit" class="w-full bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-3 rounded-xl transition-all shadow-md shadow-indigo-500/20">Unlock Access</button>
+            </form>
+        </div>
+    </div>
+    <?php
+    include 'includes/footer.php';
+    exit;
+}
+
 $msg = '';
 $err = '';
+
+// Handle Delete All Bots
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'delete_all') {
+    $conn->query("DELETE FROM daily_counts WHERE user_id IN (SELECT id FROM users WHERE is_bot = 1)");
+    $conn->query("DELETE FROM live_sessions WHERE user_id IN (SELECT id FROM users WHERE is_bot = 1)");
+    $conn->query("DELETE FROM users WHERE is_bot = 1");
+    $msg = "All bots deleted successfully!";
+}
+
+// Handle Fix Bot Names
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'fix_names') {
+    $conn->query("UPDATE users SET username = REPLACE(username, '_', ' ') WHERE is_bot = 1");
+    $msg = "Bot names fixed successfully!";
+}
 
 // Handle Bot Creation
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'add_bot') {
@@ -119,20 +160,46 @@ include 'includes/header.php';
     </div>
 <?php endif; ?>
 
-<!-- Create Bot Form -->
-<div class="bg-white/60 backdrop-blur-xl border border-white rounded-2xl shadow-[0_4px_24px_rgb(0,0,0,0.02)] overflow-hidden mb-8 p-6">
-    <h2 class="text-lg font-bold text-slate-800 mb-4">Create New Bot</h2>
-    <form method="POST" action="bots.php" class="flex flex-col sm:flex-row gap-4">
-        <input type="hidden" name="action" value="add_bot">
-        <input type="text" name="bot_name" required placeholder="Enter Bot Name (e.g. Rahul_Das)" class="flex-1 block w-full px-4 py-2.5 border border-slate-200/60 rounded-xl bg-white/60 text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-orange-500/50 transition-all">
-        <input type="text" name="bot_mantra" placeholder="Mantra Name (e.g. Hare Krishna)" class="flex-1 block w-full px-4 py-2.5 border border-slate-200/60 rounded-xl bg-white/60 text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-orange-500/50 transition-all">
-        <button type="submit" class="bg-orange-500 hover:bg-orange-600 text-white px-6 py-2.5 rounded-xl font-bold shadow-md shadow-orange-500/20 transition-all flex items-center justify-center gap-2">
-            <i class="fa-solid fa-robot"></i> Generate Bot
-        </button>
-    </form>
-</div>
-
-<!-- Bots Table -->
+  <div class="mb-8 grid grid-cols-1 md:grid-cols-2 gap-4">
+      <!-- Create Bot Form -->
+      <div class="bg-white/60 backdrop-blur-xl border border-white rounded-2xl shadow-[0_4px_24px_rgb(0,0,0,0.02)] overflow-hidden p-6">
+          <h2 class="text-lg font-bold text-slate-800 mb-4">Create New Bot</h2>
+          <form method="POST" action="bots.php" class="flex flex-col gap-4">
+              <input type="hidden" name="action" value="add_bot">
+              <input type="text" name="bot_name" required placeholder="Enter Bot Name (e.g. Rahul_Das)" class="block w-full px-4 py-2.5 border border-slate-200/60 rounded-xl bg-white/60 text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-orange-500/50 transition-all">
+              <input type="text" name="bot_mantra" placeholder="Mantra Name (e.g. Hare Krishna)" class="block w-full px-4 py-2.5 border border-slate-200/60 rounded-xl bg-white/60 text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-orange-500/50 transition-all">
+              <button type="submit" class="bg-orange-500 hover:bg-orange-600 text-white px-6 py-2.5 rounded-xl font-bold shadow-md shadow-orange-500/20 transition-all flex items-center justify-center gap-2">
+                  <i class="fa-solid fa-robot"></i> Generate Bot
+              </button>
+          </form>
+      </div>
+      
+      <!-- Quick Actions -->
+      <div class="bg-white/60 backdrop-blur-xl border border-white rounded-2xl shadow-[0_4px_24px_rgb(0,0,0,0.02)] overflow-hidden p-6 flex flex-col justify-center">
+          <h2 class="text-lg font-bold text-slate-800 mb-4">Bot Operations</h2>
+          <div class="flex flex-col gap-3">
+              <form method="POST" action="bots.php" onsubmit="return confirm('Are you sure you want to remove underscores from all bot names?');">
+                  <input type="hidden" name="action" value="fix_names">
+                  <button type="submit" class="w-full bg-slate-800 hover:bg-slate-900 text-white px-6 py-2.5 rounded-xl font-bold transition-all flex items-center justify-center gap-2">
+                      <i class="fa-solid fa-wand-magic-sparkles"></i> Fix Bot Names (Remove _ )
+                  </button>
+              </form>
+              
+              <form method="POST" action="bots.php" onsubmit="return confirm('WARNING: This will permanently delete ALL bots from the database! Are you sure?');">
+                  <input type="hidden" name="action" value="delete_all">
+                  <button type="submit" class="w-full bg-red-500 hover:bg-red-600 text-white px-6 py-2.5 rounded-xl font-bold shadow-md shadow-red-500/20 transition-all flex items-center justify-center gap-2">
+                      <i class="fa-solid fa-trash-can"></i> Delete All Bots
+                  </button>
+              </form>
+              
+              <a href="bots.php?lock_bots=1" class="w-full bg-slate-200 hover:bg-slate-300 text-slate-700 px-6 py-2.5 rounded-xl font-bold transition-all flex items-center justify-center gap-2 text-center">
+                  <i class="fa-solid fa-lock"></i> Lock Bot Page
+              </a>
+          </div>
+      </div>
+  </div>
+  
+  <!-- Bots Table -->
 <div class="bg-white/60 backdrop-blur-xl border border-white rounded-2xl shadow-[0_4px_24px_rgb(0,0,0,0.02)] overflow-hidden">
     <div class="overflow-x-auto">
         <table class="w-full text-left text-sm text-slate-600">
