@@ -33,8 +33,6 @@ if ($bots_res && $bots_res->num_rows > 0) {
             $current_daily = $row['daily_count'];
         }
         
-            // Randomly decide if this bot is active this run (e.g. 50% chance)
-            if (rand(1, 100) > 50) {
                 // Add a random amount of counts (between 5 and 25 per run)
                 // Assuming cron runs every 15-30 mins, 5-25 is realistic for a short session
                 $increment = rand(5, 25);
@@ -65,9 +63,6 @@ if ($bots_res && $bots_res->num_rows > 0) {
                               session_count = session_count + $increment");
                 
                 echo "Bot: $bot_name - Chanted $increment times. Total Today: $new_daily<br>";
-            } else {
-                echo "Bot: $bot_name - Resting right now.<br>";
-            }
 
     }
 } else {
@@ -76,4 +71,5 @@ if ($bots_res && $bots_res->num_rows > 0) {
 
 echo "Routine Completed.";
 ?>
+
 
