@@ -584,7 +584,7 @@ async function refreshLiveUsers() {
                     <p class="text-sm">No one is counting right now</p>
                 </div>`;
             } else {
-                list.innerHTML = data.users.map(u => `
+                list.innerHTML = data.users.slice(0, 100).map(u => `
                     <div class="flex items-center gap-3 p-3 bg-green-50/60 border border-green-100 rounded-xl fade-in">
                         <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-orange-500 to-indigo-500 flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
                             ${u.username.charAt(0).toUpperCase()}
