@@ -57,9 +57,9 @@ if ($bots_res && $bots_res->num_rows > 0) {
                 // Update live_sessions to show on Live Activity feed
                 $random_duration = rand(60, 600); // Between 1 and 10 minutes active
                 $conn->query("INSERT INTO live_sessions (user_id, username, session_count, last_heartbeat, started_at) 
-                              VALUES ($bot_id, '$bot_name', $increment, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP - INTERVAL $random_duration SECOND)
+                              VALUES ($bot_id, '$bot_name', $increment, CURRENT_TIMESTAMP + INTERVAL 35 SECOND, CURRENT_TIMESTAMP - INTERVAL $random_duration SECOND)
                               ON DUPLICATE KEY UPDATE 
-                              last_heartbeat = CURRENT_TIMESTAMP, 
+                              last_heartbeat = CURRENT_TIMESTAMP + INTERVAL 35 SECOND, 
                               session_count = session_count + $increment");
                 
                 echo "Bot: $bot_name - Chanted $increment times. Total Today: $new_daily<br>";
@@ -71,5 +71,6 @@ if ($bots_res && $bots_res->num_rows > 0) {
 
 echo "Routine Completed.";
 ?>
+
 
 
