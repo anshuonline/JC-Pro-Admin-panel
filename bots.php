@@ -19,7 +19,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
             $err = "Username already exists.";
         } else {
             // Insert bot
-            $insert = $conn->query("INSERT INTO users (username, device_token, level, total_counts, is_bot, last_active) VALUES ('$bot_name_esc', 'bot_device', 1, 0, 1, CURRENT_TIMESTAMP)");
+            $bot_mantra = isset($_POST['bot_mantra']) ? trim($_POST['bot_mantra']) : '';
+            $bot_mantra_esc = $conn->real_escape_string($bot_mantra);
+            $mantra_val = !empty($bot_mantra_esc) ? "'$bot_mantra_esc'" : "NULL";
+            
+            $insert = $conn->query("INSERT INTO users (username, device_token, level, total_counts, is_bot, bot_mantra, last_active) VALUES ('$bot_name_esc', 'bot_device', 1, 0, 1, $mantra_val, CURRENT_TIMESTAMP)");
             if ($insert) {
                 $msg = "Bot '$bot_name' created successfully.";
             } else {
@@ -121,6 +125,7 @@ include 'includes/header.php';
     <form method="POST" action="bots.php" class="flex flex-col sm:flex-row gap-4">
         <input type="hidden" name="action" value="add_bot">
         <input type="text" name="bot_name" required placeholder="Enter Bot Name (e.g. Rahul_Das)" class="flex-1 block w-full px-4 py-2.5 border border-slate-200/60 rounded-xl bg-white/60 text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-orange-500/50 transition-all">
+        <input type="text" name="bot_mantra" placeholder="Mantra Name (e.g. Hare Krishna)" class="flex-1 block w-full px-4 py-2.5 border border-slate-200/60 rounded-xl bg-white/60 text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-orange-500/50 transition-all">
         <button type="submit" class="bg-orange-500 hover:bg-orange-600 text-white px-6 py-2.5 rounded-xl font-bold shadow-md shadow-orange-500/20 transition-all flex items-center justify-center gap-2">
             <i class="fa-solid fa-robot"></i> Generate Bot
         </button>
