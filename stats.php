@@ -203,7 +203,7 @@ include 'includes/header.php';
         <div class="flex justify-between items-start">
             <div>
                 <p class="text-xs font-semibold text-slate-500 uppercase tracking-wide">Total Users</p>
-                <p class="text-3xl font-extrabold text-slate-800 mt-1" id="stat-total-users"><?php echo number_format($stats['total_users']); ?></p>
+                <p class="text-2xl xl:text-3xl tracking-tight break-all font-extrabold text-slate-800 mt-1" id="stat-total-users"><?php echo number_format($stats['total_users']); ?></p>
             </div>
             <div class="w-10 h-10 bg-orange-100 rounded-xl flex items-center justify-center">
                 <i class="fa-solid fa-users text-orange-600"></i>
@@ -217,7 +217,7 @@ include 'includes/header.php';
         <div class="flex justify-between items-start">
             <div>
                 <p class="text-xs font-semibold text-slate-500 uppercase tracking-wide">Today's Jaap</p>
-                <p class="text-3xl font-extrabold text-green-600 mt-1" id="stat-today-counts"><?php echo number_format($stats['today_counts']); ?></p>
+                <p class="text-2xl xl:text-3xl tracking-tight break-all font-extrabold text-green-600 mt-1" id="stat-today-counts"><?php echo number_format($stats['today_counts']); ?></p>
             </div>
             <div class="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center">
                 <i class="fa-solid fa-om text-green-600"></i>
@@ -231,7 +231,7 @@ include 'includes/header.php';
         <div class="flex justify-between items-start">
             <div>
                 <p class="text-xs font-semibold text-slate-500 uppercase tracking-wide">This Week</p>
-                <p class="text-3xl font-extrabold text-amber-600 mt-1" id="stat-week-counts"><?php echo number_format($stats['this_week_counts']); ?></p>
+                <p class="text-2xl xl:text-3xl tracking-tight break-all font-extrabold text-amber-600 mt-1" id="stat-week-counts"><?php echo number_format($stats['this_week_counts']); ?></p>
             </div>
             <div class="w-10 h-10 bg-amber-100 rounded-xl flex items-center justify-center">
                 <i class="fa-solid fa-calendar-week text-amber-600"></i>
@@ -245,7 +245,7 @@ include 'includes/header.php';
         <div class="flex justify-between items-start">
             <div>
                 <p class="text-xs font-semibold text-slate-500 uppercase tracking-wide">Live Now</p>
-                <p class="text-3xl font-extrabold text-slate-600 mt-1" id="stat-live-count"><?php echo $live_count; ?></p>
+                <p class="text-2xl xl:text-3xl tracking-tight break-all font-extrabold text-slate-600 mt-1" id="stat-live-count"><?php echo $live_count; ?></p>
             </div>
             <div class="w-10 h-10 bg-slate-100 rounded-xl flex items-center justify-center">
                 <span class="w-3 h-3 bg-green-500 rounded-full live-pulse"></span>
@@ -259,15 +259,15 @@ include 'includes/header.php';
 <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
     <div class="bg-white/60 backdrop-blur-xl rounded-2xl p-5 border border-white shadow-sm text-center">
         <p class="text-xs font-semibold text-slate-500 uppercase tracking-wide">This Month</p>
-        <p class="text-2xl font-extrabold text-orange-600 mt-1"><?php echo number_format($stats['this_month_counts']); ?></p>
+        <p class="text-xl sm:text-2xl tracking-tight break-all font-extrabold text-orange-600 mt-1"><?php echo number_format($stats['this_month_counts']); ?></p>
     </div>
     <div class="bg-white/60 backdrop-blur-xl rounded-2xl p-5 border border-white shadow-sm text-center">
         <p class="text-xs font-semibold text-slate-500 uppercase tracking-wide">This Year</p>
-        <p class="text-2xl font-extrabold text-slate-600 mt-1"><?php echo number_format($stats['this_year_counts']); ?></p>
+        <p class="text-xl sm:text-2xl tracking-tight break-all font-extrabold text-slate-600 mt-1"><?php echo number_format($stats['this_year_counts']); ?></p>
     </div>
     <div class="bg-white/60 backdrop-blur-xl rounded-2xl p-5 border border-white shadow-sm text-center">
         <p class="text-xs font-semibold text-slate-500 uppercase tracking-wide">All Time</p>
-        <p class="text-2xl font-extrabold text-slate-800 mt-1"><?php echo number_format($stats['total_counts']); ?></p>
+        <p class="text-xl sm:text-2xl tracking-tight break-all font-extrabold text-slate-800 mt-1"><?php echo number_format($stats['total_counts']); ?></p>
     </div>
 </div>
 
