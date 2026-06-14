@@ -91,7 +91,7 @@ include 'includes/header.php';
 
 <div class="mb-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
     <div>
-        <h1 class="text-2xl font-bold text-slate-900 tracking-tight">Manage Bots</h1>
+        <h1 class="text-2xl font-bold text-slate-900 tracking-tight">Manage Bots <span class="bg-indigo-100 text-indigo-700 text-sm px-3 py-1 rounded-full ml-2 align-middle font-semibold border border-indigo-200"><?php echo $total_rows; ?> Total</span></h1>
         <p class="text-slate-500 text-sm mt-1 font-medium">Create and manage AI bots that simulate real users on the leaderboard.</p>
     </div>
     
@@ -215,3 +215,4 @@ include 'includes/header.php';
 </div>
 
 <?php include 'includes/footer.php'; ?>
+
