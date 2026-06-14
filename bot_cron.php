@@ -33,18 +33,12 @@ if ($bots_res && $bots_res->num_rows > 0) {
             $current_daily = $row['daily_count'];
         }
         
-        // Max limit of 500 per day to keep it realistic
-        if ($current_daily < 500) {
             // Randomly decide if this bot is active this run (e.g. 50% chance)
             if (rand(1, 100) > 50) {
                 // Add a random amount of counts (between 5 and 25 per run)
                 // Assuming cron runs every 15-30 mins, 5-25 is realistic for a short session
                 $increment = rand(5, 25);
                 
-                // If adding increment exceeds 500, cap it
-                if ($current_daily + $increment > 500) {
-                    $increment = 500 - $current_daily;
-                }
                 
                 $new_daily = $current_daily + $increment;
                 $new_total = $current_total + $increment;
@@ -74,9 +68,7 @@ if ($bots_res && $bots_res->num_rows > 0) {
             } else {
                 echo "Bot: $bot_name - Resting right now.<br>";
             }
-        } else {
-            echo "Bot: $bot_name - Already reached daily target of 500.<br>";
-        }
+
     }
 } else {
     echo "No bots found.";
@@ -84,3 +76,4 @@ if ($bots_res && $bots_res->num_rows > 0) {
 
 echo "Routine Completed.";
 ?>
+
