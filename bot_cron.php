@@ -14,7 +14,7 @@ if (!isset($_GET['key']) || $_GET['key'] !== $secret_key) {
 echo "Starting Bot Routine...<br>";
 
 // 1. Get all bots
-$bots_res = $conn->query("SELECT id, username, total_counts FROM users WHERE is_bot = 1 ORDER BY RAND() LIMIT 200");
+$bots_res = $conn->query("SELECT id, username, total_counts FROM users WHERE is_bot = 1 ORDER BY RAND() LIMIT 500");
 
 if ($bots_res && $bots_res->num_rows > 0) {
     $today = date('Y-m-d');
