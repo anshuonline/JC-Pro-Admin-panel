@@ -19,7 +19,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
             $err = "Username already exists.";
         } else {
             // Insert bot
-            $insert = $conn->query("INSERT INTO users (username, device_id, fcm_token, level, total_counts, is_bot, last_active) VALUES ('$bot_name_esc', 'bot_device', '', 1, 0, 1, CURRENT_TIMESTAMP)");
+            $insert = $conn->query("INSERT INTO users (username, device_token, level, total_counts, is_bot, last_active) VALUES ('$bot_name_esc', 'bot_device', 1, 0, 1, CURRENT_TIMESTAMP)");
             if ($insert) {
                 $msg = "Bot '$bot_name' created successfully.";
             } else {
