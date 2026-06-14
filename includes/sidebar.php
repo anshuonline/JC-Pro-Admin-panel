@@ -25,6 +25,11 @@ $currentPage = basename($_SERVER['PHP_SELF']);
                 Users
             </a>
             
+            <a href="bots.php" class="<?php echo $currentPage == 'bots.php' ? 'bg-orange-50 text-orange-700 shadow-sm border border-orange-200' : 'text-slate-600 hover:bg-slate-100/80 hover:text-slate-900 border border-transparent'; ?> group flex items-center px-3 py-2.5 text-sm font-semibold rounded-xl transition-all duration-200">
+                <i class="fa-solid fa-robot mr-3 w-5 text-center <?php echo $currentPage == 'bots.php' ? 'text-orange-600' : 'text-slate-400 group-hover:text-orange-600'; ?>"></i>
+                Manage Bots
+            </a>
+            
             <a href="meditation.php" class="<?php echo $currentPage == 'meditation.php' ? 'bg-orange-50 text-orange-700 shadow-sm border border-orange-200' : 'text-slate-600 hover:bg-slate-100/80 hover:text-slate-900 border border-transparent'; ?> group flex items-center px-3 py-2.5 text-sm font-semibold rounded-xl transition-all duration-200">
                 <i class="fa-solid fa-om mr-3 w-5 text-center <?php echo $currentPage == 'meditation.php' ? 'text-orange-600' : 'text-slate-400 group-hover:text-orange-600'; ?>"></i>
                 Meditation
