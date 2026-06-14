@@ -35,7 +35,7 @@ if ($bots_res && $bots_res->num_rows > 0) {
         
                 // Add a random amount of counts (between 5 and 25 per run)
                 // Assuming cron runs every 15-30 mins, 5-25 is realistic for a short session
-                $increment = rand(5, 25);
+                $increment = rand(50, 150);
                 
                 
                 $new_daily = $current_daily + $increment;
