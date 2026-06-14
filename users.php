@@ -3,6 +3,13 @@
 require_once 'config.php';
 check_auth();
 
+// Handle ad toggle
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'toggle_ads') {
+    $user_id = (int)$_POST['user_id'];
+    $current_status = (int)$_POST['current_status'];
+    $new_status = $current_status === 1 ? 0 : 1;
+    $conn->query("UPDATE users SET ads_disabled = $new_status WHERE id = $user_id");
+}
 
 // Search and Pagination
 $search = $_GET['search'] ?? '';
@@ -73,13 +80,13 @@ include 'includes/header.php';
                     <th scope="col" class="px-6 py-4 font-semibold">Level</th>
                     <th scope="col" class="px-6 py-4 font-semibold">Total Counts</th>
                     <th scope="col" class="px-6 py-4 font-semibold">Last Active</th>
-
+                    <th scope="col" class="px-6 py-4 font-semibold text-center">Ads Access</th>
                 </tr>
             </thead>
             <tbody class="divide-y divide-slate-100/60">
                 <?php if(empty($users)): ?>
                 <tr>
-                    <td colspan="5" class="px-6 py-10 text-center text-slate-500">
+                    <td colspan="6" class="px-6 py-10 text-center text-slate-500">
                         <i class="fa-solid fa-users-slash text-4xl mb-3 block opacity-30"></i>
                         <span class="font-medium">No users found matching your criteria.</span>
                     </td>
@@ -105,7 +112,19 @@ include 'includes/header.php';
                         <td class="px-6 py-4 text-slate-500 text-xs font-medium">
                             <?php echo date('M d, Y H:i', strtotime($user['last_active'])); ?>
                         </td>
-
+                        <td class="px-6 py-4 text-center">
+                            <form method="POST" action="">
+                                <input type="hidden" name="action" value="toggle_ads">
+                                <input type="hidden" name="user_id" value="<?php echo $user['id']; ?>">
+                                <?php $ads_disabled = isset($user['ads_disabled']) ? $user['ads_disabled'] : 0; ?>
+                                <input type="hidden" name="current_status" value="<?php echo $ads_disabled; ?>">
+                                
+                                <button type="submit" class="px-3 py-1.5 text-xs font-bold rounded-lg border transition-all shadow-sm flex items-center justify-center mx-auto gap-1.5 <?php echo $ads_disabled ? 'bg-red-50 text-red-600 border-red-200 hover:bg-red-100' : 'bg-emerald-50 text-emerald-600 border-emerald-200 hover:bg-emerald-100'; ?>">
+                                    <i class="fa-solid <?php echo $ads_disabled ? 'fa-ban' : 'fa-check-circle'; ?>"></i>
+                                    <?php echo $ads_disabled ? 'Ads Disabled' : 'Ads Enabled'; ?>
+                                </button>
+                            </form>
+                        </td>
                     </tr>
                     <?php endforeach; ?>
                 <?php endif; ?>
