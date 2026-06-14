@@ -62,6 +62,14 @@ if ($bots_res && $bots_res->num_rows > 0) {
                     $conn->query("INSERT INTO daily_counts (user_id, date, daily_count) VALUES ($bot_id, '$today', $new_daily)");
                 }
                 
+                // Update live_sessions to show on Live Activity feed
+                $random_duration = rand(60, 600); // Between 1 and 10 minutes active
+                $conn->query("INSERT INTO live_sessions (user_id, username, session_count, last_heartbeat, started_at) 
+                              VALUES ($bot_id, '$bot_name', $increment, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP - INTERVAL $random_duration SECOND)
+                              ON DUPLICATE KEY UPDATE 
+                              last_heartbeat = CURRENT_TIMESTAMP, 
+                              session_count = session_count + $increment");
+                
                 echo "Bot: $bot_name - Chanted $increment times. Total Today: $new_daily<br>";
             } else {
                 echo "Bot: $bot_name - Resting right now.<br>";
