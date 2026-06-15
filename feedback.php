@@ -46,94 +46,113 @@ include 'includes/header.php';
     </form>
 </div>
 
-<div class="bg-white/60 backdrop-blur-xl border border-slate-200/60 shadow-[0_8px_30px_rgb(0,0,0,0.04)] rounded-2xl overflow-hidden">
-    <div class="overflow-x-auto">
-        <table class="w-full text-sm text-left text-slate-600">
-            <thead class="text-xs text-slate-500 uppercase bg-slate-50/80 border-b border-slate-200/60 font-semibold tracking-wider">
-                <tr>
-                    <th scope="col" class="px-6 py-4">Date</th>
-                    <th scope="col" class="px-6 py-4">User</th>
-                    <th scope="col" class="px-6 py-4">Ratings (Acc/UI/Snd/His)</th>
-                    <th scope="col" class="px-6 py-4 max-w-xs">Liked Most</th>
-                    <th scope="col" class="px-6 py-4 max-w-xs">Improvements</th>
-                    <th scope="col" class="px-6 py-4">Bugs</th>
-                    <th scope="col" class="px-6 py-4">Overall</th>
-                </tr>
-            </thead>
-            <tbody class="divide-y divide-slate-100/80">
-                <?php if (count($feedback) > 0): ?>
-                    <?php foreach ($feedback as $f): ?>
-                        <tr class="hover:bg-slate-50/50 transition-colors">
-                            <td class="px-6 py-4 whitespace-nowrap font-medium text-slate-800">
-                                <?php echo date('d M Y', strtotime($f['submitted_at'])); ?>
-                            </td>
-                            <td class="px-6 py-4">
-                                <div class="font-semibold text-slate-800"><?php echo htmlspecialchars($f['name'] ?: 'Anonymous'); ?></div>
-                                <div class="text-xs text-slate-400"><?php echo htmlspecialchars($f['email']); ?></div>
-                                <div class="text-xs text-orange-600 font-medium mt-0.5"><?php echo htmlspecialchars($f['app_usage']); ?></div>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap font-medium text-slate-600">
-                                <?php echo "{$f['rating_accuracy']}/{$f['rating_ui']}/{$f['rating_sound']}/{$f['rating_history']}"; ?>
-                            </td>
-                            <td class="px-6 py-4 max-w-xs truncate" title="<?php echo htmlspecialchars($f['likes_most']); ?>">
-                                <?php echo htmlspecialchars($f['likes_most']); ?>
-                            </td>
-                            <td class="px-6 py-4 max-w-xs truncate" title="<?php echo htmlspecialchars($f['improvements']); ?>">
-                                <?php echo htmlspecialchars($f['improvements']); ?>
-                            </td>
-                            <td class="px-6 py-4">
-                                <?php if ($f['experienced_bugs'] === 'Yes'): ?>
-                                    <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-bold bg-red-100 text-red-700">Yes</span>
-                                    <div class="text-xs text-slate-500 mt-1 max-w-[150px] truncate" title="<?php echo htmlspecialchars($f['bug_details']); ?>">
-                                        <?php echo htmlspecialchars($f['bug_details']); ?>
-                                    </div>
-                                <?php else: ?>
-                                    <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-bold bg-green-100 text-green-700">No</span>
-                                <?php endif; ?>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="flex items-center font-bold text-slate-800">
-                                    <i class="fa-solid fa-star text-orange-400 mr-1.5"></i>
-                                    <?php echo $f['overall_rating']; ?>/5
-                                </div>
-                            </td>
-                        </tr>
-                    <?php endforeach; ?>
-                <?php else: ?>
-                    <tr>
-                        <td colspan="7" class="px-6 py-8 text-center text-slate-500">
-                            <div class="flex flex-col items-center justify-center">
-                                <i class="fa-regular fa-folder-open text-4xl text-slate-300 mb-3"></i>
-                                <p class="text-base font-medium text-slate-600">No feedback found</p>
+<div class="space-y-6">
+    <?php if (count($feedback) > 0): ?>
+        <?php foreach ($feedback as $f): ?>
+            <div class="bg-white/80 backdrop-blur-xl border border-slate-200/60 shadow-sm rounded-2xl p-6 transition-all hover:shadow-md">
+                <div class="flex flex-col md:flex-row md:items-start justify-between gap-4 mb-4">
+                    <div class="flex items-start gap-4">
+                        <div class="w-12 h-12 rounded-full bg-orange-100 flex items-center justify-center text-orange-600 font-bold text-xl shrink-0">
+                            <?php echo strtoupper(substr($f['name'] ?: 'A', 0, 1)); ?>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-bold text-slate-800 tracking-tight flex items-center gap-2">
+                                <?php echo htmlspecialchars($f['name'] ?: 'Anonymous'); ?>
+                                <span class="bg-slate-100 text-slate-500 text-[10px] uppercase tracking-wider font-bold px-2 py-0.5 rounded-full">
+                                    <?php echo htmlspecialchars($f['app_usage']); ?> User
+                                </span>
+                            </h3>
+                            <p class="text-sm text-slate-500"><?php echo htmlspecialchars($f['email']); ?></p>
+                        </div>
+                    </div>
+                    <div class="flex flex-col items-end gap-2">
+                        <div class="text-xs font-semibold text-slate-400 bg-slate-50 px-3 py-1 rounded-full border border-slate-100">
+                            <i class="fa-regular fa-clock mr-1"></i> <?php echo date('d M Y, h:i A', strtotime($f['submitted_at'])); ?>
+                        </div>
+                        <div class="flex items-center gap-1 bg-orange-50 px-3 py-1 rounded-full border border-orange-100">
+                            <i class="fa-solid fa-star text-orange-500 text-sm"></i>
+                            <span class="font-bold text-orange-700"><?php echo $f['overall_rating']; ?>/5</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 pt-4 border-t border-slate-100 mt-4">
+                    <!-- Feature Ratings -->
+                    <div class="col-span-1 bg-slate-50/50 rounded-xl p-4 border border-slate-100">
+                        <h4 class="text-xs font-bold uppercase text-slate-400 mb-3 tracking-wider"><i class="fa-solid fa-sliders text-slate-300 mr-1.5"></i> Feature Ratings</h4>
+                        <div class="space-y-2.5">
+                            <div class="flex justify-between items-center text-sm">
+                                <span class="text-slate-600 font-medium">Counter Accuracy</span>
+                                <span class="font-bold text-slate-800"><?php echo $f['rating_accuracy']; ?>/5</span>
                             </div>
-                        </td>
-                    </tr>
-                <?php endif; ?>
-            </tbody>
-        </table>
-    </div>
-    
-    <!-- Pagination -->
-    <?php if ($total_pages > 1): ?>
-    <div class="px-6 py-4 border-t border-slate-100 flex items-center justify-between bg-slate-50/30">
-        <span class="text-sm text-slate-500">
-            Showing <?php echo $offset + 1; ?> to <?php echo min($offset + $per_page, $total_rows); ?> of <?php echo $total_rows; ?> entries
-        </span>
-        <div class="inline-flex rounded-lg shadow-sm">
-            <?php if ($page > 1): ?>
-                <a href="?page=<?php echo $page-1; ?><?php echo $search ? '&search='.urlencode($search) : ''; ?>" class="px-3 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-200 rounded-l-lg hover:bg-slate-50 hover:text-orange-600 transition-colors">Previous</a>
-            <?php else: ?>
-                <span class="px-3 py-2 text-sm font-medium text-slate-300 bg-slate-50 border border-slate-200 rounded-l-lg cursor-not-allowed">Previous</span>
-            <?php endif; ?>
-            
-            <?php if ($page < $total_pages): ?>
-                <a href="?page=<?php echo $page+1; ?><?php echo $search ? '&search='.urlencode($search) : ''; ?>" class="px-3 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-200 rounded-r-lg hover:bg-slate-50 hover:text-orange-600 transition-colors -ml-px">Next</a>
-            <?php else: ?>
-                <span class="px-3 py-2 text-sm font-medium text-slate-300 bg-slate-50 border border-slate-200 rounded-r-lg cursor-not-allowed -ml-px">Next</span>
-            <?php endif; ?>
+                            <div class="flex justify-between items-center text-sm">
+                                <span class="text-slate-600 font-medium">UI Design</span>
+                                <span class="font-bold text-slate-800"><?php echo $f['rating_ui']; ?>/5</span>
+                            </div>
+                            <div class="flex justify-between items-center text-sm">
+                                <span class="text-slate-600 font-medium">Sound/Vibration</span>
+                                <span class="font-bold text-slate-800"><?php echo $f['rating_sound']; ?>/5</span>
+                            </div>
+                            <div class="flex justify-between items-center text-sm">
+                                <span class="text-slate-600 font-medium">History/Analytics</span>
+                                <span class="font-bold text-slate-800"><?php echo $f['rating_history']; ?>/5</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Text Feedback -->
+                    <div class="col-span-1 lg:col-span-2 flex flex-col gap-4">
+                        <div class="bg-emerald-50/50 rounded-xl p-4 border border-emerald-100">
+                            <h4 class="text-xs font-bold uppercase text-emerald-600 mb-2 tracking-wider"><i class="fa-solid fa-heart text-emerald-400 mr-1.5"></i> Liked Most</h4>
+                            <p class="text-sm text-slate-700 leading-relaxed"><?php echo nl2br(htmlspecialchars($f['likes_most'])); ?></p>
+                        </div>
+                        
+                        <div class="bg-blue-50/50 rounded-xl p-4 border border-blue-100">
+                            <h4 class="text-xs font-bold uppercase text-blue-600 mb-2 tracking-wider"><i class="fa-solid fa-lightbulb text-blue-400 mr-1.5"></i> Suggestions</h4>
+                            <p class="text-sm text-slate-700 leading-relaxed"><?php echo nl2br(htmlspecialchars($f['improvements'])); ?></p>
+                        </div>
+
+                        <?php if ($f['experienced_bugs'] === 'Yes'): ?>
+                        <div class="bg-red-50/50 rounded-xl p-4 border border-red-100">
+                            <h4 class="text-xs font-bold uppercase text-red-600 mb-2 tracking-wider"><i class="fa-solid fa-bug text-red-400 mr-1.5"></i> Bug Reported</h4>
+                            <p class="text-sm text-slate-700 leading-relaxed"><?php echo nl2br(htmlspecialchars($f['bug_details'])); ?></p>
+                        </div>
+                        <?php endif; ?>
+                    </div>
+                </div>
+            </div>
+        <?php endforeach; ?>
+    <?php else: ?>
+        <div class="bg-white border border-slate-200 rounded-2xl p-12 flex flex-col items-center justify-center">
+            <div class="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mb-4">
+                <i class="fa-regular fa-folder-open text-2xl text-slate-400"></i>
+            </div>
+            <h3 class="text-lg font-bold text-slate-800 mb-1">No Feedback Yet</h3>
+            <p class="text-slate-500 text-sm">When users submit feedback, it will appear here as cards.</p>
         </div>
-    </div>
     <?php endif; ?>
 </div>
+
+<!-- Pagination -->
+<?php if ($total_pages > 1): ?>
+<div class="mt-8 flex items-center justify-between">
+    <span class="text-sm text-slate-500 font-medium">
+        Showing <?php echo $offset + 1; ?> to <?php echo min($offset + $per_page, $total_rows); ?> of <?php echo $total_rows; ?> entries
+    </span>
+    <div class="inline-flex rounded-xl shadow-sm">
+        <?php if ($page > 1): ?>
+            <a href="?page=<?php echo $page-1; ?><?php echo $search ? '&search='.urlencode($search) : ''; ?>" class="px-4 py-2.5 text-sm font-semibold text-slate-700 bg-white border border-slate-200 rounded-l-xl hover:bg-slate-50 hover:text-orange-600 transition-colors">Previous</a>
+        <?php else: ?>
+            <span class="px-4 py-2.5 text-sm font-semibold text-slate-300 bg-slate-50 border border-slate-200 rounded-l-xl cursor-not-allowed">Previous</span>
+        <?php endif; ?>
+        
+        <?php if ($page < $total_pages): ?>
+            <a href="?page=<?php echo $page+1; ?><?php echo $search ? '&search='.urlencode($search) : ''; ?>" class="px-4 py-2.5 text-sm font-semibold text-slate-700 bg-white border border-slate-200 rounded-r-xl hover:bg-slate-50 hover:text-orange-600 transition-colors -ml-px">Next</a>
+        <?php else: ?>
+            <span class="px-4 py-2.5 text-sm font-semibold text-slate-300 bg-slate-50 border border-slate-200 rounded-r-xl cursor-not-allowed -ml-px">Next</span>
+        <?php endif; ?>
+    </div>
+</div>
+<?php endif; ?>
 
 <?php include 'includes/footer.php'; ?>
