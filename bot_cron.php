@@ -22,8 +22,8 @@ if (file_exists('bot_limit.txt')) {
     if ($val > 0) $limit = $val;
 }
 
-// 1. Get all bots
-$bots_res = $conn->query("SELECT id, username, total_counts FROM users WHERE is_bot = 1 ORDER BY RAND() LIMIT $limit");
+// 1. Get all bots (Optimized to prevent Hostinger suspension: avoids slow RAND() on 50k rows)
+$bots_res = $conn->query("SELECT id, username, total_counts FROM users WHERE is_bot = 1 ORDER BY last_active ASC LIMIT $limit");
 
 if ($bots_res && $bots_res->num_rows > 0) {
     $today = date('Y-m-d');
