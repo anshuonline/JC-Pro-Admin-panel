@@ -11,10 +11,19 @@ if (!isset($_GET['key']) || $_GET['key'] !== $secret_key) {
     die("Unauthorized");
 }
 
+set_time_limit(0);
+ignore_user_abort(true);
+
 echo "Starting Bot Routine...<br>";
 
+$limit = 4000;
+if (file_exists('bot_limit.txt')) {
+    $val = (int)file_get_contents('bot_limit.txt');
+    if ($val > 0) $limit = $val;
+}
+
 // 1. Get all bots
-$bots_res = $conn->query("SELECT id, username, total_counts FROM users WHERE is_bot = 1 ORDER BY RAND() LIMIT 4000");
+$bots_res = $conn->query("SELECT id, username, total_counts FROM users WHERE is_bot = 1 ORDER BY RAND() LIMIT $limit");
 
 if ($bots_res && $bots_res->num_rows > 0) {
     $today = date('Y-m-d');
