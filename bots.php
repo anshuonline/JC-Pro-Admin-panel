@@ -91,6 +91,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     }
 }
 
+// Handle Update Limit
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'update_limit') {
+    $new_limit = (int)$_POST['bot_limit'];
+    if ($new_limit > 0) {
+        file_put_contents('bot_limit.txt', $new_limit);
+        $msg = "Bot concurrent limit updated to $new_limit!";
+    } else {
+        $err = "Invalid limit amount.";
+    }
+}
+
 // Handle Bot Deletion
 if (isset($_GET['delete'])) {
     $bot_id = (int)$_GET['delete'];
@@ -191,6 +202,20 @@ include 'includes/header.php';
                       <i class="fa-solid fa-trash-can"></i> Delete All Bots
                   </button>
               </form>
+
+              <?php 
+                $current_limit = 4000;
+                if (file_exists('bot_limit.txt')) {
+                    $current_limit = (int)file_get_contents('bot_limit.txt');
+                }
+                ?>
+                <form method="POST" action="bots.php" class="flex gap-2">
+                    <input type="hidden" name="action" value="update_limit">
+                    <input type="number" name="bot_limit" value="<?php echo $current_limit; ?>" class="w-full px-4 py-2 border border-slate-200 rounded-xl bg-white text-sm" placeholder="Max Bots (e.g. 4000)">
+                    <button type="submit" class="bg-indigo-500 hover:bg-indigo-600 text-white px-4 py-2 rounded-xl font-bold text-sm whitespace-nowrap">
+                        Update Limit
+                    </button>
+                </form>
               
               <a href="bots.php?lock_bots=1" class="w-full bg-slate-200 hover:bg-slate-300 text-slate-700 px-6 py-2.5 rounded-xl font-bold transition-all flex items-center justify-center gap-2 text-center">
                   <i class="fa-solid fa-lock"></i> Lock Bot Page
