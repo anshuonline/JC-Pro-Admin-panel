@@ -157,6 +157,7 @@ include 'includes/header.php';
         <?php endif; ?>
     </div>
 </div>
+<?php endif; ?>
 <script>
 function toggleFeatured(id, btn) {
     const formData = new FormData();
