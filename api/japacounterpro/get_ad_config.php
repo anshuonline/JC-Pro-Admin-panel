@@ -8,9 +8,9 @@ $response = array(
     'success' => false,
     'global_ads_enabled' => true,
     'user_ads_disabled' => false,
-    'interstitial_id' => 'ca-app-pub-3940256099942544/1033173712',
-    'rewarded_id' => 'ca-app-pub-3940256099942544/5354046379',
-    'app_open_id' => 'ca-app-pub-3940256099942544/9257395921'
+    'interstitial_id' => 'ca-app-pub-8044395417844839/4765060917',
+    'rewarded_id' => 'ca-app-pub-8044395417844839/8105540126',
+    'app_open_id' => 'ca-app-pub-8044395417844839/3487638267'
 );
 
 // Fetch global settings
