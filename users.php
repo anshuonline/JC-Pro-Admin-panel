@@ -20,9 +20,15 @@ $offset = ($page - 1) * $per_page;
 $where_clause = "";
 if ($search) {
     $search_esc = $conn->real_escape_string($search);
-    if (is_numeric($search)) {
-        $where_clause = "WHERE username LIKE '%$search_esc%' OR id = " . (int)$search;
+    if (strpos(trim($search), '#') === 0) {
+        // Strict ID search (e.g., "#15")
+        $id_search = (int)substr(trim($search), 1);
+        $where_clause = "WHERE id = " . $id_search;
+    } elseif (is_numeric(trim($search))) {
+        // Both Username and ID
+        $where_clause = "WHERE username LIKE '%$search_esc%' OR id = " . (int)trim($search);
     } else {
+        // Only Username
         $where_clause = "WHERE username LIKE '%$search_esc%'";
     }
 }
