@@ -40,12 +40,18 @@ if (empty($name)) {
 }
 
 $stmt = $conn->prepare("INSERT INTO feedback (name, email, app_usage, rating_accuracy, rating_ui, rating_sound, rating_history, likes_most, improvements, experienced_bugs, bug_details, overall_rating) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+
+if ($stmt === false) {
+    echo json_encode(["success" => false, "message" => "Database prepare error: " . $conn->error]);
+    exit;
+}
+
 $stmt->bind_param("sssiiiissssi", $name, $email, $app_usage, $rating_accuracy, $rating_ui, $rating_sound, $rating_history, $likes_most, $improvements, $experienced_bugs, $bug_details, $overall_rating);
 
 if ($stmt->execute()) {
     echo json_encode(["success" => true, "message" => "Feedback submitted successfully"]);
 } else {
-    echo json_encode(["success" => false, "message" => "Database error: " . $stmt->error]);
+    echo json_encode(["success" => false, "message" => "Database execute error: " . $stmt->error]);
 }
 
 $stmt->close();
