@@ -16,7 +16,7 @@ require_once '../../config.php';
 $data = json_decode(file_get_contents('php://input'), true);
 
 if (!$data) {
-    echo json_encode(["status" => "error", "message" => "No JSON data provided"]);
+    echo json_encode(["success" => false, "message" => "No JSON data provided"]);
     exit;
 }
 
@@ -34,8 +34,8 @@ $experienced_bugs = isset($data['experienced_bugs']) ? $data['experienced_bugs']
 $bug_details = isset($data['bug_details']) ? $data['bug_details'] : '';
 $overall_rating = isset($data['overall_rating']) ? (int)$data['overall_rating'] : 0;
 
-if (empty($email)) {
-    echo json_encode(["status" => "error", "message" => "Email is required"]);
+if (empty($name)) {
+    echo json_encode(["success" => false, "message" => "Name is required"]);
     exit;
 }
 
@@ -43,9 +43,9 @@ $stmt = $conn->prepare("INSERT INTO feedback (name, email, app_usage, rating_acc
 $stmt->bind_param("sssiiiissssi", $name, $email, $app_usage, $rating_accuracy, $rating_ui, $rating_sound, $rating_history, $likes_most, $improvements, $experienced_bugs, $bug_details, $overall_rating);
 
 if ($stmt->execute()) {
-    echo json_encode(["status" => "success", "message" => "Feedback submitted successfully"]);
+    echo json_encode(["success" => true, "message" => "Feedback submitted successfully"]);
 } else {
-    echo json_encode(["status" => "error", "message" => "Database error: " . $stmt->error]);
+    echo json_encode(["success" => false, "message" => "Database error: " . $stmt->error]);
 }
 
 $stmt->close();
