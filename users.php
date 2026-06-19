@@ -20,7 +20,11 @@ $offset = ($page - 1) * $per_page;
 $where_clause = "";
 if ($search) {
     $search_esc = $conn->real_escape_string($search);
-    $where_clause = "WHERE username LIKE '%$search_esc%'";
+    if (is_numeric($search)) {
+        $where_clause = "WHERE username LIKE '%$search_esc%' OR id = " . (int)$search;
+    } else {
+        $where_clause = "WHERE username LIKE '%$search_esc%'";
+    }
 }
 
 // Total rows
@@ -70,67 +74,60 @@ include 'includes/header.php';
     </div>
 <?php endif; ?>
 
-<div class="bg-white/60 backdrop-blur-xl border border-white rounded-2xl shadow-[0_4px_24px_rgb(0,0,0,0.02)] overflow-hidden">
-    <div class="overflow-x-auto">
-        <table class="w-full text-left text-sm text-slate-600">
-            <thead class="text-xs uppercase bg-slate-50/50 text-slate-500 border-b border-slate-100">
-                <tr>
-                    <th scope="col" class="px-6 py-4 font-semibold">ID</th>
-                    <th scope="col" class="px-6 py-4 font-semibold">Username</th>
-                    <th scope="col" class="px-6 py-4 font-semibold">Level</th>
-                    <th scope="col" class="px-6 py-4 font-semibold">Total Counts</th>
-                    <th scope="col" class="px-6 py-4 font-semibold">Last Active</th>
-                    <th scope="col" class="px-6 py-4 font-semibold text-center">Ads Access</th>
-                </tr>
-            </thead>
-            <tbody class="divide-y divide-slate-100/60">
-                <?php if(empty($users)): ?>
-                <tr>
-                    <td colspan="6" class="px-6 py-10 text-center text-slate-500">
-                        <i class="fa-solid fa-users-slash text-4xl mb-3 block opacity-30"></i>
-                        <span class="font-medium">No users found matching your criteria.</span>
-                    </td>
-                </tr>
-                <?php else: ?>
-                    <?php foreach($users as $user): ?>
-                    <tr class="hover:bg-white/60 transition-colors">
-                        <td class="px-6 py-4 font-medium text-slate-500"><?php echo $user['id']; ?></td>
-                        <td class="px-6 py-4 font-semibold text-slate-800 flex items-center">
-                            <div class="w-9 h-9 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center mr-3 font-bold border border-blue-200/50 shadow-sm">
-                                <?php echo strtoupper(substr($user['username'], 0, 1)); ?>
-                            </div>
-                            <?php echo htmlspecialchars($user['username']); ?>
-                        </td>
-                        <td class="px-6 py-4">
-                            <span class="bg-slate-100 text-slate-600 py-1 px-3 rounded-full text-xs font-bold border border-slate-200/60">
-                                Lvl <?php echo $user['level']; ?>
-                            </span>
-                        </td>
-                        <td class="px-6 py-4 font-mono font-medium text-slate-700">
-                            <?php echo formatNumberShort($user['total_counts']); ?>
-                        </td>
-                        <td class="px-6 py-4 text-slate-500 text-xs font-medium">
-                            <?php echo date('M d, Y H:i', strtotime($user['last_active'])); ?>
-                        </td>
-                        <td class="px-6 py-4 text-center">
-                            <form method="POST" action="">
-                                <input type="hidden" name="action" value="toggle_ads">
-                                <input type="hidden" name="user_id" value="<?php echo $user['id']; ?>">
-                                <?php $ads_disabled = isset($user['ads_disabled']) ? $user['ads_disabled'] : 0; ?>
-                                <input type="hidden" name="current_status" value="<?php echo $ads_disabled; ?>">
-                                
-                                <button type="submit" class="px-3 py-1.5 text-xs font-bold rounded-lg border transition-all shadow-sm flex items-center justify-center mx-auto gap-1.5 <?php echo $ads_disabled ? 'bg-red-50 text-red-600 border-red-200 hover:bg-red-100' : 'bg-emerald-50 text-emerald-600 border-emerald-200 hover:bg-emerald-100'; ?>">
-                                    <i class="fa-solid <?php echo $ads_disabled ? 'fa-ban' : 'fa-check-circle'; ?>"></i>
-                                    <?php echo $ads_disabled ? 'Ads Disabled' : 'Ads Enabled'; ?>
-                                </button>
-                            </form>
-                        </td>
-                    </tr>
-                    <?php endforeach; ?>
-                <?php endif; ?>
-            </tbody>
-        </table>
+<?php if(empty($users)): ?>
+    <div class="bg-white/60 backdrop-blur-xl border border-white rounded-2xl shadow-[0_4px_24px_rgb(0,0,0,0.02)] p-12 text-center text-slate-500 w-full">
+        <i class="fa-solid fa-users-slash text-4xl mb-3 block opacity-30"></i>
+        <span class="font-medium">No users found matching your criteria.</span>
     </div>
+<?php else: ?>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        <?php foreach($users as $user): ?>
+            <div class="bg-white/80 backdrop-blur-xl border border-slate-200/60 shadow-sm rounded-2xl p-6 transition-all hover:shadow-lg hover:-translate-y-1 group">
+                <div class="flex justify-between items-start mb-5">
+                    <div class="flex items-center gap-3">
+                        <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 text-white flex items-center justify-center font-bold text-xl shadow-inner group-hover:scale-105 transition-transform">
+                            <?php echo strtoupper(substr($user['username'], 0, 1)); ?>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-slate-800 text-lg leading-tight truncate max-w-[120px]" title="<?php echo htmlspecialchars($user['username']); ?>">
+                                <?php echo htmlspecialchars($user['username']); ?>
+                            </h3>
+                            <p class="text-[11px] text-slate-400 font-bold uppercase tracking-wider mt-0.5">ID: #<?php echo $user['id']; ?></p>
+                        </div>
+                    </div>
+                    <span class="bg-slate-100 text-slate-600 py-1 px-2.5 rounded-full text-xs font-bold border border-slate-200/60">
+                        Lvl <?php echo $user['level']; ?>
+                    </span>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-3 mb-5">
+                    <div class="bg-slate-50/70 rounded-xl p-3 border border-slate-100/80">
+                        <p class="text-[10px] uppercase font-bold text-slate-400 tracking-wider mb-1 flex items-center gap-1.5"><i class="fa-solid fa-calculator text-slate-300"></i> Counts</p>
+                        <p class="font-mono font-bold text-slate-700 text-lg"><?php echo formatNumberShort($user['total_counts']); ?></p>
+                    </div>
+                    <div class="bg-slate-50/70 rounded-xl p-3 border border-slate-100/80">
+                        <p class="text-[10px] uppercase font-bold text-slate-400 tracking-wider mb-1 flex items-center gap-1.5"><i class="fa-solid fa-clock-rotate-left text-slate-300"></i> Active</p>
+                        <p class="font-semibold text-slate-600 text-xs mt-1"><?php echo date('M d, Y', strtotime($user['last_active'])); ?></p>
+                    </div>
+                </div>
+
+                <div class="border-t border-slate-100 pt-4 mt-auto">
+                    <form method="POST" action="" class="w-full">
+                        <input type="hidden" name="action" value="toggle_ads">
+                        <input type="hidden" name="user_id" value="<?php echo $user['id']; ?>">
+                        <?php $ads_disabled = isset($user['ads_disabled']) ? $user['ads_disabled'] : 0; ?>
+                        <input type="hidden" name="current_status" value="<?php echo $ads_disabled; ?>">
+                        
+                        <button type="submit" class="w-full py-2.5 text-xs font-bold rounded-xl border transition-all shadow-sm flex items-center justify-center gap-2 <?php echo $ads_disabled ? 'bg-red-50 text-red-600 border-red-200 hover:bg-red-100' : 'bg-emerald-50 text-emerald-600 border-emerald-200 hover:bg-emerald-100'; ?>">
+                            <i class="fa-solid <?php echo $ads_disabled ? 'fa-ban' : 'fa-check-circle'; ?>"></i>
+                            <?php echo $ads_disabled ? 'Ads Disabled for User' : 'Ads Enabled for User'; ?>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        <?php endforeach; ?>
+    </div>
+<?php endif; ?>
     
     <!-- Pagination -->
     <?php if ($total_pages > 1): ?>
