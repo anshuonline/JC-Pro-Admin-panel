@@ -68,20 +68,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_dates'])) {
     exit();
 }
 
-// Handle Wipe Scores
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['wipe_scores'])) {
-    // Wipe previous scores and analytics history
-    $conn->query("UPDATE users SET total_counts = 0, level = 1");
-    $conn->query("TRUNCATE TABLE daily_counts");
-    
-    $_SESSION['success'] = "All User Scores and Analytics have been successfully wiped to 0.";
-    header("Location: leaderboard_manager.php");
-    exit();
-}
+// Wipe Scores functionality has been safely removed as the leaderboard is now dynamically scoped by date.
 
 // Fetch Top 100 Users
 $leaderboard_data = [];
-$leaderboard_res = $conn->query("SELECT username, total_counts, level FROM users WHERE total_counts > 0 ORDER BY total_counts DESC LIMIT 100");
+$leaderboard_res = $conn->query("SELECT u.username, SUM(dc.daily_count) as total_counts, MAX(u.level) as level 
+        FROM users u 
+        JOIN daily_counts dc ON u.id = dc.user_id 
+        WHERE dc.date >= DATE('$challenge_start') AND dc.date <= DATE('$challenge_end')
+        GROUP BY u.id 
+        HAVING total_counts > 0
+        ORDER BY total_counts DESC LIMIT 100");
 if ($leaderboard_res && $leaderboard_res->num_rows > 0) {
     while($row = $leaderboard_res->fetch_assoc()) {
         $leaderboard_data[] = $row;
@@ -129,16 +126,11 @@ include 'includes/header.php';
         </div>
     </div>
 
-    <!-- Wipe Scores Card -->
-    <div class="bg-white rounded-lg shadow-sm border border-red-200 p-6">
-        <h3 class="text-lg font-bold text-red-600 mb-2"><i class="fa-solid fa-triangle-exclamation mr-2"></i> Danger Zone</h3>
-        <p class="text-slate-600 mb-6">Wiping scores will reset every user's total counts to 0 and clear all analytics charts. Do this right before a new challenge starts.</p>
-        
-        <form method="POST" onsubmit="return confirm('WARNING: Are you sure you want to WIPE all user scores and analytics? This cannot be undone!');">
-            <button type="submit" name="wipe_scores" class="bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-6 rounded-lg shadow-sm transition-colors w-full sm:w-auto">
-                <i class="fa-solid fa-skull-crossbones mr-2"></i> Wipe All Scores to 0
-            </button>
-        </form>
+    <!-- Info Card -->
+    <div class="bg-blue-50 rounded-lg shadow-sm border border-blue-200 p-6 flex flex-col justify-center">
+        <h3 class="text-lg font-bold text-blue-800 mb-2"><i class="fa-solid fa-wand-magic-sparkles mr-2"></i> Auto-Reset Magic</h3>
+        <p class="text-blue-600 mb-2">You no longer need to wipe scores! The leaderboard automatically recalculates scores using only the counts generated within the exact start and end dates you choose.</p>
+        <p class="text-blue-600 font-semibold text-sm">Users' lifetime counts remain completely safe.</p>
     </div>
 </div>
 
@@ -170,7 +162,7 @@ include 'includes/header.php';
         <li><strong>Waiting:</strong> If the current time is <em>before</em> the Start Date, the challenge is locked. Users cannot submit scores for the challenge yet.</li>
         <li><strong>Active Tracking:</strong> Once the Start Date passes, tracking begins automatically. App users will sync their scores seamlessly.</li>
         <li><strong>Results Phase:</strong> Once the End Date passes, the leaderboard automatically locks itself. The final winners are displayed, and no new scores can be submitted.</li>
-        <li><strong>Wiping Scores:</strong> Setting the dates does <strong>NOT</strong> reset user scores! You must manually click the red "Wipe All Scores" button to clear the slate for a new challenge.</li>
+        <li><strong>Automatic Reset:</strong> Just set a new Start and End date for the next month! The system will automatically reset everyone's challenge score to 0 for the new month without touching their lifetime history.</li>
     </ul>
 </div>
 
