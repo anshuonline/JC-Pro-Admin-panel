@@ -7,10 +7,7 @@ header('Content-Type: application/json');
 $response = array(
     'success' => false,
     'global_ads_enabled' => true,
-    'user_ads_disabled' => false,
-    'interstitial_id' => 'ca-app-pub-8044395417844839/4765060917',
-    'rewarded_id' => 'ca-app-pub-8044395417844839/8105540126',
-    'app_open_id' => 'ca-app-pub-8044395417844839/3487638267'
+    'user_ads_disabled' => false
 );
 
 // Fetch global settings
@@ -19,16 +16,7 @@ if ($res && $res->num_rows > 0) {
     $settings = $res->fetch_assoc();
     $response['global_ads_enabled'] = (bool)$settings['ads_enabled'];
     
-    // Only send the real IDs if they are configured and not empty
-    if (!empty($settings['admob_interstitial_id'])) {
-        $response['interstitial_id'] = $settings['admob_interstitial_id'];
-    }
-    if (!empty($settings['admob_rewarded_id'])) {
-        $response['rewarded_id'] = $settings['admob_rewarded_id'];
-    }
-    if (!empty($settings['admob_app_open_id'])) {
-        $response['app_open_id'] = $settings['admob_app_open_id'];
-    }
+    // Ad IDs are now handled directly in the Android app.
 }
 
 // Check user specific setting

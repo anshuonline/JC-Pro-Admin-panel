@@ -6,15 +6,9 @@ check_auth();
 $message = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $ads_enabled = isset($_POST['ads_enabled']) ? 1 : 0;
-    $interstitial = $conn->real_escape_string($_POST['interstitial']);
-    $rewarded = $conn->real_escape_string($_POST['rewarded']);
-    $app_open = $conn->real_escape_string($_POST['app_open']);
 
     $update_query = "UPDATE app_settings SET 
-        ads_enabled = $ads_enabled,
-        admob_interstitial_id = '$interstitial',
-        admob_rewarded_id = '$rewarded',
-        admob_app_open_id = '$app_open'
+        ads_enabled = $ads_enabled
         WHERE id = 1";
 
     if ($conn->query($update_query)) {
@@ -56,28 +50,7 @@ include 'includes/header.php';
             </label>
         </div>
 
-        <div class="space-y-6">
-            <div>
-                <label class="block text-sm font-semibold text-slate-700 mb-2">Interstitial Ad Unit ID</label>
-                <input type="text" name="interstitial" value="<?php echo htmlspecialchars($settings['admob_interstitial_id']); ?>" required
-                    class="block w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 focus:bg-white focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all font-mono text-sm"
-                    placeholder="ca-app-pub-xxxxxxxxxxxxxxxx/xxxxxxxxxx">
-            </div>
-
-            <div>
-                <label class="block text-sm font-semibold text-slate-700 mb-2">Rewarded Ad Unit ID</label>
-                <input type="text" name="rewarded" value="<?php echo htmlspecialchars($settings['admob_rewarded_id']); ?>" required
-                    class="block w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 focus:bg-white focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all font-mono text-sm"
-                    placeholder="ca-app-pub-xxxxxxxxxxxxxxxx/xxxxxxxxxx">
-            </div>
-
-            <div>
-                <label class="block text-sm font-semibold text-slate-700 mb-2">App Open Ad Unit ID</label>
-                <input type="text" name="app_open" value="<?php echo htmlspecialchars($settings['admob_app_open_id']); ?>" required
-                    class="block w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 focus:bg-white focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all font-mono text-sm"
-                    placeholder="ca-app-pub-xxxxxxxxxxxxxxxx/xxxxxxxxxx">
-            </div>
-        </div>
+        <!-- Ad Unit IDs removed by request -->
 
         <div class="mt-10">
             <button type="submit" class="w-full md:w-auto px-8 py-3 bg-slate-900 hover:bg-slate-800 text-white font-semibold rounded-xl transition-all shadow-md shadow-slate-900/10 flex items-center justify-center gap-2">
