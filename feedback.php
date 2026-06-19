@@ -73,6 +73,10 @@ include 'includes/header.php';
                             <i class="fa-solid fa-star text-orange-500 text-sm"></i>
                             <span class="font-bold text-orange-700"><?php echo $f['overall_rating']; ?>/5</span>
                         </div>
+                        <button onclick="toggleFeatured(<?php echo $f['id']; ?>, this)" class="mt-1 flex items-center gap-1.5 px-3 py-1 text-xs font-semibold rounded-full border transition-all <?php echo isset($f['is_featured']) && $f['is_featured'] ? 'bg-indigo-50 text-indigo-700 border-indigo-200' : 'bg-slate-50 text-slate-500 border-slate-200 hover:bg-slate-100'; ?>">
+                            <i class="<?php echo isset($f['is_featured']) && $f['is_featured'] ? 'fa-solid' : 'fa-regular'; ?> fa-eye text-xs"></i>
+                            <span><?php echo isset($f['is_featured']) && $f['is_featured'] ? 'Featured on Web' : 'Hide on Web'; ?></span>
+                        </button>
                     </div>
                 </div>
 
@@ -153,6 +157,43 @@ include 'includes/header.php';
         <?php endif; ?>
     </div>
 </div>
-<?php endif; ?>
+<script>
+function toggleFeatured(id, btn) {
+    const formData = new FormData();
+    formData.append('id', id);
+    
+    btn.disabled = true;
+    fetch('toggle_feedback.php', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        btn.disabled = false;
+        if (data.status === 'success') {
+            const isFeatured = data.is_featured;
+            const icon = btn.querySelector('i');
+            const span = btn.querySelector('span');
+            
+            if (isFeatured) {
+                btn.className = 'mt-1 flex items-center gap-1.5 px-3 py-1 text-xs font-semibold rounded-full border transition-all bg-indigo-50 text-indigo-700 border-indigo-200';
+                icon.className = 'fa-solid fa-eye text-xs';
+                span.textContent = 'Featured on Web';
+            } else {
+                btn.className = 'mt-1 flex items-center gap-1.5 px-3 py-1 text-xs font-semibold rounded-full border transition-all bg-slate-50 text-slate-500 border-slate-200 hover:bg-slate-100';
+                icon.className = 'fa-regular fa-eye text-xs';
+                span.textContent = 'Hide on Web';
+            }
+        } else {
+            alert('Failed to update status.');
+        }
+    })
+    .catch(err => {
+        btn.disabled = false;
+        console.error(err);
+        alert('An error occurred.');
+    });
+}
+</script>
 
 <?php include 'includes/footer.php'; ?>

@@ -5,9 +5,9 @@ header("Content-Type: application/json; charset=UTF-8");
 
 require_once '../../config.php';
 
-// Fetch top 10 recent feedbacks with high ratings to show on website
+// Fetch top 10 featured feedbacks to show on website
 $feedbacks = [];
-$res = $conn->query("SELECT name, overall_rating, likes_most, submitted_at FROM feedback WHERE overall_rating >= 4 AND likes_most != '' ORDER BY id DESC LIMIT 10");
+$res = $conn->query("SELECT name, overall_rating, likes_most, submitted_at FROM feedback WHERE is_featured = 1 AND likes_most != '' ORDER BY id DESC LIMIT 10");
 
 if ($res) {
     while ($row = $res->fetch_assoc()) {
