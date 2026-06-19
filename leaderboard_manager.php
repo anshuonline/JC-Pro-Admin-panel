@@ -68,10 +68,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_dates'])) {
     exit();
 }
 
-// Wipe Scores functionality has been safely removed as the leaderboard is now dynamically scoped by date.
+// YAHAN NAYA LOGIC HAI:
+// Pehle yahan "Wipe Scores" ka button aur code hota tha.
+// Ab uski zaroorat nahi hai kyunki Leaderboard automatically naye mahine ke Start/End Date ke hisaab se 0 se chalu ho jata hai.
+// Isliye maine database wipe karne ka khatarnak code hamesha ke liye hata diya hai.
 
 // Fetch Top 100 Users
 $leaderboard_data = [];
+// YAHAN NAYA LOGIC HAI:
+// Admin panel ka table bhi ab sirf current mahine (Start aur End Date ke beech) ke daily_counts ko SUM karta hai.
+// Isse Admin ko bilkul wahi live result dikhta hai jo app mein users ko dikh raha hota hai.
 $leaderboard_res = $conn->query("SELECT u.username, SUM(dc.daily_count) as total_counts, MAX(u.level) as level 
         FROM users u 
         JOIN daily_counts dc ON u.id = dc.user_id 
