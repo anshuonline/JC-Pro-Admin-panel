@@ -48,10 +48,25 @@ include 'includes/header.php';
 
 <div class="space-y-6">
     <?php if (count($feedback) > 0): ?>
+        
+        <!-- Bulk Actions Bar -->
+        <div class="flex items-center justify-between bg-slate-50 border border-slate-200 rounded-xl p-3 mb-4">
+            <div class="flex items-center gap-3 pl-2">
+                <input type="checkbox" id="selectAll" class="w-5 h-5 text-orange-600 rounded border-slate-300 focus:ring-orange-500 cursor-pointer">
+                <label for="selectAll" class="text-sm font-semibold text-slate-700 cursor-pointer select-none">Select All on Page</label>
+            </div>
+            <button id="bulkDeleteBtn" onclick="deleteSelected()" disabled class="opacity-50 cursor-not-allowed bg-red-50 text-red-600 hover:bg-red-100 px-4 py-1.5 rounded-lg font-semibold text-sm border border-red-200 transition-colors flex items-center gap-2">
+                <i class="fa-solid fa-trash-can"></i> Delete (<span id="selectedCount">0</span>)
+            </button>
+        </div>
+
         <?php foreach ($feedback as $f): ?>
-            <div class="bg-white/80 backdrop-blur-xl border border-slate-200/60 shadow-sm rounded-2xl p-6 transition-all hover:shadow-md">
+            <div class="feedback-card bg-white/80 backdrop-blur-xl border border-slate-200/60 shadow-sm rounded-2xl p-6 transition-all hover:shadow-md" data-id="<?php echo $f['id']; ?>">
                 <div class="flex flex-col md:flex-row md:items-start justify-between gap-4 mb-4">
                     <div class="flex items-start gap-4">
+                        <div class="pt-3">
+                            <input type="checkbox" value="<?php echo $f['id']; ?>" class="feedback-checkbox w-5 h-5 text-orange-600 rounded border-slate-300 focus:ring-orange-500 cursor-pointer">
+                        </div>
                         <div class="w-12 h-12 rounded-full bg-orange-100 flex items-center justify-center text-orange-600 font-bold text-xl shrink-0">
                             <?php echo strtoupper(substr($f['name'] ?: 'A', 0, 1)); ?>
                         </div>
@@ -73,10 +88,16 @@ include 'includes/header.php';
                             <i class="fa-solid fa-star text-orange-500 text-sm"></i>
                             <span class="font-bold text-orange-700"><?php echo $f['overall_rating']; ?>/5</span>
                         </div>
-                        <button onclick="toggleFeatured(<?php echo $f['id']; ?>, this)" class="mt-1 flex items-center gap-1.5 px-3 py-1 text-xs font-semibold rounded-full border transition-all <?php echo isset($f['is_featured']) && $f['is_featured'] ? 'bg-indigo-50 text-indigo-700 border-indigo-200' : 'bg-slate-50 text-slate-500 border-slate-200 hover:bg-slate-100'; ?>">
-                            <i class="<?php echo isset($f['is_featured']) && $f['is_featured'] ? 'fa-solid' : 'fa-regular'; ?> fa-eye text-xs"></i>
-                            <span><?php echo isset($f['is_featured']) && $f['is_featured'] ? 'Featured on Web' : 'Hide on Web'; ?></span>
-                        </button>
+                        <div class="flex gap-2 mt-1">
+                            <button onclick="toggleFeatured(<?php echo $f['id']; ?>, this)" class="flex items-center gap-1.5 px-3 py-1 text-xs font-semibold rounded-full border transition-all <?php echo isset($f['is_featured']) && $f['is_featured'] ? 'bg-indigo-50 text-indigo-700 border-indigo-200' : 'bg-slate-50 text-slate-500 border-slate-200 hover:bg-slate-100'; ?>">
+                                <i class="<?php echo isset($f['is_featured']) && $f['is_featured'] ? 'fa-solid' : 'fa-regular'; ?> fa-eye text-xs"></i>
+                                <span><?php echo isset($f['is_featured']) && $f['is_featured'] ? 'Featured' : 'Hide'; ?></span>
+                            </button>
+                            <button onclick="deleteFeedback(<?php echo $f['id']; ?>)" class="flex items-center gap-1.5 px-3 py-1 text-xs font-semibold rounded-full border transition-all bg-red-50 text-red-600 border-red-200 hover:bg-red-100">
+                                <i class="fa-regular fa-trash-can text-xs"></i>
+                                <span>Delete</span>
+                            </button>
+                        </div>
                     </div>
                 </div>
 
@@ -177,13 +198,13 @@ function toggleFeatured(id, btn) {
             const span = btn.querySelector('span');
             
             if (isFeatured) {
-                btn.className = 'mt-1 flex items-center gap-1.5 px-3 py-1 text-xs font-semibold rounded-full border transition-all bg-indigo-50 text-indigo-700 border-indigo-200';
+                btn.className = 'flex items-center gap-1.5 px-3 py-1 text-xs font-semibold rounded-full border transition-all bg-indigo-50 text-indigo-700 border-indigo-200';
                 icon.className = 'fa-solid fa-eye text-xs';
-                span.textContent = 'Featured on Web';
+                span.textContent = 'Featured';
             } else {
-                btn.className = 'mt-1 flex items-center gap-1.5 px-3 py-1 text-xs font-semibold rounded-full border transition-all bg-slate-50 text-slate-500 border-slate-200 hover:bg-slate-100';
+                btn.className = 'flex items-center gap-1.5 px-3 py-1 text-xs font-semibold rounded-full border transition-all bg-slate-50 text-slate-500 border-slate-200 hover:bg-slate-100';
                 icon.className = 'fa-regular fa-eye text-xs';
-                span.textContent = 'Hide on Web';
+                span.textContent = 'Hide';
             }
         } else {
             alert('Failed to update status.');
@@ -193,6 +214,83 @@ function toggleFeatured(id, btn) {
         btn.disabled = false;
         console.error(err);
         alert('An error occurred.');
+    });
+}
+
+// Selection Logic
+const selectAll = document.getElementById('selectAll');
+const checkboxes = document.querySelectorAll('.feedback-checkbox');
+const bulkDeleteBtn = document.getElementById('bulkDeleteBtn');
+const selectedCount = document.getElementById('selectedCount');
+
+function updateBulkDeleteBtn() {
+    const checked = document.querySelectorAll('.feedback-checkbox:checked').length;
+    selectedCount.textContent = checked;
+    if (checked > 0) {
+        bulkDeleteBtn.disabled = false;
+        bulkDeleteBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+    } else {
+        bulkDeleteBtn.disabled = true;
+        bulkDeleteBtn.classList.add('opacity-50', 'cursor-not-allowed');
+    }
+    selectAll.checked = checked === checkboxes.length && checkboxes.length > 0;
+}
+
+if (selectAll) {
+    selectAll.addEventListener('change', (e) => {
+        checkboxes.forEach(cb => cb.checked = e.target.checked);
+        updateBulkDeleteBtn();
+    });
+}
+
+checkboxes.forEach(cb => {
+    cb.addEventListener('change', updateBulkDeleteBtn);
+});
+
+// Single Delete
+function deleteFeedback(id) {
+    if (confirm('Are you sure you want to delete this feedback? This cannot be undone.')) {
+        executeDelete([id]);
+    }
+}
+
+// Bulk Delete
+function deleteSelected() {
+    const selected = Array.from(document.querySelectorAll('.feedback-checkbox:checked')).map(cb => cb.value);
+    if (selected.length === 0) return;
+    
+    if (confirm(`Are you sure you want to delete ${selected.length} selected feedback(s)? This cannot be undone.`)) {
+        executeDelete(selected);
+    }
+}
+
+function executeDelete(ids) {
+    const formData = new FormData();
+    formData.append('action', 'delete');
+    formData.append('ids', JSON.stringify(ids));
+
+    fetch('delete_feedback.php', {
+        method: 'POST',
+        body: formData
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.status === 'success') {
+            ids.forEach(id => {
+                const card = document.querySelector(`.feedback-card[data-id="${id}"]`);
+                if (card) {
+                    card.style.opacity = '0';
+                    setTimeout(() => card.remove(), 300);
+                }
+            });
+            setTimeout(() => location.reload(), 300);
+        } else {
+            alert(data.message || 'Error deleting feedback.');
+        }
+    })
+    .catch(err => {
+        console.error(err);
+        alert('Network error occurred.');
     });
 }
 </script>
