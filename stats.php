@@ -203,7 +203,7 @@ include 'includes/header.php';
         <div class="flex justify-between items-start">
             <div>
                 <p class="text-xs font-semibold text-slate-500 uppercase tracking-wide">Total Users</p>
-                <p class="text-2xl xl:text-3xl tracking-tight break-all font-extrabold text-slate-800 mt-1" id="stat-total-users"><?php echo number_format($stats['total_users']); ?></p>
+                <p class="text-2xl xl:text-3xl tracking-tight break-all font-extrabold text-slate-800 mt-1" id="stat-total-users"><?php echo formatNumberShort($stats['total_users']); ?></p>
             </div>
             <div class="w-10 h-10 bg-orange-100 rounded-xl flex items-center justify-center">
                 <i class="fa-solid fa-users text-orange-600"></i>
@@ -217,7 +217,7 @@ include 'includes/header.php';
         <div class="flex justify-between items-start">
             <div>
                 <p class="text-xs font-semibold text-slate-500 uppercase tracking-wide">Today's Jaap</p>
-                <p class="text-2xl xl:text-3xl tracking-tight break-all font-extrabold text-green-600 mt-1" id="stat-today-counts"><?php echo number_format($stats['today_counts']); ?></p>
+                <p class="text-2xl xl:text-3xl tracking-tight break-all font-extrabold text-green-600 mt-1" id="stat-today-counts"><?php echo formatNumberShort($stats['today_counts']); ?></p>
             </div>
             <div class="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center">
                 <i class="fa-solid fa-om text-green-600"></i>
@@ -231,7 +231,7 @@ include 'includes/header.php';
         <div class="flex justify-between items-start">
             <div>
                 <p class="text-xs font-semibold text-slate-500 uppercase tracking-wide">This Week</p>
-                <p class="text-2xl xl:text-3xl tracking-tight break-all font-extrabold text-amber-600 mt-1" id="stat-week-counts"><?php echo number_format($stats['this_week_counts']); ?></p>
+                <p class="text-2xl xl:text-3xl tracking-tight break-all font-extrabold text-amber-600 mt-1" id="stat-week-counts"><?php echo formatNumberShort($stats['this_week_counts']); ?></p>
             </div>
             <div class="w-10 h-10 bg-amber-100 rounded-xl flex items-center justify-center">
                 <i class="fa-solid fa-calendar-week text-amber-600"></i>
@@ -259,15 +259,15 @@ include 'includes/header.php';
 <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
     <div class="bg-white/60 backdrop-blur-xl rounded-2xl p-5 border border-white shadow-sm text-center">
         <p class="text-xs font-semibold text-slate-500 uppercase tracking-wide">This Month</p>
-        <p class="text-xl sm:text-2xl tracking-tight break-all font-extrabold text-orange-600 mt-1"><?php echo number_format($stats['this_month_counts']); ?></p>
+        <p class="text-xl sm:text-2xl tracking-tight break-all font-extrabold text-orange-600 mt-1"><?php echo formatNumberShort($stats['this_month_counts']); ?></p>
     </div>
     <div class="bg-white/60 backdrop-blur-xl rounded-2xl p-5 border border-white shadow-sm text-center">
         <p class="text-xs font-semibold text-slate-500 uppercase tracking-wide">This Year</p>
-        <p class="text-xl sm:text-2xl tracking-tight break-all font-extrabold text-slate-600 mt-1"><?php echo number_format($stats['this_year_counts']); ?></p>
+        <p class="text-xl sm:text-2xl tracking-tight break-all font-extrabold text-slate-600 mt-1"><?php echo formatNumberShort($stats['this_year_counts']); ?></p>
     </div>
     <div class="bg-white/60 backdrop-blur-xl rounded-2xl p-5 border border-white shadow-sm text-center">
         <p class="text-xs font-semibold text-slate-500 uppercase tracking-wide">All Time</p>
-        <p class="text-xl sm:text-2xl tracking-tight break-all font-extrabold text-slate-800 mt-1"><?php echo number_format($stats['total_counts']); ?></p>
+        <p class="text-xl sm:text-2xl tracking-tight break-all font-extrabold text-slate-800 mt-1"><?php echo formatNumberShort($stats['total_counts']); ?></p>
     </div>
 </div>
 
@@ -310,7 +310,7 @@ include 'includes/header.php';
                         <p class="text-sm font-semibold text-slate-800 truncate"><?php echo htmlspecialchars($lu['username']); ?></p>
                         <p class="text-xs text-slate-500"><?php echo gmdate("H:i:s", (int)$lu['duration_seconds']); ?> active</p>
                     </div>
-                    <span class="text-lg font-extrabold text-green-600"><?php echo number_format((int)$lu['session_count']); ?></span>
+                    <span class="text-lg font-extrabold text-green-600"><?php echo formatNumberShort((int)$lu['session_count']); ?></span>
                 </div>
                 <?php endforeach; ?>
             <?php endif; ?>
@@ -361,13 +361,13 @@ include 'includes/header.php';
                         </div>
                         <div>
                             <div class="font-bold text-slate-800 text-base"><?php echo htmlspecialchars($u['username']); ?></div>
-                            <div class="text-xs font-medium text-slate-500">All Time: <span class="font-mono text-slate-700"><?php echo number_format((int)$u['total_counts']); ?></span></div>
+                            <div class="text-xs font-medium text-slate-500">All Time: <span class="font-mono text-slate-700"><?php echo formatNumberShort((int)$u['total_counts']); ?></span></div>
                         </div>
                     </div>
                     <div class="flex items-center justify-between sm:justify-end gap-6 sm:w-auto w-full pl-12 sm:pl-0">
                         <div class="text-left sm:text-right">
                             <div class="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-green-500 to-teal-400">
-                                <?php echo number_format((int)$u['today_count']); ?>
+                                <?php echo formatNumberShort((int)$u['today_count']); ?>
                             </div>
                             <div class="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Today</div>
                         </div>
@@ -413,7 +413,7 @@ const defaultOptions = {
             padding: 12,
             cornerRadius: 10,
             callbacks: {
-                label: ctx => new Intl.NumberFormat('en-IN').format(ctx.raw) + ' counts'
+                label: ctx => formatNumberShort(ctx.raw) + ' counts'
             }
         }
     },
@@ -622,17 +622,17 @@ async function refreshFullStats() {
         const data = await res.json();
         if (data.success && data.overview) {
             // Update Overview Cards
-            document.getElementById('stat-total-users').textContent = new Intl.NumberFormat('en-IN').format(data.overview.total_users || 0);
-            document.getElementById('stat-today-counts').textContent = new Intl.NumberFormat('en-IN').format(data.overview.today_counts || 0);
+            document.getElementById('stat-total-users').textContent = formatNumberShort(data.overview.total_users || 0);
+            document.getElementById('stat-today-counts').textContent = formatNumberShort(data.overview.today_counts || 0);
             document.getElementById('stat-today-users').textContent = data.overview.today_active_users || 0;
-            document.getElementById('stat-week-counts').textContent = new Intl.NumberFormat('en-IN').format(data.overview.this_week_counts || 0);
+            document.getElementById('stat-week-counts').textContent = formatNumberShort(data.overview.this_week_counts || 0);
             
             // Update Period Summary
             const summaries = document.querySelectorAll('.grid-cols-3 .text-2xl');
             if (summaries.length >= 3) {
-                summaries[0].textContent = new Intl.NumberFormat('en-IN').format(data.overview.this_month_counts || 0);
-                summaries[1].textContent = new Intl.NumberFormat('en-IN').format(data.overview.this_year_counts || 0);
-                summaries[2].textContent = new Intl.NumberFormat('en-IN').format(data.overview.total_counts || 0);
+                summaries[0].textContent = formatNumberShort(data.overview.this_month_counts || 0);
+                summaries[1].textContent = formatNumberShort(data.overview.this_year_counts || 0);
+                summaries[2].textContent = formatNumberShort(data.overview.total_counts || 0);
             }
 
             // Update Charts Data
@@ -669,13 +669,13 @@ async function refreshFullStats() {
                             </div>
                             <div>
                                 <div class="font-bold text-slate-800 text-base">${u.username}</div>
-                                <div class="text-xs font-medium text-slate-500">All Time: <span class="font-mono text-slate-700">${new Intl.NumberFormat('en-IN').format(u.total_counts)}</span></div>
+                                <div class="text-xs font-medium text-slate-500">All Time: <span class="font-mono text-slate-700">${formatNumberShort(u.total_counts)}</span></div>
                             </div>
                         </div>
                         <div class="flex items-center justify-between sm:justify-end gap-6 sm:w-auto w-full pl-12 sm:pl-0">
                             <div class="text-left sm:text-right">
                                 <div class="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-green-500 to-teal-400">
-                                    ${new Intl.NumberFormat('en-IN').format(u.today_count)}
+                                    ${formatNumberShort(u.today_count)}
                                 </div>
                                 <div class="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Today</div>
                             </div>

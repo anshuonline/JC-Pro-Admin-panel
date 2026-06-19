@@ -107,7 +107,7 @@ include 'includes/header.php';
                             </span>
                         </td>
                         <td class="px-6 py-4 font-mono font-medium text-slate-700">
-                            <?php echo number_format($user['total_counts']); ?>
+                            <?php echo formatNumberShort($user['total_counts']); ?>
                         </td>
                         <td class="px-6 py-4 text-slate-500 text-xs font-medium">
                             <?php echo date('M d, Y H:i', strtotime($user['last_active'])); ?>

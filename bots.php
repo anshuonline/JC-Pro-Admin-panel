@@ -268,7 +268,7 @@ include 'includes/header.php';
                             </span>
                         </td>
                         <td class="px-6 py-4 font-mono font-medium text-green-600">
-                            <?php echo number_format($bot['total_counts']); ?>
+                            <?php echo formatNumberShort($bot['total_counts']); ?>
                         </td>
                         <td class="px-6 py-4 text-slate-500 text-xs font-medium">
                             <?php echo date('M d, Y H:i', strtotime($bot['last_active'])); ?>

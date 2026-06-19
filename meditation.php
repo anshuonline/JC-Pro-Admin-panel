@@ -90,10 +90,10 @@ include 'includes/header.php';
         fetch('api/japacounterpro/get_meditation_stats.php')
             .then(res => res.json())
             .then(data => {
-                document.getElementById('statActive').innerText = data.active_count;
-                document.getElementById('statHours').innerText = data.total_hours;
-                document.getElementById('statPeople').innerText = data.total_people;
-                document.getElementById('statMax').innerHTML = data.max_minutes + ' <span class="text-lg text-slate-500 font-medium">min</span>';
+                document.getElementById('statActive').innerText = formatNumberShort(data.active_count);
+                document.getElementById('statHours').innerText = formatNumberShort(data.total_hours);
+                document.getElementById('statPeople').innerText = formatNumberShort(data.total_people);
+                document.getElementById('statMax').innerHTML = formatNumberShort(data.max_minutes) + ' <span class="text-lg text-slate-500 font-medium">min</span>';
                 
                 const list = document.getElementById('activeUsersList');
                 if (data.active_users.length === 0) {

@@ -137,7 +137,7 @@ body.theme-90s .btn-90s-toggle:active {
             <i class="fa-solid fa-users text-6xl text-orange-500"></i>
         </div>
         <h3 class="text-slate-500 text-sm font-semibold mb-1">Total Users</h3>
-        <p class="text-3xl font-bold text-slate-800" id="dash-users"><?php echo number_format($stats['users']); ?></p>
+        <p class="text-3xl font-bold text-slate-800" id="dash-users"><?php echo formatNumberShort($stats['users']); ?></p>
         <div class="mt-4 flex items-center text-sm font-medium">
             <span class="text-orange-600 flex items-center"><i class="fa-solid fa-arrow-trend-up mr-1.5"></i> Registered</span>
         </div>
@@ -149,9 +149,9 @@ body.theme-90s .btn-90s-toggle:active {
             <i class="fa-solid fa-om text-6xl text-green-500"></i>
         </div>
         <h3 class="text-slate-500 text-sm font-semibold mb-1">Total Jaap Count</h3>
-        <p class="text-3xl font-bold text-slate-800" id="dash-total"><?php echo number_format($stats['total_counts']); ?></p>
+        <p class="text-3xl font-bold text-slate-800" id="dash-total"><?php echo formatNumberShort($stats['total_counts']); ?></p>
         <div class="mt-4 flex items-center text-sm font-medium">
-            <span class="text-green-600 flex items-center"><i class="fa-solid fa-calendar-day mr-1.5"></i> <span id="dash-today" class="mx-1"><?php echo number_format($stats['today_counts']); ?></span> Today</span>
+            <span class="text-green-600 flex items-center"><i class="fa-solid fa-calendar-day mr-1.5"></i> <span id="dash-today" class="mx-1"><?php echo formatNumberShort($stats['today_counts']); ?></span> Today</span>
         </div>
     </div>
 
@@ -162,7 +162,7 @@ body.theme-90s .btn-90s-toggle:active {
             <i class="fa-solid fa-file-lines text-6xl text-slate-500"></i>
         </div>
         <h3 class="text-slate-500 text-sm font-semibold mb-1">Content Pages</h3>
-        <p class="text-3xl font-bold text-slate-800" id="dash-pages"><?php echo number_format($stats['pages']); ?></p>
+        <p class="text-3xl font-bold text-slate-800" id="dash-pages"><?php echo formatNumberShort($stats['pages']); ?></p>
         <div class="mt-4 flex items-center text-sm font-medium">
             <a href="content.php" class="text-slate-600 hover:text-purple-700 transition-colors">Manage Content <i class="fa-solid fa-arrow-right ml-1 text-xs"></i></a>
         </div>
@@ -204,7 +204,7 @@ body.theme-90s .btn-90s-toggle:active {
                             </span>
                         </td>
                         <td class="px-6 py-4 font-mono font-medium text-slate-700">
-                            <?php echo number_format($user['total_counts']); ?>
+                            <?php echo formatNumberShort($user['total_counts']); ?>
                         </td>
                         <td class="px-6 py-4 text-slate-500 text-xs font-medium">
                             <?php echo date('M d, Y H:i', strtotime($user['last_active'])); ?>
@@ -223,10 +223,10 @@ async function refreshDashboard() {
         const res = await fetch('dashboard.php?ajax=1');
         const data = await res.json();
         if (data.stats) {
-            document.getElementById('dash-users').textContent = new Intl.NumberFormat('en-IN').format(data.stats.users || 0);
-            document.getElementById('dash-total').textContent = new Intl.NumberFormat('en-IN').format(data.stats.total_counts || 0);
-            document.getElementById('dash-today').textContent = new Intl.NumberFormat('en-IN').format(data.stats.today_counts || 0);
-            document.getElementById('dash-pages').textContent = new Intl.NumberFormat('en-IN').format(data.stats.pages || 0);
+            document.getElementById('dash-users').textContent = formatNumberShort(data.stats.users || 0);
+            document.getElementById('dash-total').textContent = formatNumberShort(data.stats.total_counts || 0);
+            document.getElementById('dash-today').textContent = formatNumberShort(data.stats.today_counts || 0);
+            document.getElementById('dash-pages').textContent = formatNumberShort(data.stats.pages || 0);
         }
         if (data.recent_users) {
             const tbody = document.getElementById('dash-recent-users');
@@ -250,7 +250,7 @@ async function refreshDashboard() {
                             </span>
                         </td>
                         <td class="px-6 py-4 font-mono font-medium text-slate-700">
-                            ${new Intl.NumberFormat('en-IN').format(user.total_counts || 0)}
+                            ${formatNumberShort(user.total_counts || 0)}
                         </td>
                         <td class="px-6 py-4 text-slate-500 text-xs font-medium">
                             ${formattedDate}

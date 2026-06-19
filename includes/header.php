@@ -1,3 +1,24 @@
+<?php
+// Function to format numbers to K, Million, Billion
+if (!function_exists('formatNumberShort')) {
+    function formatNumberShort($num) {
+        $num = floatval($num);
+        if ($num >= 1000000000) {
+            $val = round($num / 1000000000, 1);
+            return ($val == intval($val) ? intval($val) : $val) . ' Billion';
+        }
+        if ($num >= 1000000) {
+            $val = round($num / 1000000, 1);
+            return ($val == intval($val) ? intval($val) : $val) . ' Million';
+        }
+        if ($num >= 1000) {
+            $val = round($num / 1000, 1);
+            return ($val == intval($val) ? intval($val) : $val) . 'K';
+        }
+        return $num;
+    }
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -8,6 +29,22 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        function formatNumberShort(num) {
+            num = parseFloat(num);
+            if (isNaN(num)) return '0';
+            if (num >= 1000000000) {
+                return parseFloat((num / 1000000000).toFixed(1)) + ' Billion';
+            }
+            if (num >= 1000000) {
+                return parseFloat((num / 1000000).toFixed(1)) + ' Million';
+            }
+            if (num >= 1000) {
+                return parseFloat((num / 1000).toFixed(1)) + 'K';
+            }
+            return num.toString();
+        }
+    </script>
     <style>
         /* Custom scrollbar */
         ::-webkit-scrollbar { width: 8px; height: 8px; }
