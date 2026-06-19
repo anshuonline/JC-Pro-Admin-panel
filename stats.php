@@ -256,14 +256,10 @@ include 'includes/header.php';
 </div>
 
 <!-- Period Summary Row -->
-<div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
     <div class="bg-white/60 backdrop-blur-xl rounded-2xl p-5 border border-white shadow-sm text-center">
         <p class="text-xs font-semibold text-slate-500 uppercase tracking-wide">This Month</p>
         <p class="text-xl sm:text-2xl tracking-tight break-all font-extrabold text-orange-600 mt-1"><?php echo formatNumberShort($stats['this_month_counts']); ?></p>
-    </div>
-    <div class="bg-white/60 backdrop-blur-xl rounded-2xl p-5 border border-white shadow-sm text-center">
-        <p class="text-xs font-semibold text-slate-500 uppercase tracking-wide">This Year</p>
-        <p class="text-xl sm:text-2xl tracking-tight break-all font-extrabold text-slate-600 mt-1"><?php echo formatNumberShort($stats['this_year_counts']); ?></p>
     </div>
     <div class="bg-white/60 backdrop-blur-xl rounded-2xl p-5 border border-white shadow-sm text-center">
         <p class="text-xs font-semibold text-slate-500 uppercase tracking-wide">All Time</p>
@@ -628,11 +624,10 @@ async function refreshFullStats() {
             document.getElementById('stat-week-counts').textContent = formatNumberShort(data.overview.this_week_counts || 0);
             
             // Update Period Summary
-            const summaries = document.querySelectorAll('.grid-cols-3 .text-2xl');
-            if (summaries.length >= 3) {
+            const summaries = document.querySelectorAll('.grid-cols-2 .text-2xl');
+            if (summaries.length >= 2) {
                 summaries[0].textContent = formatNumberShort(data.overview.this_month_counts || 0);
-                summaries[1].textContent = formatNumberShort(data.overview.this_year_counts || 0);
-                summaries[2].textContent = formatNumberShort(data.overview.total_counts || 0);
+                summaries[1].textContent = formatNumberShort(data.overview.total_counts || 0);
             }
 
             // Update Charts Data

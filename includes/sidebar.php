@@ -24,6 +24,11 @@ $currentPage = basename($_SERVER['PHP_SELF']);
                 <i class="fa-solid fa-users mr-3 w-5 text-center <?php echo $currentPage == 'users.php' ? 'text-orange-600' : 'text-slate-400 group-hover:text-orange-600'; ?>"></i>
                 Users
             </a>
+
+            <a href="leaderboard_manager.php" class="<?php echo $currentPage == 'leaderboard_manager.php' ? 'bg-orange-50 text-orange-700 shadow-sm border border-orange-200' : 'text-slate-600 hover:bg-slate-100/80 hover:text-slate-900 border border-transparent'; ?> group flex items-center px-3 py-2.5 text-sm font-semibold rounded-xl transition-all duration-200">
+                <i class="fa-solid fa-trophy mr-3 w-5 text-center <?php echo $currentPage == 'leaderboard_manager.php' ? 'text-orange-600' : 'text-slate-400 group-hover:text-orange-600'; ?>"></i>
+                Monthly Challenge
+            </a>
             
             <a href="bots.php" class="<?php echo $currentPage == 'bots.php' ? 'bg-orange-50 text-orange-700 shadow-sm border border-orange-200' : 'text-slate-600 hover:bg-slate-100/80 hover:text-slate-900 border border-transparent'; ?> group flex items-center px-3 py-2.5 text-sm font-semibold rounded-xl transition-all duration-200">
                 <i class="fa-solid fa-robot mr-3 w-5 text-center <?php echo $currentPage == 'bots.php' ? 'text-orange-600' : 'text-slate-400 group-hover:text-orange-600'; ?>"></i>
