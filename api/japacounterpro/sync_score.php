@@ -42,8 +42,19 @@ $conn->query("UPDATE users SET $updates WHERE id = $user_id");
 // Step 2: Calendar Sync — only if sessions are provided
 // This is the ONLY way daily_counts gets written. Calendar is the source of truth.
 if (!empty($sessions)) {
-    // NUKE all existing daily_counts for this user
-    $conn->query("DELETE FROM daily_counts WHERE user_id = $user_id");
+    // Fetch current challenge dates
+    $cfg_res = $conn->query("SELECT challenge_start, challenge_end FROM leaderboard_config LIMIT 1");
+    if ($cfg_res && $cfg_res->num_rows > 0) {
+        $cfg_row = $cfg_res->fetch_assoc();
+        $c_start = $conn->real_escape_string(date('Y-m-d', strtotime($cfg_row['challenge_start'])));
+        $c_end = $conn->real_escape_string(date('Y-m-d', strtotime($cfg_row['challenge_end'])));
+        
+        // NUKE all existing daily_counts for this user ONLY within the current challenge period
+        $conn->query("DELETE FROM daily_counts WHERE user_id = $user_id AND date >= '$c_start' AND date <= '$c_end'");
+    } else {
+        // Fallback if config is missing
+        $conn->query("DELETE FROM daily_counts WHERE user_id = $user_id");
+    }
     
     // Insert ONLY what Calendar says — nothing more, nothing less
     $total = 0;
