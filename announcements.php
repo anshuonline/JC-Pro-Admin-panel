@@ -14,7 +14,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $type = $conn->real_escape_string($_POST['type']);
             
             if ($_POST['action'] == 'add') {
-                $sql = "INSERT INTO announcements (title, message, type) VALUES ('$title', '$message', '$type')";
+                date_default_timezone_set('Asia/Kolkata');
+                $created_at = date('Y-m-d H:i:s');
+                $sql = "INSERT INTO announcements (title, message, type, created_at) VALUES ('$title', '$message', '$type', '$created_at')";
                 if ($conn->query($sql)) {
                     $success_msg = "Announcement added successfully.";
                 } else {
