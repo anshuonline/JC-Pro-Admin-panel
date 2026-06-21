@@ -26,28 +26,30 @@ if ($user_res && $user_res->num_rows > 0) {
     $user_row = $user_res->fetch_assoc();
     $user_id = $user_row['id'];
     
-    // Update user
+    // Update user stats
     if ($device_token) {
         $conn->query("UPDATE users SET total_counts = $total_counts, level = $level, device_token = '$device_token' WHERE id = $user_id");
     } else {
         $conn->query("UPDATE users SET total_counts = $total_counts, level = $level WHERE id = $user_id");
     }
     
-    // Sync daily calendar counts if provided
-    foreach ($sessions as $session) {
-        if (isset($session['date']) && isset($session['count'])) {
-            $date = $conn->real_escape_string($session['date']);
-            $count = intval($session['count']);
-            
-            // Delete any existing records for this date to remove duplicates
-            $conn->query("DELETE FROM daily_counts WHERE user_id = $user_id AND date = '$date'");
-            
-            // Insert the fresh, accurate count
-            $stmt = $conn->prepare("INSERT INTO daily_counts (user_id, date, daily_count) VALUES (?, ?, ?)");
-            $stmt->bind_param("isi", $user_id, $date, $count);
-            $stmt->execute();
-            $stmt->close();
+    // Only sync daily_counts if sessions array is provided
+    if (!empty($sessions)) {
+        // *** FIX: Delete ALL existing daily_counts for this user FIRST ***
+        // This removes all stale/duplicate old data completely
+        $conn->query("DELETE FROM daily_counts WHERE user_id = $user_id");
+        
+        // Now insert only the fresh, accurate sessions from the app
+        $stmt = $conn->prepare("INSERT INTO daily_counts (user_id, date, daily_count) VALUES (?, ?, ?)");
+        foreach ($sessions as $session) {
+            if (isset($session['date']) && isset($session['count']) && intval($session['count']) > 0) {
+                $date = $conn->real_escape_string($session['date']);
+                $count = intval($session['count']);
+                $stmt->bind_param("isi", $user_id, $date, $count);
+                $stmt->execute();
+            }
         }
+        $stmt->close();
     }
     
     echo json_encode(["success" => true, "message" => "Score and calendar successfully synced"]);
