@@ -146,7 +146,14 @@ $announcements = $conn->query("SELECT * FROM announcements ORDER BY created_at D
                                                     </div>
                                                     <p class="text-sm text-slate-600 mb-3 leading-relaxed"><?php echo nl2br(htmlspecialchars($row['message'])); ?></p>
                                                     <div class="flex gap-2">
-                                                        <button onclick="editAnnouncement(<?php echo $row['id']; ?>, '<?php echo addslashes(htmlspecialchars($row['title'])); ?>', '<?php echo addslashes(htmlspecialchars($row['message'])); ?>', '<?php echo $row['type']; ?>')" class="text-xs font-bold text-slate-500 hover:text-blue-600 px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-blue-50 transition-colors">
+                                                        <?php 
+                                                            $safeTitle = htmlspecialchars($row['title'], ENT_QUOTES, 'UTF-8');
+                                                            $safeMessage = htmlspecialchars($row['message'], ENT_QUOTES, 'UTF-8');
+                                                        ?>
+                                                        <button onclick="editAnnouncement(<?php echo $row['id']; ?>, this.dataset.title, this.dataset.message, '<?php echo $row['type']; ?>')" 
+                                                                data-title="<?php echo $safeTitle; ?>"
+                                                                data-message="<?php echo $safeMessage; ?>"
+                                                                class="text-xs font-bold text-slate-500 hover:text-blue-600 px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-blue-50 transition-colors">
                                                             <i class="fa-solid fa-pen mr-1.5"></i>Edit
                                                         </button>
                                                         <form method="POST" class="inline" onsubmit="return confirm('Are you sure you want to delete this announcement?');">
