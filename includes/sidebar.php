@@ -60,6 +60,11 @@ $currentPage = basename($_SERVER['PHP_SELF']);
                 <i class="fa-solid fa-envelope-open-text mr-3 w-5 text-center <?php echo $currentPage == 'feedback.php' ? 'text-orange-600' : 'text-slate-400 group-hover:text-orange-600'; ?>"></i>
                 App Feedback
             </a>
+
+            <a href="announcements.php" class="<?php echo $currentPage == 'announcements.php' ? 'bg-orange-50 text-orange-700 shadow-sm border border-orange-200' : 'text-slate-600 hover:bg-slate-100/80 hover:text-slate-900 border border-transparent'; ?> group flex items-center px-3 py-2.5 text-sm font-semibold rounded-xl transition-all duration-200">
+                <i class="fa-solid fa-bullhorn mr-3 w-5 text-center <?php echo $currentPage == 'announcements.php' ? 'text-orange-600' : 'text-slate-400 group-hover:text-orange-600'; ?>"></i>
+                System Status
+            </a>
         </nav>
 
         <div class="px-5 mt-8 mb-3">
