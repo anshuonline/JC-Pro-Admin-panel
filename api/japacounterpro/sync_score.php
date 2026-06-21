@@ -56,14 +56,22 @@ if (!empty($sessions)) {
         $conn->query("DELETE FROM daily_counts WHERE user_id = $user_id");
     }
     
-    // Insert ONLY what Calendar says — nothing more, nothing less
+    // Insert ONLY what Calendar says — BUT strictly filter to challenge dates
+    // This prevents any accidental pollution of the database with out-of-bounds data
     $total = 0;
     $stmt = $conn->prepare("INSERT INTO daily_counts (user_id, date, daily_count) VALUES (?, ?, ?)");
     foreach ($sessions as $session) {
         if (isset($session['date']) && isset($session['count'])) {
             $date = $conn->real_escape_string($session['date']);
             $count = intval($session['count']);
-            if ($count > 0) {
+            
+            // Strictly check if the session date is within the active challenge period
+            if ($count > 0 && isset($c_start) && isset($c_end) && $date >= $c_start && $date <= $c_end) {
+                $stmt->bind_param("isi", $user_id, $date, $count);
+                $stmt->execute();
+                $total += $count;
+            } else if ($count > 0 && (!isset($c_start) || !isset($c_end))) {
+                // Fallback if config is missing
                 $stmt->bind_param("isi", $user_id, $date, $count);
                 $stmt->execute();
                 $total += $count;
