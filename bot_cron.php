@@ -75,10 +75,18 @@ if ($bots_res && $bots_res->num_rows > 0) {
 
     }
 } else {
-    echo "No bots found.";
+    echo "No bots found.<br>";
 }
 
-echo "Routine Completed.";
+// ==========================================
+// BACKGROUND AUTOMATIC CLEANUP TASKS
+// ==========================================
+// 1. Delete analytics_events older than 60 days
+$conn->query("DELETE FROM analytics_events WHERE created_at < NOW() - INTERVAL 60 DAY");
+// 2. Delete dead live_sessions older than 10 minutes
+$conn->query("DELETE FROM live_sessions WHERE last_heartbeat < NOW() - INTERVAL 10 MINUTE");
+
+echo "Routine and Cleanups Completed.";
 ?>
 
 
