@@ -39,9 +39,12 @@ if ($user_res && $user_res->num_rows > 0) {
             $date = $conn->real_escape_string($session['date']);
             $count = intval($session['count']);
             
-            // Insert or Update daily_counts table
-            $stmt = $conn->prepare("INSERT INTO daily_counts (user_id, date, daily_count) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE daily_count = ?");
-            $stmt->bind_param("isii", $user_id, $date, $count, $count);
+            // Delete any existing records for this date to remove duplicates
+            $conn->query("DELETE FROM daily_counts WHERE user_id = $user_id AND date = '$date'");
+            
+            // Insert the fresh, accurate count
+            $stmt = $conn->prepare("INSERT INTO daily_counts (user_id, date, daily_count) VALUES (?, ?, ?)");
+            $stmt->bind_param("isi", $user_id, $date, $count);
             $stmt->execute();
             $stmt->close();
         }
