@@ -61,91 +61,98 @@ include 'includes/header.php';
 
 <style>
 /* ==================================================
-   AMOLED MODERN DARK MODE (MUI STYLE) OVERRIDE
+   ULTRA-MODERN AMOLED GLASSMORPHISM THEME
    ================================================== */
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&display=swap');
+
 body.amoled-theme {
-    background-color: #000000 !important;
+    background-color: #030303 !important;
+    /* Deep space background with subtle neon mesh gradients */
+    background-image: 
+        radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.12) 0px, transparent 50%),
+        radial-gradient(at 100% 0%, rgba(236, 72, 153, 0.12) 0px, transparent 50%),
+        radial-gradient(at 50% 100%, rgba(234, 88, 12, 0.1) 0px, transparent 50%) !important;
+    background-attachment: fixed !important;
     color: #ffffff !important;
-    font-family: 'Inter', Roboto, 'Helvetica Neue', Arial, sans-serif !important;
+    font-family: 'Outfit', 'Inter', sans-serif !important;
 }
 
-/* Override Header & Sidebar */
+/* Override Header & Sidebar to blend with background */
 body.amoled-theme header, 
 body.amoled-theme aside,
 body.amoled-theme .bg-white\/60,
 body.amoled-theme .bg-white {
-    background-color: #121212 !important;
-    border-color: #2d2d2d !important;
-    backdrop-filter: none !important;
+    background-color: rgba(10, 10, 10, 0.7) !important;
+    border-color: rgba(255, 255, 255, 0.05) !important;
+    backdrop-filter: blur(20px) !important;
+    -webkit-backdrop-filter: blur(20px) !important;
 }
 
-/* Material Design Cards */
+/* Next-Gen Glassmorphism Cards */
 body.amoled-theme .mui-card {
-    background-color: #1e1e1e !important;
-    border: 1px solid #2d2d2d !important;
-    border-radius: 16px !important;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.5) !important;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    background: linear-gradient(145deg, rgba(30,30,30,0.6) 0%, rgba(15,15,15,0.8) 100%) !important;
+    backdrop-filter: blur(16px) !important;
+    -webkit-backdrop-filter: blur(16px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    border-radius: 24px !important;
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4) !important;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 body.amoled-theme .mui-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(0,0,0,0.7) !important;
+    transform: translateY(-6px) scale(1.02);
+    box-shadow: 0 15px 45px 0 rgba(0, 0, 0, 0.6) !important;
+    border-color: rgba(255, 255, 255, 0.2) !important;
 }
 
-/* Text Colors */
+/* Vibrant Typography */
 body.amoled-theme .text-slate-800,
 body.amoled-theme h1, body.amoled-theme h2, body.amoled-theme h3 {
     color: #ffffff !important;
+    letter-spacing: -0.5px !important;
 }
 body.amoled-theme .text-slate-500, 
 body.amoled-theme .text-slate-600 {
-    color: #a0aabf !important;
+    color: #94a3b8 !important;
 }
 
-/* Icons & Accents */
-body.amoled-theme .text-orange-500 { color: #ff9800 !important; }
-body.amoled-theme .text-green-500 { color: #4caf50 !important; }
-body.amoled-theme .text-blue-500 { color: #2196f3 !important; }
-body.amoled-theme .text-purple-500 { color: #9c27b0 !important; }
+/* Neon Glowing Icons & Accents */
+body.amoled-theme .text-orange-500 { color: #f97316 !important; filter: drop-shadow(0 0 12px rgba(249,115,22,0.4)); }
+body.amoled-theme .text-green-500 { color: #10b981 !important; filter: drop-shadow(0 0 12px rgba(16,185,129,0.4)); }
+body.amoled-theme .text-blue-500 { color: #3b82f6 !important; filter: drop-shadow(0 0 12px rgba(59,130,246,0.4)); }
+body.amoled-theme .text-purple-500 { color: #a855f7 !important; filter: drop-shadow(0 0 12px rgba(168,85,247,0.4)); }
 
-/* Table Overrides */
+/* Premium Table Overrides */
 body.amoled-theme table th {
-    background-color: #1a1a1a !important;
-    color: #a0aabf !important;
-    border-bottom: 1px solid #2d2d2d !important;
+    background-color: transparent !important;
+    color: #94a3b8 !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-size: 0.75rem;
 }
 body.amoled-theme table td {
-    border-bottom: 1px solid #2d2d2d !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.03) !important;
 }
 body.amoled-theme tr.hover\:bg-slate-50:hover {
-    background-color: #252525 !important;
+    background-color: rgba(255, 255, 255, 0.03) !important;
 }
 
-/* Buttons / Chips */
+/* Smooth Badges / Chips */
 body.amoled-theme .bg-slate-100 {
-    background-color: #2d2d2d !important;
-    border-color: #3d3d3d !important;
-    color: #e0e0e0 !important;
+    background-color: rgba(255, 255, 255, 0.05) !important;
+    border-color: rgba(255, 255, 255, 0.1) !important;
+    color: #e2e8f0 !important;
 }
-body.amoled-theme .bg-orange-100 { background-color: rgba(255, 152, 0, 0.1) !important; }
-body.amoled-theme .bg-green-100 { background-color: rgba(76, 175, 80, 0.1) !important; }
+body.amoled-theme .bg-orange-100 { background-color: rgba(249, 115, 22, 0.15) !important; }
+body.amoled-theme .bg-green-100 { background-color: rgba(16, 185, 129, 0.15) !important; }
 
-/* MUI Ripple Button */
-.mui-btn {
-    position: relative;
-    overflow: hidden;
-    background-color: #3f51b5;
-    color: white;
-    border-radius: 8px;
-    padding: 8px 16px;
-    font-weight: 600;
-    letter-spacing: 0.5px;
-    transition: background-color 0.3s;
-    border: none;
-    cursor: pointer;
-    box-shadow: 0 2px 4px -1px rgba(0,0,0,0.2), 0 4px 5px 0 rgba(0,0,0,0.14), 0 1px 10px 0 rgba(0,0,0,0.12);
+/* Gradient Headers */
+body.amoled-theme h1.text-2xl {
+    background: linear-gradient(to right, #ffffff, #a5b4fc);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-weight: 800;
 }
-.mui-btn:hover { background-color: #303f9f; }
 </style>
 
 <div class="flex justify-between items-center mb-6">
