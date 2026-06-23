@@ -9,9 +9,15 @@ check_auth();
 $new_users_daily = [];
 $res = $conn->query("SELECT DATE(created_at) as d, COUNT(id) as c 
                      FROM users 
-                     WHERE created_at >= DATE_SUB(CURDATE(), INTERVAL 30 DAY) 
-                     GROUP BY DATE(created_at) ORDER BY d ASC");
-if ($res) while ($row = $res->fetch_assoc()) $new_users_daily[] = $row;
+                     WHERE created_at >= DATE_SUB(CURDATE(), INTERVAL 29 DAY) 
+                     GROUP BY DATE(created_at)");
+$temp_new = [];
+if ($res) while ($row = $res->fetch_assoc()) $temp_new[$row['d']] = $row['c'];
+
+for ($i = 29; $i >= 0; $i--) {
+    $date = date('Y-m-d', strtotime("-$i days"));
+    $new_users_daily[] = ['d' => $date, 'c' => isset($temp_new[$date]) ? $temp_new[$date] : 0];
+}
 
 $new_users_weekly = [];
 $res = $conn->query("SELECT YEARWEEK(created_at, 1) as yw, MIN(DATE(created_at)) as d, COUNT(id) as c 
@@ -30,9 +36,15 @@ if ($res) while ($row = $res->fetch_assoc()) $new_users_monthly[] = $row;
 $active_daily = [];
 $res = $conn->query("SELECT date as d, COUNT(DISTINCT user_id) as c 
                      FROM daily_counts 
-                     WHERE date >= DATE_SUB(CURDATE(), INTERVAL 30 DAY) 
-                     GROUP BY date ORDER BY date ASC");
-if ($res) while ($row = $res->fetch_assoc()) $active_daily[] = $row;
+                     WHERE date >= DATE_SUB(CURDATE(), INTERVAL 29 DAY) 
+                     GROUP BY date");
+$temp_active = [];
+if ($res) while ($row = $res->fetch_assoc()) $temp_active[$row['d']] = $row['c'];
+
+for ($i = 29; $i >= 0; $i--) {
+    $date = date('Y-m-d', strtotime("-$i days"));
+    $active_daily[] = ['d' => $date, 'c' => isset($temp_active[$date]) ? $temp_active[$date] : 0];
+}
 
 $active_weekly = [];
 $res = $conn->query("SELECT YEARWEEK(date, 1) as yw, MIN(date) as d, COUNT(DISTINCT user_id) as c 
