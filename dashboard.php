@@ -60,153 +60,180 @@ include 'includes/header.php';
 ?>
 
 <style>
-/* 90s Classic Theme Override */
-body.theme-90s {
-    background: #008080 !important;
-    font-family: 'Tahoma', 'MS Sans Serif', sans-serif !important;
+/* ==================================================
+   AMOLED MODERN DARK MODE (MUI STYLE) OVERRIDE
+   ================================================== */
+body.amoled-theme {
+    background-color: #000000 !important;
+    color: #ffffff !important;
+    font-family: 'Inter', Roboto, 'Helvetica Neue', Arial, sans-serif !important;
 }
-body.theme-90s header {
-    background: #c0c0c0 !important;
-    border-bottom: 2px solid #000000 !important;
+
+/* Override Header & Sidebar */
+body.amoled-theme header, 
+body.amoled-theme aside,
+body.amoled-theme .bg-white\/60,
+body.amoled-theme .bg-white {
+    background-color: #121212 !important;
+    border-color: #2d2d2d !important;
+    backdrop-filter: none !important;
 }
-body.theme-90s aside {
-    background: #c0c0c0 !important;
-    border-right: 2px solid #000000 !important;
+
+/* Material Design Cards */
+body.amoled-theme .mui-card {
+    background-color: #1e1e1e !important;
+    border: 1px solid #2d2d2d !important;
+    border-radius: 16px !important;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.5) !important;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
-body.theme-90s .bg-white, body.theme-90s .bg-slate-50, body.theme-90s .bg-slate-100 {
-    background: #c0c0c0 !important;
-    border: 2px solid !important;
-    border-color: #ffffff #808080 #808080 #ffffff !important;
-    box-shadow: none !important;
-    border-radius: 0 !important;
+body.amoled-theme .mui-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.7) !important;
 }
-body.theme-90s .text-slate-800, body.theme-90s .text-slate-600, body.theme-90s .text-slate-500 {
-    color: #000000 !important;
+
+/* Text Colors */
+body.amoled-theme .text-slate-800,
+body.amoled-theme h1, body.amoled-theme h2, body.amoled-theme h3 {
+    color: #ffffff !important;
 }
-body.theme-90s .text-orange-500, body.theme-90s .text-orange-600, body.theme-90s .text-green-500, body.theme-90s .text-green-600 {
-    color: #000080 !important;
+body.amoled-theme .text-slate-500, 
+body.amoled-theme .text-slate-600 {
+    color: #a0aabf !important;
 }
-body.theme-90s table {
-    background: #ffffff !important;
-    border: 2px solid #000000 !important;
-    border-collapse: collapse;
+
+/* Icons & Accents */
+body.amoled-theme .text-orange-500 { color: #ff9800 !important; }
+body.amoled-theme .text-green-500 { color: #4caf50 !important; }
+body.amoled-theme .text-blue-500 { color: #2196f3 !important; }
+body.amoled-theme .text-purple-500 { color: #9c27b0 !important; }
+
+/* Table Overrides */
+body.amoled-theme table th {
+    background-color: #1a1a1a !important;
+    color: #a0aabf !important;
+    border-bottom: 1px solid #2d2d2d !important;
 }
-body.theme-90s th {
-    background: #c0c0c0 !important;
-    border: 2px solid !important;
-    border-color: #ffffff #808080 #808080 #ffffff !important;
-    color: #000000 !important;
+body.amoled-theme table td {
+    border-bottom: 1px solid #2d2d2d !important;
 }
-body.theme-90s td {
-    background: #ffffff !important;
-    border: 1px solid #c0c0c0 !important;
+body.amoled-theme tr.hover\:bg-slate-50:hover {
+    background-color: #252525 !important;
 }
-body.theme-90s .rounded-lg, body.theme-90s .rounded-xl, body.theme-90s .rounded-2xl, body.theme-90s .rounded-full {
-    border-radius: 0 !important;
+
+/* Buttons / Chips */
+body.amoled-theme .bg-slate-100 {
+    background-color: #2d2d2d !important;
+    border-color: #3d3d3d !important;
+    color: #e0e0e0 !important;
 }
-body.theme-90s .border-t-4 {
-    border-top: 2px solid #ffffff !important;
+body.amoled-theme .bg-orange-100 { background-color: rgba(255, 152, 0, 0.1) !important; }
+body.amoled-theme .bg-green-100 { background-color: rgba(76, 175, 80, 0.1) !important; }
+
+/* MUI Ripple Button */
+.mui-btn {
+    position: relative;
+    overflow: hidden;
+    background-color: #3f51b5;
+    color: white;
+    border-radius: 8px;
+    padding: 8px 16px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    transition: background-color 0.3s;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 2px 4px -1px rgba(0,0,0,0.2), 0 4px 5px 0 rgba(0,0,0,0.14), 0 1px 10px 0 rgba(0,0,0,0.12);
 }
-.btn-90s-toggle {
-    transition: all 0.2s;
-}
-body.theme-90s .btn-90s-toggle {
-    background: #c0c0c0 !important;
-    border: 2px solid !important;
-    border-color: #ffffff #808080 #808080 #ffffff !important;
-    color: #000000 !important;
-    font-weight: bold;
-    border-radius: 0 !important;
-    padding: 4px 12px;
-}
-body.theme-90s .btn-90s-toggle:active {
-    border-color: #808080 #ffffff #ffffff #808080 !important;
-}
+.mui-btn:hover { background-color: #303f9f; }
 </style>
 
-<div class="flex justify-end mb-6">
-    <button id="themeToggleBtn" class="btn-90s-toggle bg-slate-800 text-white px-4 py-2 rounded-lg shadow-sm text-sm font-semibold hover:bg-slate-700">
-        <i class="fa-solid fa-desktop mr-2"></i>Switch to 90s Look
+<div class="flex justify-between items-center mb-6">
+    <div>
+        <h1 class="text-2xl font-bold text-slate-800">Dashboard</h1>
+        <p class="text-sm text-slate-500 mt-0.5">Overview of your application stats</p>
+    </div>
+    <button id="themeToggleBtn" class="mui-btn flex items-center">
+        <i class="fa-solid fa-moon mr-2"></i><span>AMOLED Dark Mode</span>
     </button>
 </div>
 
 <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-6 mb-8">
     <!-- Stat Card 1 -->
-    <div class="bg-white rounded-lg p-6 border-t-4 border-orange-500 shadow-sm relative overflow-hidden group hover:shadow-md transition-all">
-        <div class="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
+    <div class="mui-card bg-white p-6 relative overflow-hidden group">
+        <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
             <i class="fa-solid fa-users text-6xl text-orange-500"></i>
         </div>
-        <h3 class="text-slate-500 text-sm font-semibold mb-1">Total Users</h3>
-        <p class="text-3xl font-bold text-slate-800" id="dash-users"><?php echo formatNumberShort($stats['users']); ?></p>
+        <h3 class="text-slate-500 text-sm font-semibold mb-1 uppercase tracking-wider">Total Users</h3>
+        <p class="text-4xl font-bold text-slate-800 tracking-tight" id="dash-users"><?php echo formatNumberShort($stats['users']); ?></p>
         <div class="mt-4 flex items-center text-sm font-medium">
-            <span class="text-orange-600 flex items-center"><i class="fa-solid fa-arrow-trend-up mr-1.5"></i> Registered</span>
+            <span class="text-orange-500 flex items-center bg-orange-100 px-2 py-1 rounded-md text-xs"><i class="fa-solid fa-arrow-trend-up mr-1.5"></i> Registered</span>
         </div>
     </div>
 
     <!-- Stat Card 2 -->
-    <div class="bg-white rounded-lg p-6 border-t-4 border-green-600 shadow-sm relative overflow-hidden group hover:shadow-md transition-all">
-        <div class="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
+    <div class="mui-card bg-white p-6 relative overflow-hidden group">
+        <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
             <i class="fa-solid fa-om text-6xl text-green-500"></i>
         </div>
-        <h3 class="text-slate-500 text-sm font-semibold mb-1">Total Jaap Count</h3>
-        <p class="text-3xl font-bold text-slate-800" id="dash-total"><?php echo formatNumberShort($stats['total_counts']); ?></p>
+        <h3 class="text-slate-500 text-sm font-semibold mb-1 uppercase tracking-wider">Total Jaap Count</h3>
+        <p class="text-4xl font-bold text-slate-800 tracking-tight" id="dash-total"><?php echo formatNumberShort($stats['total_counts']); ?></p>
         <div class="mt-4 flex items-center text-sm font-medium">
-            <span class="text-green-600 flex items-center"><i class="fa-solid fa-calendar-day mr-1.5"></i> <span id="dash-today" class="mx-1"><?php echo formatNumberShort($stats['today_counts']); ?></span> Today</span>
+            <span class="text-green-500 flex items-center bg-green-100 px-2 py-1 rounded-md text-xs"><i class="fa-solid fa-calendar-day mr-1.5"></i> <span id="dash-today" class="mx-1"><?php echo formatNumberShort($stats['today_counts']); ?></span> Today</span>
         </div>
     </div>
 
-
-    <!-- Stat Card 4 -->
-    <div class="bg-white rounded-lg p-6 border-t-4 border-slate-500 shadow-sm relative overflow-hidden group hover:shadow-md transition-all">
-        <div class="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
-            <i class="fa-solid fa-file-lines text-6xl text-slate-500"></i>
+    <!-- Stat Card 3 -->
+    <div class="mui-card bg-white p-6 relative overflow-hidden group">
+        <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+            <i class="fa-solid fa-file-lines text-6xl text-blue-500"></i>
         </div>
-        <h3 class="text-slate-500 text-sm font-semibold mb-1">Content Pages</h3>
-        <p class="text-3xl font-bold text-slate-800" id="dash-pages"><?php echo formatNumberShort($stats['pages']); ?></p>
+        <h3 class="text-slate-500 text-sm font-semibold mb-1 uppercase tracking-wider">Content Pages</h3>
+        <p class="text-4xl font-bold text-slate-800 tracking-tight" id="dash-pages"><?php echo formatNumberShort($stats['pages']); ?></p>
         <div class="mt-4 flex items-center text-sm font-medium">
-            <a href="content.php" class="text-slate-600 hover:text-purple-700 transition-colors">Manage Content <i class="fa-solid fa-arrow-right ml-1 text-xs"></i></a>
+            <a href="content.php" class="text-blue-500 hover:text-blue-400 transition-colors flex items-center bg-blue-100/10 px-2 py-1 rounded-md text-xs">Manage Content <i class="fa-solid fa-arrow-right ml-1"></i></a>
         </div>
     </div>
 </div>
 
-<div class="bg-white border border-slate-200 rounded-lg shadow-sm overflow-hidden">
-    <div class="px-6 py-4 border-b border-slate-200 flex justify-between items-center bg-slate-50">
-        <h3 class="text-lg font-bold text-slate-800">Recently Active Users</h3>
-        <a href="users.php" class="text-sm font-semibold text-orange-600 hover:text-blue-700 transition-colors">View All</a>
+<div class="mui-card bg-white overflow-hidden">
+    <div class="px-6 py-5 border-b border-slate-200 flex justify-between items-center bg-transparent">
+        <h3 class="text-lg font-bold text-slate-800 tracking-wide">Recently Active Users</h3>
+        <a href="users.php" class="text-sm font-bold text-indigo-500 hover:text-indigo-400 transition-colors uppercase tracking-wider">View All</a>
     </div>
     <div class="overflow-x-auto">
         <table class="w-full text-left text-sm text-slate-600">
-            <thead class="text-xs uppercase bg-slate-100 text-slate-600 border-b border-slate-200">
+            <thead class="text-xs uppercase bg-slate-50 text-slate-500 tracking-wider">
                 <tr>
                     <th scope="col" class="px-6 py-4 font-semibold">Username</th>
                     <th scope="col" class="px-6 py-4 font-semibold">Level</th>
                     <th scope="col" class="px-6 py-4 font-semibold">Total Counts</th>
-                    <th scope="col" class="px-6 py-4 font-semibold">Last Active</th>
+                    <th scope="col" class="px-6 py-4 font-semibold text-right">Last Active</th>
                 </tr>
             </thead>
-            <tbody class="divide-y divide-slate-200" id="dash-recent-users">
+            <tbody id="dash-recent-users">
                 <?php if(empty($recent_users)): ?>
                 <tr>
-                    <td colspan="4" class="px-6 py-6 text-center text-slate-500">No users found.</td>
+                    <td colspan="4" class="px-6 py-8 text-center text-slate-500">No users found.</td>
                 </tr>
                 <?php else: ?>
                     <?php foreach($recent_users as $user): ?>
                     <tr class="hover:bg-slate-50 transition-colors">
                         <td class="px-6 py-4 font-semibold text-slate-800 flex items-center">
-                            <div class="w-9 h-9 rounded-full bg-orange-100 text-orange-600 flex items-center justify-center mr-3 font-bold border border-blue-200/50 shadow-sm">
+                            <div class="w-10 h-10 rounded-full bg-orange-100 text-orange-500 flex items-center justify-center mr-4 font-bold text-lg shadow-sm">
                                 <?php echo strtoupper(substr($user['username'], 0, 1)); ?>
                             </div>
                             <?php echo htmlspecialchars($user['username']); ?>
                         </td>
                         <td class="px-6 py-4">
-                            <span class="bg-slate-100 text-slate-600 py-1 px-3 rounded-full text-xs font-bold border border-slate-200/60">
+                            <span class="bg-slate-100 text-slate-600 py-1.5 px-3 rounded-md text-xs font-bold tracking-wide">
                                 Lvl <?php echo $user['level']; ?>
                             </span>
                         </td>
-                        <td class="px-6 py-4 font-mono font-medium text-slate-700">
+                        <td class="px-6 py-4 font-mono font-medium text-slate-700 text-base">
                             <?php echo formatNumberShort($user['total_counts']); ?>
                         </td>
-                        <td class="px-6 py-4 text-slate-500 text-xs font-medium">
+                        <td class="px-6 py-4 text-slate-500 text-xs font-medium text-right">
                             <?php echo date('M d, Y H:i', strtotime($user['last_active'])); ?>
                         </td>
                     </tr>
@@ -239,26 +266,26 @@ async function refreshDashboard() {
                     return `
                     <tr class="hover:bg-slate-50 transition-colors">
                         <td class="px-6 py-4 font-semibold text-slate-800 flex items-center">
-                            <div class="w-9 h-9 rounded-full bg-orange-100 text-orange-600 flex items-center justify-center mr-3 font-bold border border-blue-200/50 shadow-sm">
+                            <div class="w-10 h-10 rounded-full bg-orange-100 text-orange-500 flex items-center justify-center mr-4 font-bold text-lg shadow-sm">
                                 ${firstChar}
                             </div>
                             ${user.username}
                         </td>
                         <td class="px-6 py-4">
-                            <span class="bg-slate-100 text-slate-600 py-1 px-3 rounded-full text-xs font-bold border border-slate-200/60">
+                            <span class="bg-slate-100 text-slate-600 py-1.5 px-3 rounded-md text-xs font-bold tracking-wide">
                                 Lvl ${user.level}
                             </span>
                         </td>
-                        <td class="px-6 py-4 font-mono font-medium text-slate-700">
+                        <td class="px-6 py-4 font-mono font-medium text-slate-700 text-base">
                             ${formatNumberShort(user.total_counts || 0)}
                         </td>
-                        <td class="px-6 py-4 text-slate-500 text-xs font-medium">
+                        <td class="px-6 py-4 text-slate-500 text-xs font-medium text-right">
                             ${formattedDate}
                         </td>
                     </tr>`;
                 }).join('');
             } else {
-                tbody.innerHTML = `<tr><td colspan="4" class="px-6 py-6 text-center text-slate-500">No users found.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="4" class="px-6 py-8 text-center text-slate-500">No users found.</td></tr>`;
             }
         }
     } catch (e) {
@@ -268,28 +295,32 @@ async function refreshDashboard() {
 
 // Theme toggling logic
 const themeToggleBtn = document.getElementById('themeToggleBtn');
-let is90sTheme = localStorage.getItem('theme-90s') === 'true';
+let isAmoledTheme = localStorage.getItem('theme-amoled') === 'true';
 
 function updateTheme() {
-    if (is90sTheme) {
-        document.body.classList.add('theme-90s');
-        themeToggleBtn.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles mr-2"></i>Switch to New Look';
+    if (isAmoledTheme) {
+        document.body.classList.add('amoled-theme');
+        themeToggleBtn.innerHTML = '<i class="fa-solid fa-sun mr-2"></i><span>Light Mode</span>';
+        themeToggleBtn.style.backgroundColor = '#ffffff';
+        themeToggleBtn.style.color = '#121212';
     } else {
-        document.body.classList.remove('theme-90s');
-        themeToggleBtn.innerHTML = '<i class="fa-solid fa-desktop mr-2"></i>Switch to 90s Look';
+        document.body.classList.remove('amoled-theme');
+        themeToggleBtn.innerHTML = '<i class="fa-solid fa-moon mr-2"></i><span>AMOLED Dark Mode</span>';
+        themeToggleBtn.style.backgroundColor = '#3f51b5';
+        themeToggleBtn.style.color = '#ffffff';
     }
 }
 
 themeToggleBtn.addEventListener('click', () => {
-    is90sTheme = !is90sTheme;
-    localStorage.setItem('theme-90s', is90sTheme);
+    isAmoledTheme = !isAmoledTheme;
+    localStorage.setItem('theme-amoled', isAmoledTheme);
     updateTheme();
 });
 
 // Init theme on load
 updateTheme();
 
-// Fetch fresh data in the background every 5 seconds (no page reload)
+// Fetch fresh data in the background every 5 seconds
 setInterval(refreshDashboard, 5000);
 </script>
 
