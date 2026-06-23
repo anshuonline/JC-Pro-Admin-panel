@@ -152,7 +152,8 @@ include 'includes/header.php';
     <div class="p-6 border-b border-slate-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
             <h2 class="text-lg font-bold text-slate-800">Installed Audience (First Time Users)</h2>
-            <p class="text-xs text-slate-500 mt-1">Unique new users who registered in the app</p>
+            <p class="text-xs text-slate-500 mt-1 mb-2">Unique new users who registered in the app</p>
+            <div class="text-3xl font-black text-blue-600 tracking-tight" id="newTotalNum">0</div>
         </div>
         <div class="flex gap-2 bg-slate-100 p-1 rounded-lg">
             <button class="filter-btn new-filter active bg-blue-500 text-white text-xs font-semibold px-4 py-1.5 rounded-md" data-view="daily">Daily</button>
@@ -172,7 +173,8 @@ include 'includes/header.php';
     <div class="p-6 border-b border-slate-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
             <h2 class="text-lg font-bold text-slate-800">Live Active Users (DAU / WAU / MAU)</h2>
-            <p class="text-xs text-slate-500 mt-1">Unique users who were active per interval</p>
+            <p class="text-xs text-slate-500 mt-1 mb-2">Unique users who were active per interval</p>
+            <div class="text-3xl font-black text-emerald-600 tracking-tight" id="activeTotalNum">0</div>
         </div>
         <div class="flex gap-2 bg-slate-100 p-1 rounded-lg">
             <button class="filter-btn active-filter active bg-emerald-500 text-white text-xs font-semibold px-4 py-1.5 rounded-md" data-view="daily">Daily</button>
@@ -303,8 +305,18 @@ const actChart = new Chart(actCtx, createChartConfig('#10b981', actGrad));
 function updateChart(chartInstance, type, view) {
     const dataset = dataStore[type][view] || [];
     chartInstance.data.labels = dataset.map(row => formatLabel(row, view));
-    chartInstance.data.datasets[0].data = dataset.map(row => parseInt(row.c) || 0);
+    const values = dataset.map(row => parseInt(row.c) || 0);
+    chartInstance.data.datasets[0].data = values;
     chartInstance.update();
+
+    // Update numbers dynamically
+    const total = values.reduce((sum, val) => sum + val, 0);
+    if (type === 'new') {
+        document.getElementById('newTotalNum').innerHTML = total.toLocaleString() + ' <span class="text-sm font-semibold text-slate-400 uppercase tracking-wider ml-1">Total added</span>';
+    } else {
+        const avg = values.length > 0 ? Math.round(total / values.length) : 0;
+        document.getElementById('activeTotalNum').innerHTML = avg.toLocaleString() + ' <span class="text-sm font-semibold text-slate-400 uppercase tracking-wider ml-1">Average</span>';
+    }
 }
 
 // Initial Render
