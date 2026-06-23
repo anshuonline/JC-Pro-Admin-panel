@@ -153,9 +153,6 @@ body.amoled-theme .bg-green-100 { background-color: rgba(76, 175, 80, 0.1) !impo
         <h1 class="text-2xl font-bold text-slate-800">Dashboard</h1>
         <p class="text-sm text-slate-500 mt-0.5">Overview of your application stats</p>
     </div>
-    <button id="themeToggleBtn" class="mui-btn flex items-center">
-        <i class="fa-solid fa-moon mr-2"></i><span>AMOLED Dark Mode</span>
-    </button>
 </div>
 
 <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-6 mb-8">
@@ -293,32 +290,8 @@ async function refreshDashboard() {
     }
 }
 
-// Theme toggling logic
-const themeToggleBtn = document.getElementById('themeToggleBtn');
-let isAmoledTheme = localStorage.getItem('theme-amoled') === 'true';
-
-function updateTheme() {
-    if (isAmoledTheme) {
-        document.body.classList.add('amoled-theme');
-        themeToggleBtn.innerHTML = '<i class="fa-solid fa-sun mr-2"></i><span>Light Mode</span>';
-        themeToggleBtn.style.backgroundColor = '#ffffff';
-        themeToggleBtn.style.color = '#121212';
-    } else {
-        document.body.classList.remove('amoled-theme');
-        themeToggleBtn.innerHTML = '<i class="fa-solid fa-moon mr-2"></i><span>AMOLED Dark Mode</span>';
-        themeToggleBtn.style.backgroundColor = '#3f51b5';
-        themeToggleBtn.style.color = '#ffffff';
-    }
-}
-
-themeToggleBtn.addEventListener('click', () => {
-    isAmoledTheme = !isAmoledTheme;
-    localStorage.setItem('theme-amoled', isAmoledTheme);
-    updateTheme();
-});
-
-// Init theme on load
-updateTheme();
+// Force AMOLED Theme permanently on Dashboard
+document.body.classList.add('amoled-theme');
 
 // Fetch fresh data in the background every 5 seconds
 setInterval(refreshDashboard, 5000);
