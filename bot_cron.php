@@ -85,6 +85,8 @@ if ($bots_res && $bots_res->num_rows > 0) {
 $conn->query("DELETE FROM analytics_events WHERE created_at < NOW() - INTERVAL 60 DAY");
 // 2. Delete dead live_sessions older than 10 minutes
 $conn->query("DELETE FROM live_sessions WHERE last_heartbeat < NOW() - INTERVAL 10 MINUTE");
+// 3. Delete daily_counts older than 60 days (User request to save DB space)
+$conn->query("DELETE FROM daily_counts WHERE date < DATE_SUB(CURDATE(), INTERVAL 60 DAY)");
 
 echo "Routine and Cleanups Completed.";
 ?>
