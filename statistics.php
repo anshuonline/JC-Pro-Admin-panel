@@ -1,11 +1,11 @@
 <?php
-// statistics.php - Audience Statistics
+// statistics.php - Audience Statistics & Deep Insights
 require_once 'config.php';
 date_default_timezone_set('Asia/Kolkata');
 $conn->query("SET time_zone = '+05:30'");
 check_auth();
 
-// Fetch New Users (First Time Users) Data
+// ====== EXISTING AUDIENCE FETCHING ======
 $new_users_daily = [];
 $res = $conn->query("SELECT DATE(created_at) as d, COUNT(id) as c 
                      FROM users 
@@ -27,8 +27,6 @@ $res = $conn->query("SELECT DATE_FORMAT(created_at, '%Y-%m') as ym, COUNT(id) as
                      GROUP BY DATE_FORMAT(created_at, '%Y-%m') ORDER BY ym ASC");
 if ($res) while ($row = $res->fetch_assoc()) $new_users_monthly[] = $row;
 
-
-// Fetch Active Users Data (DAU, WAU, MAU)
 $active_daily = [];
 $res = $conn->query("SELECT date as d, COUNT(DISTINCT user_id) as c 
                      FROM daily_counts 
@@ -50,19 +48,104 @@ $res = $conn->query("SELECT DATE_FORMAT(date, '%Y-%m') as ym, COUNT(DISTINCT use
                      GROUP BY DATE_FORMAT(date, '%Y-%m') ORDER BY ym ASC");
 if ($res) while ($row = $res->fetch_assoc()) $active_monthly[] = $row;
 
+
+// ====== ADVANCED ANALYSIS METRICS ======
+
+// 1. App Stickiness (DAU/MAU Ratio)
+$dau = 0; $mau = 0;
+$res = $conn->query("SELECT COUNT(DISTINCT user_id) as c FROM daily_counts WHERE date = CURDATE()");
+if ($res && $row = $res->fetch_assoc()) $dau = (int)$row['c'];
+
+$res = $conn->query("SELECT COUNT(DISTINCT user_id) as c FROM daily_counts WHERE date >= DATE_SUB(CURDATE(), INTERVAL 30 DAY)");
+if ($res && $row = $res->fetch_assoc()) $mau = (int)$row['c'];
+
+$stickiness = ($mau > 0) ? round(($dau / $mau) * 100, 1) : 0;
+
+// 2. Peak Chanting Hours (from analytics_events)
+$peak_hours = array_fill(0, 24, 0);
+$res = $conn->query("SELECT HOUR(created_at) as h, COUNT(*) as c 
+                     FROM analytics_events 
+                     WHERE event_type IN ('count_tap', 'app_open') 
+                     GROUP BY HOUR(created_at)");
+if ($res) {
+    while ($row = $res->fetch_assoc()) {
+        $peak_hours[(int)$row['h']] = (int)$row['c'];
+    }
+}
+
+// 3. User Retention Rate (7-Day)
+$cohort_size = 0;
+$retention_count = 0;
+// Users registered exactly 7 days ago
+$res = $conn->query("SELECT id FROM users WHERE DATE(created_at) = DATE_SUB(CURDATE(), INTERVAL 7 DAY)");
+if ($res && $res->num_rows > 0) {
+    $cohort_size = $res->num_rows;
+    $ids = [];
+    while ($row = $res->fetch_assoc()) $ids[] = $row['id'];
+    $ids_str = implode(',', $ids);
+    
+    // How many of them are active today?
+    $res2 = $conn->query("SELECT COUNT(DISTINCT user_id) as c FROM daily_counts WHERE date = CURDATE() AND user_id IN ($ids_str)");
+    if ($res2 && $row2 = $res2->fetch_assoc()) {
+        $retention_count = (int)$row2['c'];
+    }
+}
+$retention_rate = ($cohort_size > 0) ? round(($retention_count / $cohort_size) * 100, 1) : 0;
+
 include 'includes/header.php';
 ?>
 
 <style>
     .chart-container { position: relative; height: 350px; width: 100%; }
+    .small-chart { position: relative; height: 200px; width: 100%; }
     .filter-btn { transition: all 0.2s; }
-    .filter-btn.active { background-color: #3b82f6; color: white; border-color: #3b82f6; }
 </style>
 
 <div class="mb-6">
-    <h1 class="text-2xl font-bold text-slate-800">Audience Statistics</h1>
-    <p class="text-sm text-slate-500 mt-0.5">See detailed reports about your app's growth and active users.</p>
+    <h1 class="text-2xl font-bold text-slate-800">Audience Statistics & Deep Insights</h1>
+    <p class="text-sm text-slate-500 mt-0.5">See detailed reports about your app's growth, retention, and activity patterns.</p>
 </div>
+
+<!-- ================== ADVANCED INSIGHTS ROW ================== -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+    
+    <!-- Stickiness Card -->
+    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 flex flex-col items-center justify-center text-center">
+        <h3 class="text-sm font-bold text-slate-500 uppercase tracking-wider mb-2">App Stickiness (DAU/MAU)</h3>
+        <div class="relative w-32 h-32 flex items-center justify-center">
+            <svg class="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
+                <path class="text-slate-100" stroke-width="3" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                <path class="text-indigo-500" stroke-dasharray="<?php echo $stickiness; ?>, 100" stroke-width="3" stroke-linecap="round" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+            </svg>
+            <div class="absolute text-2xl font-black text-slate-800"><?php echo $stickiness; ?>%</div>
+        </div>
+        <p class="text-xs text-slate-500 mt-4">Percentage of monthly users who use the app daily. >20% is excellent.</p>
+    </div>
+
+    <!-- Retention Card -->
+    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 flex flex-col items-center justify-center text-center">
+        <h3 class="text-sm font-bold text-slate-500 uppercase tracking-wider mb-2">7-Day Retention Rate</h3>
+        <div class="relative w-32 h-32 flex items-center justify-center">
+            <svg class="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
+                <path class="text-slate-100" stroke-width="3" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                <path class="text-emerald-500" stroke-dasharray="<?php echo $retention_rate; ?>, 100" stroke-width="3" stroke-linecap="round" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+            </svg>
+            <div class="absolute text-2xl font-black text-slate-800"><?php echo $retention_rate; ?>%</div>
+        </div>
+        <p class="text-xs text-slate-500 mt-4">Users who installed exactly 7 days ago and are active today: <?php echo $retention_count; ?>/<?php echo $cohort_size; ?></p>
+    </div>
+
+    <!-- Peak Hours Card -->
+    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
+        <h3 class="text-sm font-bold text-slate-500 uppercase tracking-wider mb-4 text-center">Peak Chanting Hours</h3>
+        <div class="small-chart">
+            <canvas id="peakHoursChart"></canvas>
+        </div>
+    </div>
+</div>
+
+
+<!-- ================== TIME SERIES CHARTS ================== -->
 
 <!-- NEW USERS CHART CARD -->
 <div class="bg-white rounded-2xl border border-slate-200 shadow-sm mb-8 overflow-hidden">
@@ -92,7 +175,7 @@ include 'includes/header.php';
             <p class="text-xs text-slate-500 mt-1">Unique users who were active per interval</p>
         </div>
         <div class="flex gap-2 bg-slate-100 p-1 rounded-lg">
-            <button class="filter-btn active-filter active bg-blue-500 text-white text-xs font-semibold px-4 py-1.5 rounded-md" data-view="daily">Daily</button>
+            <button class="filter-btn active-filter active bg-emerald-500 text-white text-xs font-semibold px-4 py-1.5 rounded-md" data-view="daily">Daily</button>
             <button class="filter-btn active-filter text-xs font-semibold px-4 py-1.5 rounded-md text-slate-600" data-view="weekly">Weekly</button>
             <button class="filter-btn active-filter text-xs font-semibold px-4 py-1.5 rounded-md text-slate-600" data-view="monthly">Monthly</button>
         </div>
@@ -106,6 +189,32 @@ include 'includes/header.php';
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
 <script>
+// Peak Hours Chart
+const peakData = <?php echo json_encode(array_values($peak_hours)); ?>;
+const peakLabels = ['12AM','1','2','3','4','5','6','7','8','9','10','11','12PM','1','2','3','4','5','6','7','8','9','10','11'];
+
+const peakCtx = document.getElementById('peakHoursChart').getContext('2d');
+new Chart(peakCtx, {
+    type: 'bar',
+    data: {
+        labels: peakLabels,
+        datasets: [{
+            data: peakData,
+            backgroundColor: 'rgba(245, 158, 11, 0.8)',
+            borderRadius: 4
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+            x: { grid: { display: false }, ticks: { font: { family: 'Inter', size: 9 }, maxRotation: 0 } },
+            y: { display: false }
+        }
+    }
+});
+
 // Data injected from PHP
 const dataStore = {
     new: {
@@ -218,11 +327,11 @@ document.querySelectorAll('.new-filter').forEach(btn => {
 document.querySelectorAll('.active-filter').forEach(btn => {
     btn.addEventListener('click', function() {
         document.querySelectorAll('.active-filter').forEach(b => {
-            b.classList.remove('active', 'bg-blue-500', 'text-white');
+            b.classList.remove('active', 'bg-emerald-500', 'text-white');
             b.classList.add('text-slate-600');
         });
         this.classList.remove('text-slate-600');
-        this.classList.add('active', 'bg-blue-500', 'text-white');
+        this.classList.add('active', 'bg-emerald-500', 'text-white');
         updateChart(actChart, 'active', this.dataset.view);
     });
 });
