@@ -309,13 +309,18 @@ function updateChart(chartInstance, type, view) {
     chartInstance.data.datasets[0].data = values;
     chartInstance.update();
 
-    // Update numbers dynamically
-    const total = values.reduce((sum, val) => sum + val, 0);
+    // Update numbers dynamically (Show latest period instead of Total)
+    const latestValue = values.length > 0 ? values[values.length - 1] : 0;
+    
+    let periodText = '';
+    if (view === 'daily') periodText = 'Today';
+    else if (view === 'weekly') periodText = 'This Week';
+    else if (view === 'monthly') periodText = 'This Month';
+
     if (type === 'new') {
-        document.getElementById('newTotalNum').innerHTML = total.toLocaleString() + ' <span class="text-sm font-semibold text-slate-400 uppercase tracking-wider ml-1">Total added</span>';
+        document.getElementById('newTotalNum').innerHTML = latestValue.toLocaleString() + ' <span class="text-sm font-semibold text-slate-400 uppercase tracking-wider ml-1">' + periodText + '</span>';
     } else {
-        const avg = values.length > 0 ? Math.round(total / values.length) : 0;
-        document.getElementById('activeTotalNum').innerHTML = avg.toLocaleString() + ' <span class="text-sm font-semibold text-slate-400 uppercase tracking-wider ml-1">Average</span>';
+        document.getElementById('activeTotalNum').innerHTML = latestValue.toLocaleString() + ' <span class="text-sm font-semibold text-slate-400 uppercase tracking-wider ml-1">' + periodText + '</span>';
     }
 }
 
