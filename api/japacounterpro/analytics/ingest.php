@@ -34,6 +34,12 @@ $conn->query("CREATE TABLE IF NOT EXISTS analytics_events (
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 )");
 
+// Safely add username column if it doesn't exist (for existing tables)
+$check = $conn->query("SHOW COLUMNS FROM analytics_events LIKE 'username'");
+if ($check && $check->num_rows == 0) {
+    $conn->query("ALTER TABLE analytics_events ADD COLUMN username VARCHAR(50) AFTER id");
+}
+
 $stmt = $conn->prepare("INSERT INTO analytics_events (username, event_type, count_value, timestamp) VALUES (?, ?, ?, ?)");
 
 if (isset($data['events']) && is_array($data['events'])) {
