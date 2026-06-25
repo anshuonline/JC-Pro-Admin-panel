@@ -52,7 +52,7 @@ include 'includes/header.php';
                     <?php foreach ($logs as $log): ?>
                         <tr class="hover:bg-slate-50/50 transition-colors">
                             <td class="py-4 px-6 font-medium text-slate-700 whitespace-nowrap">
-                                <?php echo date('d M Y, h:i A', strtotime($log['created_at'])); ?>
+                                <?php echo date('d M Y, h:i A', strtotime($log['created_at'] . ' UTC')); ?>
                             </td>
                             <td class="py-4 px-6 font-bold text-slate-800">
                                 <?php echo htmlspecialchars($log['admin_username']); ?>
