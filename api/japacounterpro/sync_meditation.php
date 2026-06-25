@@ -20,6 +20,15 @@ if (!$data || !isset($data['username']) || !isset($data['sessions'])) {
 $username = $conn->real_escape_string($data['username']);
 $sessions = $data['sessions']; // Array of {duration_seconds: int, date: string}
 
+// Auto-register user if they don't exist
+$user_check = $conn->query("SELECT id FROM users WHERE username = '$username' LIMIT 1");
+if (!$user_check || $user_check->num_rows == 0) {
+    $stmt = $conn->prepare("INSERT INTO users (username, device_token, level, total_counts, is_bot) VALUES (?, '', 1, 0, 0)");
+    $stmt->bind_param("s", $username);
+    $stmt->execute();
+    $stmt->close();
+}
+
 $successCount = 0;
 
 foreach ($sessions as $session) {
