@@ -8,6 +8,7 @@ require_once '../../config.php';
 
 $username = isset($_GET['username']) ? trim($conn->real_escape_string($_GET['username'])) : '';
 $device_token = isset($_GET['device_token']) ? $conn->real_escape_string($_GET['device_token']) : '';
+$user_ip = isset($_SERVER['REMOTE_ADDR']) ? $conn->real_escape_string($_SERVER['REMOTE_ADDR']) : null;
 
 if (empty($username)) {
     echo json_encode(["success" => false, "message" => "Username required"]);
@@ -28,8 +29,8 @@ if ($res && $res->num_rows > 0) {
     ]);
 } else {
     // Username available — CREATE the user now
-    $stmt = $conn->prepare("INSERT INTO users (username, device_token, level, total_counts, is_bot, bot_mantra, ads_disabled, created_at, last_active) VALUES (?, ?, 1, 0, 0, '', 0, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)");
-    $stmt->bind_param("ss", $username, $device_token);
+    $stmt = $conn->prepare("INSERT INTO users (username, device_token, level, total_counts, is_bot, bot_mantra, ads_disabled, created_at, last_active, ip_address) VALUES (?, ?, 1, 0, 0, '', 0, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, ?)");
+    $stmt->bind_param("sss", $username, $device_token, $user_ip);
 
     if ($stmt->execute()) {
         $new_id = $stmt->insert_id;
@@ -43,7 +44,7 @@ if ($res && $res->num_rows > 0) {
     } else {
         $stmt->close();
         // Fallback for strict mode
-        $conn->query("INSERT IGNORE INTO users (username, device_token, level, total_counts, is_bot, ads_disabled) VALUES ('$username', '$device_token', 1, 0, 0, 0)");
+        $conn->query("INSERT IGNORE INTO users (username, device_token, level, total_counts, is_bot, ads_disabled, ip_address) VALUES ('$username', '$device_token', 1, 0, 0, 0, '$user_ip')");
         echo json_encode([
             "success" => true,
             "available" => true,

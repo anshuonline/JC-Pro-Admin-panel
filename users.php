@@ -153,7 +153,12 @@ include 'includes/header.php';
                                     <i class="fa-solid fa-pen text-xs"></i>
                                 </button>
                             </div>
-                            <p class="text-[11px] text-slate-400 font-bold uppercase tracking-wider mt-0.5">ID: #<?php echo $user['id']; ?></p>
+                            <p class="text-[11px] text-slate-400 font-bold uppercase tracking-wider mt-0.5">
+                                ID: #<?php echo $user['id']; ?> 
+                                <?php if(!empty($user['ip_address'])): ?>
+                                    &bull; <span class="normal-case">IP: <?php echo htmlspecialchars($user['ip_address']); ?></span>
+                                <?php endif; ?>
+                            </p>
                         </div>
                     </div>
                     <span class="bg-slate-100 text-slate-600 py-1 px-2.5 rounded-full text-xs font-bold border border-slate-200/60">

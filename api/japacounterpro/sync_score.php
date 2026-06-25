@@ -25,6 +25,14 @@ if ($check_column && $check_column->num_rows == 0) {
     $conn->query("ALTER TABLE users ADD COLUMN is_private TINYINT(1) DEFAULT 0");
 }
 
+// Ensure ip_address column exists
+$check_column_ip = $conn->query("SHOW COLUMNS FROM users LIKE 'ip_address'");
+if ($check_column_ip && $check_column_ip->num_rows == 0) {
+    $conn->query("ALTER TABLE users ADD COLUMN ip_address VARCHAR(45) NULL");
+}
+
+$user_ip = isset($_SERVER['REMOTE_ADDR']) ? $conn->real_escape_string($_SERVER['REMOTE_ADDR']) : null;
+
 // Calendar sessions = SOURCE OF TRUTH from the app
 // Each session = { "date": "2026-06-22", "count": 109 }
 $sessions = isset($data['sessions']) ? $data['sessions'] : [];
@@ -33,7 +41,7 @@ $sessions = isset($data['sessions']) ? $data['sessions'] : [];
 $user_res = $conn->query("SELECT id FROM users WHERE username = '$username' LIMIT 1");
 if (!$user_res || $user_res->num_rows == 0) {
     // Auto-register user if missing
-    $conn->query("INSERT IGNORE INTO users (username, device_token, level, total_counts, is_bot, ads_disabled, is_private) VALUES ('$username', '$device_token', $level, 0, 0, 0, $is_private)");
+    $conn->query("INSERT IGNORE INTO users (username, device_token, level, total_counts, is_bot, ads_disabled, is_private, ip_address) VALUES ('$username', '$device_token', $level, 0, 0, 0, $is_private, '$user_ip')");
     $user_res = $conn->query("SELECT id FROM users WHERE username = '$username' LIMIT 1");
     if (!$user_res || $user_res->num_rows == 0) {
         echo json_encode(["success" => false, "message" => "User not found and could not be auto-registered"]);
@@ -45,7 +53,7 @@ $user_row = $user_res->fetch_assoc();
 $user_id = $user_row['id'];
 
 // Step 1: Update user level & device token (NOT total_counts — we don't trust client total)
-$updates = "level = $level";
+$updates = "level = $level, ip_address = '$user_ip'";
 if (isset($data['is_private'])) {
     $updates .= ", is_private = $is_private";
 }
