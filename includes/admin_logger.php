@@ -56,4 +56,13 @@ if (!function_exists('log_admin_action')) {
                       VALUES ('$username_esc', '$action_esc', '$ip_esc', '$city_esc', '$state_esc')");
     }
 }
+
+// Automatically log all POST requests made by the admin
+$current_admin = isset($_SESSION['admin_username']) ? $_SESSION['admin_username'] : (isset($_SESSION['admin_logged_in']) ? 'admin' : null);
+
+if ($current_admin && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    $page_name = basename($_SERVER['PHP_SELF']);
+    $action_detail = isset($_POST['action']) ? $_POST['action'] : 'Submitted form';
+    log_admin_action($conn, $current_admin, "Action ($action_detail) on $page_name");
+}
 ?>

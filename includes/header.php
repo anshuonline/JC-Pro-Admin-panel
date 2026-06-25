@@ -1,10 +1,12 @@
 <?php
 require_once __DIR__ . '/admin_logger.php';
-if (isset($_SESSION['admin_username']) && $_SERVER['REQUEST_METHOD'] === 'GET') {
+$current_admin = isset($_SESSION['admin_username']) ? $_SESSION['admin_username'] : (isset($_SESSION['admin_logged_in']) ? 'admin' : null);
+
+if ($current_admin && $_SERVER['REQUEST_METHOD'] === 'GET') {
     $page_name = basename($_SERVER['PHP_SELF']);
     // Avoid logging repetitive polling endpoints if any, but most pages are static
     if ($page_name !== 'admin_logs.php') {
-        log_admin_action($conn, $_SESSION['admin_username'], "Visited $page_name");
+        log_admin_action($conn, $current_admin, "Visited $page_name");
     }
 }
 
