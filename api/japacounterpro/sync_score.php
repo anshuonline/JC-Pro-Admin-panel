@@ -45,7 +45,10 @@ $user_row = $user_res->fetch_assoc();
 $user_id = $user_row['id'];
 
 // Step 1: Update user level & device token (NOT total_counts — we don't trust client total)
-$updates = "level = $level, is_private = $is_private";
+$updates = "level = $level";
+if (isset($data['is_private'])) {
+    $updates .= ", is_private = $is_private";
+}
 if ($device_token) {
     $updates .= ", device_token = '$device_token'";
 }
