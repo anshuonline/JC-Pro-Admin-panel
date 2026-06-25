@@ -10,6 +10,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 
 require_once '../../../config.php';
 
+// Set timezone
+date_default_timezone_set('Asia/Kolkata');
+$conn->query("SET time_zone = '+05:30'");
+
 $json = file_get_contents('php://input');
 $data = json_decode($json, true);
 
