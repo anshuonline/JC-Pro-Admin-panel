@@ -5,16 +5,6 @@ header('Access-Control-Allow-Methods: POST');
 
 require_once '../../config.php';
 
-// Ensure columns exist on live server
-$check_uid = $conn->query("SHOW COLUMNS FROM users LIKE 'google_uid'");
-if ($check_uid && $check_uid->num_rows == 0) {
-    $conn->query("ALTER TABLE users ADD COLUMN google_uid VARCHAR(100) UNIQUE DEFAULT NULL");
-}
-$check_em = $conn->query("SHOW COLUMNS FROM users LIKE 'email'");
-if ($check_em && $check_em->num_rows == 0) {
-    $conn->query("ALTER TABLE users ADD COLUMN email VARCHAR(100) DEFAULT NULL");
-}
-
 $json = file_get_contents('php://input');
 $data = json_decode($json, true);
 
