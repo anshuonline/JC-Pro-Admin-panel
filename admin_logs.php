@@ -1,6 +1,7 @@
 <?php
 // F:\APPS\JC Pro Admin panel\admin_logs.php
 require_once 'config.php';
+require_once 'includes/admin_logger.php';
 check_auth();
 
 // Pagination
