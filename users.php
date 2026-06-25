@@ -23,6 +23,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     }
 }
 
+// Handle link email
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'link_email') {
+    $user_id = (int)$_POST['user_id'];
+    $email_to_link = $conn->real_escape_string(trim($_POST['email_to_link']));
+    
+    if (!empty($email_to_link)) {
+        // Find the new account created by Google Login with this email
+        $res = $conn->query("SELECT google_uid, email, id FROM users WHERE email = '$email_to_link' AND id != $user_id LIMIT 1");
+        if ($res && $res->num_rows > 0) {
+            $new_acc = $res->fetch_assoc();
+            $g_uid = $conn->real_escape_string($new_acc['google_uid']);
+            $new_id = $new_acc['id'];
+            
+            // Update the old account with the google_uid and email
+            $conn->query("UPDATE users SET google_uid = '$g_uid', email = '$email_to_link' WHERE id = $user_id");
+            
+            // Delete the new empty account
+            $conn->query("DELETE FROM users WHERE id = $new_id");
+            
+            $msg = "Account successfully linked to $email_to_link!";
+        } else {
+            $err = "Could not find a Google account with that email. Make sure the user has logged in with Google at least once.";
+        }
+    } else {
+        $err = "Email cannot be empty.";
+    }
+}
+
 // Search and Pagination
 $search = $_GET['search'] ?? '';
 $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
@@ -135,17 +163,31 @@ include 'includes/header.php';
                 </div>
 
                 <div class="border-t border-slate-100 pt-4 mt-auto">
-                    <form method="POST" action="" class="w-full">
-                        <input type="hidden" name="action" value="toggle_ads">
-                        <input type="hidden" name="user_id" value="<?php echo $user['id']; ?>">
-                        <?php $ads_disabled = isset($user['ads_disabled']) ? $user['ads_disabled'] : 0; ?>
-                        <input type="hidden" name="current_status" value="<?php echo $ads_disabled; ?>">
-                        
-                        <button type="submit" class="w-full py-2.5 text-xs font-bold rounded-xl border transition-all shadow-sm flex items-center justify-center gap-2 <?php echo $ads_disabled ? 'bg-red-50 text-red-600 border-red-200 hover:bg-red-100' : 'bg-emerald-50 text-emerald-600 border-emerald-200 hover:bg-emerald-100'; ?>">
-                            <i class="fa-solid <?php echo $ads_disabled ? 'fa-ban' : 'fa-check-circle'; ?>"></i>
-                            <?php echo $ads_disabled ? 'Ads Disabled for User' : 'Ads Enabled for User'; ?>
+                    <div class="flex flex-col gap-2">
+                        <form method="POST" action="" class="w-full">
+                            <input type="hidden" name="action" value="toggle_ads">
+                            <input type="hidden" name="user_id" value="<?php echo $user['id']; ?>">
+                            <?php $ads_disabled = isset($user['ads_disabled']) ? $user['ads_disabled'] : 0; ?>
+                            <input type="hidden" name="current_status" value="<?php echo $ads_disabled; ?>">
+                            
+                            <button type="submit" class="w-full py-2.5 text-xs font-bold rounded-xl border transition-all shadow-sm flex items-center justify-center gap-2 <?php echo $ads_disabled ? 'bg-red-50 text-red-600 border-red-200 hover:bg-red-100' : 'bg-emerald-50 text-emerald-600 border-emerald-200 hover:bg-emerald-100'; ?>">
+                                <i class="fa-solid <?php echo $ads_disabled ? 'fa-ban' : 'fa-check-circle'; ?>"></i>
+                                <?php echo $ads_disabled ? 'Ads Disabled' : 'Ads Enabled'; ?>
+                            </button>
+                        </form>
+
+                        <?php if (empty($user['google_uid'])): ?>
+                        <button type="button" onclick="linkEmail(<?php echo $user['id']; ?>)" class="w-full py-2.5 text-xs font-bold rounded-xl border transition-all shadow-sm flex items-center justify-center gap-2 bg-blue-50 text-blue-600 border-blue-200 hover:bg-blue-100">
+                            <i class="fa-brands fa-google"></i>
+                            Link Google Email
                         </button>
-                    </form>
+                        <?php else: ?>
+                        <div class="w-full py-2.5 text-[10px] font-bold rounded-xl border shadow-sm flex items-center justify-center gap-2 bg-slate-50 text-slate-500 border-slate-200 overflow-hidden px-2">
+                            <i class="fa-solid fa-link shrink-0"></i>
+                            <span class="truncate"><?php echo htmlspecialchars($user['email']); ?></span>
+                        </div>
+                        <?php endif; ?>
+                    </div>
                 </div>
             </div>
         <?php endforeach; ?>
@@ -180,6 +222,13 @@ include 'includes/header.php';
     <input type="hidden" name="new_username" id="update_new_username" value="">
 </form>
 
+<!-- Hidden Form for Link Email -->
+<form id="linkEmailForm" method="POST" style="display: none;">
+    <input type="hidden" name="action" value="link_email">
+    <input type="hidden" name="user_id" id="link_user_id" value="">
+    <input type="hidden" name="email_to_link" id="link_email_to_link" value="">
+</form>
+
 <script>
 function editUsername(userId, currentUsername) {
     const newUsername = prompt("Enter new username for user #" + userId + ":", currentUsername);
@@ -187,6 +236,15 @@ function editUsername(userId, currentUsername) {
         document.getElementById('update_user_id').value = userId;
         document.getElementById('update_new_username').value = newUsername.trim();
         document.getElementById('updateUsernameForm').submit();
+    }
+}
+
+function linkEmail(userId) {
+    const emailToLink = prompt("Enter the Google Email that the user logged in with:\n(This will link their old account to their new Google login)", "");
+    if (emailToLink !== null && emailToLink.trim() !== "") {
+        document.getElementById('link_user_id').value = userId;
+        document.getElementById('link_email_to_link').value = emailToLink.trim();
+        document.getElementById('linkEmailForm').submit();
     }
 }
 </script>
