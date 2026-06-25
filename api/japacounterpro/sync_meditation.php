@@ -21,12 +21,12 @@ $username = $conn->real_escape_string($data['username']);
 $sessions = $data['sessions']; // Array of {duration_seconds: int, date: string}
 
 // Auto-register user if they don't exist
+$conn->query("INSERT IGNORE INTO users (username) VALUES ('$username')");
+
 $user_check = $conn->query("SELECT id FROM users WHERE username = '$username' LIMIT 1");
 if (!$user_check || $user_check->num_rows == 0) {
-    $stmt = $conn->prepare("INSERT INTO users (username, device_token, level, total_counts, is_bot) VALUES (?, '', 1, 0, 0)");
-    $stmt->bind_param("s", $username);
-    $stmt->execute();
-    $stmt->close();
+    echo json_encode(["status" => "error", "message" => "Database error: Could not create user"]);
+    exit();
 }
 
 $successCount = 0;

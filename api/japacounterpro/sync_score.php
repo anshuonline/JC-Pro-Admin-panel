@@ -22,20 +22,17 @@ $device_token = isset($data['device_token']) ? $conn->real_escape_string($data['
 // Each session = { "date": "2026-06-22", "count": 109 }
 $sessions = isset($data['sessions']) ? $data['sessions'] : [];
 
-// Find user
+// Safe Auto-Register
+$conn->query("INSERT IGNORE INTO users (username) VALUES ('$username')");
+
+// Find user ID (will exist now)
 $user_res = $conn->query("SELECT id FROM users WHERE username = '$username' LIMIT 1");
 if (!$user_res || $user_res->num_rows == 0) {
-    // AUTO-REGISTER NEW USER
-    $dt = $device_token ? $device_token : '';
-    $stmt = $conn->prepare("INSERT INTO users (username, device_token, level, total_counts, is_bot) VALUES (?, ?, ?, 0, 0)");
-    $stmt->bind_param("ssi", $username, $dt, $level);
-    $stmt->execute();
-    $user_id = $stmt->insert_id;
-    $stmt->close();
-} else {
-    $user_row = $user_res->fetch_assoc();
-    $user_id = $user_row['id'];
+    echo json_encode(["success" => false, "message" => "Database error: Could not create user"]);
+    exit();
 }
+$user_row = $user_res->fetch_assoc();
+$user_id = $user_row['id'];
 
 // Step 1: Update user level & device token (NOT total_counts — we don't trust client total)
 $updates = "level = $level";
@@ -63,7 +60,7 @@ if (!empty($sessions)) {
     
     // Insert ONLY what Calendar says — nothing more, nothing less
     $total = 0;
-    $stmt = $conn->prepare("INSERT INTO daily_counts (user_id, date, daily_count) VALUES (?, ?, ?)");
+    $stmt = $conn->prepare("INSERT INTO daily_counts (user_id, date, daily_count) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE daily_count = VALUES(daily_count)");
     foreach ($sessions as $session) {
         if (isset($session['date']) && isset($session['count'])) {
             $date = $conn->real_escape_string($session['date']);
