@@ -41,6 +41,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     $msg = "All bots deleted successfully!";
 }
 
+// Handle Reset Bot Counts
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'reset_counts') {
+    $conn->query("DELETE FROM daily_counts WHERE user_id IN (SELECT id FROM users WHERE is_bot = 1)");
+    $conn->query("UPDATE users SET total_counts = 0 WHERE is_bot = 1");
+    $msg = "All bot counts have been reset to zero!";
+}
+
 // Handle Fix Bot Names
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'fix_names') {
     $conn->query("UPDATE users SET username = REPLACE(username, '_', ' ') WHERE is_bot = 1");
@@ -200,6 +207,13 @@ include 'includes/header.php';
                   <input type="hidden" name="action" value="delete_all">
                   <button type="submit" class="w-full bg-red-500 hover:bg-red-600 text-white px-6 py-2.5 rounded-xl font-bold shadow-md shadow-red-500/20 transition-all flex items-center justify-center gap-2">
                       <i class="fa-solid fa-trash-can"></i> Delete All Bots
+                  </button>
+              </form>
+              
+              <form method="POST" action="bots.php" onsubmit="return confirm('Are you sure you want to reset all bot counts to 0?');">
+                  <input type="hidden" name="action" value="reset_counts">
+                  <button type="submit" class="w-full bg-yellow-500 hover:bg-yellow-600 text-white px-6 py-2.5 rounded-xl font-bold shadow-md shadow-yellow-500/20 transition-all flex items-center justify-center gap-2">
+                      <i class="fa-solid fa-rotate-left"></i> Reset Bot Counts
                   </button>
               </form>
 
