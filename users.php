@@ -3,6 +3,16 @@
 require_once 'config.php';
 check_auth();
 
+// Ensure columns exist on live server
+$check_uid = $conn->query("SHOW COLUMNS FROM users LIKE 'google_uid'");
+if ($check_uid && $check_uid->num_rows == 0) {
+    $conn->query("ALTER TABLE users ADD COLUMN google_uid VARCHAR(100) UNIQUE DEFAULT NULL");
+}
+$check_em = $conn->query("SHOW COLUMNS FROM users LIKE 'email'");
+if ($check_em && $check_em->num_rows == 0) {
+    $conn->query("ALTER TABLE users ADD COLUMN email VARCHAR(100) DEFAULT NULL");
+}
+
 // Handle ad toggle
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'toggle_ads') {
     $user_id = (int)$_POST['user_id'];
