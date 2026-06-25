@@ -36,6 +36,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
             $g_uid = $conn->real_escape_string($new_acc['google_uid']);
             $new_id = $new_acc['id'];
             
+            // Nullify the new account's google_uid first to avoid UNIQUE constraint violation
+            $conn->query("UPDATE users SET google_uid = NULL WHERE id = $new_id");
+            
             // Update the old account with the google_uid and email
             $conn->query("UPDATE users SET google_uid = '$g_uid', email = '$email_to_link' WHERE id = $user_id");
             
