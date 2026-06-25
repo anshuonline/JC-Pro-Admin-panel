@@ -11,6 +11,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     $conn->query("UPDATE users SET ads_disabled = $new_status WHERE id = $user_id");
 }
 
+// Handle username update
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'update_username') {
+    $user_id = (int)$_POST['user_id'];
+    $new_username = $conn->real_escape_string(trim($_POST['new_username']));
+    if (!empty($new_username)) {
+        $conn->query("UPDATE users SET username = '$new_username' WHERE id = $user_id");
+        $msg = "Username updated successfully.";
+    } else {
+        $err = "Username cannot be empty.";
+    }
+}
+
 // Search and Pagination
 $search = $_GET['search'] ?? '';
 $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
@@ -95,9 +107,14 @@ include 'includes/header.php';
                             <?php echo strtoupper(substr($user['username'], 0, 1)); ?>
                         </div>
                         <div>
-                            <h3 class="font-bold text-slate-800 text-lg leading-tight truncate max-w-[120px]" title="<?php echo htmlspecialchars($user['username']); ?>">
-                                <?php echo htmlspecialchars($user['username']); ?>
-                            </h3>
+                            <div class="flex items-center gap-2">
+                                <h3 class="font-bold text-slate-800 text-lg leading-tight truncate max-w-[120px]" title="<?php echo htmlspecialchars($user['username']); ?>">
+                                    <?php echo htmlspecialchars($user['username']); ?>
+                                </h3>
+                                <button type="button" onclick="editUsername(<?php echo $user['id']; ?>, '<?php echo addslashes(htmlspecialchars($user['username'])); ?>')" class="text-blue-500 hover:text-blue-700 focus:outline-none" title="Edit Username">
+                                    <i class="fa-solid fa-pen text-xs"></i>
+                                </button>
+                            </div>
                             <p class="text-[11px] text-slate-400 font-bold uppercase tracking-wider mt-0.5">ID: #<?php echo $user['id']; ?></p>
                         </div>
                     </div>
@@ -155,5 +172,23 @@ include 'includes/header.php';
     </div>
     <?php endif; ?>
 </div>
+
+<!-- Hidden Form for Username Update -->
+<form id="updateUsernameForm" method="POST" style="display: none;">
+    <input type="hidden" name="action" value="update_username">
+    <input type="hidden" name="user_id" id="update_user_id" value="">
+    <input type="hidden" name="new_username" id="update_new_username" value="">
+</form>
+
+<script>
+function editUsername(userId, currentUsername) {
+    const newUsername = prompt("Enter new username for user #" + userId + ":", currentUsername);
+    if (newUsername !== null && newUsername.trim() !== "" && newUsername.trim() !== currentUsername) {
+        document.getElementById('update_user_id').value = userId;
+        document.getElementById('update_new_username').value = newUsername.trim();
+        document.getElementById('updateUsernameForm').submit();
+    }
+}
+</script>
 
 <?php include 'includes/footer.php'; ?>
