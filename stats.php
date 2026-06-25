@@ -142,20 +142,6 @@ if ($live_table_exists && $live_table_exists->num_rows > 0) {
     }
 }
 
-// --- Audience Demographics (Top Locations) ---
-$top_locations = [];
-$res = $conn->query("SELECT state, city, COUNT(*) as count 
-                     FROM users 
-                     WHERE city IS NOT NULL AND city != 'Unknown' AND is_bot = 0
-                     GROUP BY state, city 
-                     ORDER BY count DESC 
-                     LIMIT 12");
-if ($res) {
-    while ($row = $res->fetch_assoc()) {
-        $top_locations[] = $row;
-    }
-}
-
 include 'includes/header.php';
 ?>
 
@@ -341,42 +327,6 @@ include 'includes/header.php';
         <div class="chart-container">
             <canvas id="monthlyChart"></canvas>
         </div>
-    </div>
-</div>
-
-<!-- Audience Demographics -->
-<div class="bg-white/60 backdrop-blur-xl border border-white rounded-2xl shadow-sm overflow-hidden mb-6">
-    <div class="px-6 py-5 border-b border-slate-100 flex justify-between items-center bg-white/40">
-        <h3 class="text-lg font-bold text-slate-800"><i class="fa-solid fa-map-location-dot text-indigo-500 mr-2"></i>Audience Locations</h3>
-        <span class="text-xs font-semibold text-slate-500">Based on IP Activity</span>
-    </div>
-    <div class="p-6">
-        <?php if (empty($top_locations)): ?>
-            <div class="py-8 text-center text-slate-400 font-medium">
-                <i class="fa-solid fa-earth-americas text-4xl mb-3 block opacity-30"></i>
-                Location data is currently syncing or unavailable.
-            </div>
-        <?php else: ?>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                <?php foreach ($top_locations as $loc): ?>
-                <div class="flex items-center justify-between p-4 bg-white/80 rounded-2xl border border-slate-100/50 shadow-sm hover:shadow-md transition-all">
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 rounded-full bg-indigo-50 text-indigo-500 flex items-center justify-center font-bold text-lg shadow-inner">
-                            <i class="fa-solid fa-city text-sm"></i>
-                        </div>
-                        <div>
-                            <div class="font-bold text-slate-800 text-sm truncate max-w-[150px]" title="<?php echo htmlspecialchars($loc['city']); ?>"><?php echo htmlspecialchars($loc['city']); ?></div>
-                            <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider truncate max-w-[150px]" title="<?php echo htmlspecialchars($loc['state']); ?>"><?php echo htmlspecialchars($loc['state']); ?></div>
-                        </div>
-                    </div>
-                    <div class="text-right">
-                        <div class="text-xl font-black text-slate-700"><?php echo formatNumberShort((int)$loc['count']); ?></div>
-                        <div class="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Users</div>
-                    </div>
-                </div>
-                <?php endforeach; ?>
-            </div>
-        <?php endif; ?>
     </div>
 </div>
 
