@@ -51,6 +51,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     }
 }
 
+// Handle unlink email
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'unlink_email') {
+    $user_id = (int)$_POST['user_id'];
+    $conn->query("UPDATE users SET google_uid = NULL, email = NULL WHERE id = $user_id");
+    $msg = "Google account unlinked successfully.";
+}
+
 // Search and Pagination
 $search = $_GET['search'] ?? '';
 $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
@@ -182,9 +189,14 @@ include 'includes/header.php';
                             Link Google Email
                         </button>
                         <?php else: ?>
-                        <div class="w-full py-2.5 text-[10px] font-bold rounded-xl border shadow-sm flex items-center justify-center gap-2 bg-slate-50 text-slate-500 border-slate-200 overflow-hidden px-2">
-                            <i class="fa-solid fa-link shrink-0"></i>
-                            <span class="truncate"><?php echo htmlspecialchars($user['email']); ?></span>
+                        <div class="flex items-center gap-1 w-full">
+                            <div class="flex-1 py-2.5 text-[10px] font-bold rounded-xl border shadow-sm flex items-center justify-center gap-2 bg-slate-50 text-slate-500 border-slate-200 overflow-hidden px-2">
+                                <i class="fa-solid fa-link shrink-0"></i>
+                                <span class="truncate"><?php echo htmlspecialchars($user['email']); ?></span>
+                            </div>
+                            <button type="button" onclick="unlinkEmail(<?php echo $user['id']; ?>, '<?php echo addslashes(htmlspecialchars($user['email'])); ?>')" class="py-2.5 px-3 text-xs font-bold rounded-xl border shadow-sm bg-red-50 text-red-600 border-red-200 hover:bg-red-100 transition-all focus:outline-none" title="Unlink Account">
+                                <i class="fa-solid fa-link-slash"></i>
+                            </button>
                         </div>
                         <?php endif; ?>
                     </div>
@@ -229,6 +241,12 @@ include 'includes/header.php';
     <input type="hidden" name="email_to_link" id="link_email_to_link" value="">
 </form>
 
+<!-- Hidden Form for Unlink Email -->
+<form id="unlinkEmailForm" method="POST" style="display: none;">
+    <input type="hidden" name="action" value="unlink_email">
+    <input type="hidden" name="user_id" id="unlink_user_id" value="">
+</form>
+
 <script>
 function editUsername(userId, currentUsername) {
     const newUsername = prompt("Enter new username for user #" + userId + ":", currentUsername);
@@ -245,6 +263,13 @@ function linkEmail(userId) {
         document.getElementById('link_user_id').value = userId;
         document.getElementById('link_email_to_link').value = emailToLink.trim();
         document.getElementById('linkEmailForm').submit();
+    }
+}
+
+function unlinkEmail(userId, email) {
+    if (confirm("Are you sure you want to unlink the Google account (" + email + ") from user #" + userId + "?\n\nThey will no longer be able to log in to this account using Google.")) {
+        document.getElementById('unlink_user_id').value = userId;
+        document.getElementById('unlinkEmailForm').submit();
     }
 }
 </script>
