@@ -36,7 +36,7 @@ $user_level = null;
 $sql = "SELECT u.username, SUM(dc.daily_count) as total_counts, MAX(u.level) as level 
         FROM users u 
         JOIN daily_counts dc ON u.id = dc.user_id 
-        WHERE dc.date >= DATE('$challenge_start') AND dc.date <= DATE('$challenge_end') AND u.is_bot = 0
+        WHERE dc.date >= DATE('$challenge_start') AND dc.date <= DATE('$challenge_end')
         GROUP BY u.id 
         HAVING total_counts > 0
         ORDER BY total_counts DESC";
