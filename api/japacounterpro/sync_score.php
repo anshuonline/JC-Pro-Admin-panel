@@ -17,6 +17,13 @@ if (!$data || !isset($data['username'])) {
 $username = $conn->real_escape_string($data['username']);
 $level = isset($data['level']) ? intval($data['level']) : 0;
 $device_token = isset($data['device_token']) ? $conn->real_escape_string($data['device_token']) : null;
+$is_private = isset($data['is_private']) && $data['is_private'] ? 1 : 0;
+
+// Ensure is_private column exists
+$check_column = $conn->query("SHOW COLUMNS FROM users LIKE 'is_private'");
+if ($check_column && $check_column->num_rows == 0) {
+    $conn->query("ALTER TABLE users ADD COLUMN is_private TINYINT(1) DEFAULT 0");
+}
 
 // Calendar sessions = SOURCE OF TRUTH from the app
 // Each session = { "date": "2026-06-22", "count": 109 }
@@ -26,7 +33,7 @@ $sessions = isset($data['sessions']) ? $data['sessions'] : [];
 $user_res = $conn->query("SELECT id FROM users WHERE username = '$username' LIMIT 1");
 if (!$user_res || $user_res->num_rows == 0) {
     // Auto-register user if missing
-    $conn->query("INSERT IGNORE INTO users (username, device_token, level, total_counts, is_bot, ads_disabled) VALUES ('$username', '$device_token', $level, 0, 0, 0)");
+    $conn->query("INSERT IGNORE INTO users (username, device_token, level, total_counts, is_bot, ads_disabled, is_private) VALUES ('$username', '$device_token', $level, 0, 0, 0, $is_private)");
     $user_res = $conn->query("SELECT id FROM users WHERE username = '$username' LIMIT 1");
     if (!$user_res || $user_res->num_rows == 0) {
         echo json_encode(["success" => false, "message" => "User not found and could not be auto-registered"]);
@@ -38,7 +45,7 @@ $user_row = $user_res->fetch_assoc();
 $user_id = $user_row['id'];
 
 // Step 1: Update user level & device token (NOT total_counts — we don't trust client total)
-$updates = "level = $level";
+$updates = "level = $level, is_private = $is_private";
 if ($device_token) {
     $updates .= ", device_token = '$device_token'";
 }

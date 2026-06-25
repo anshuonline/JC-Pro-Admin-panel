@@ -33,7 +33,7 @@ $user_counts = null;
 $user_level = null;
 
 // Get the sum of daily counts within the challenge dates
-$sql = "SELECT u.username, SUM(dc.daily_count) as total_counts, MAX(u.level) as level 
+$sql = "SELECT u.username, u.is_private, SUM(dc.daily_count) as total_counts, MAX(u.level) as level 
         FROM users u 
         JOIN daily_counts dc ON u.id = dc.user_id 
         WHERE dc.date >= DATE('$challenge_start') AND dc.date <= DATE('$challenge_end')
@@ -45,14 +45,17 @@ $res = $conn->query($sql);
 $rank = 1;
 if ($res && $res->num_rows > 0) {
     while($row = $res->fetch_assoc()) {
+        $actual_username = $row['username'];
+        $display_username = (isset($row['is_private']) && $row['is_private'] == 1) ? 'Anonymous' : $actual_username;
+
         $leaderboard_data[] = [
             "rank" => $rank,
-            "username" => $row['username'],
+            "username" => $display_username,
             "total_counts" => intval($row['total_counts']),
             "level" => intval($row['level'])
         ];
         
-        if ($username_query && strtolower($row['username']) === strtolower($username_query)) {
+        if ($username_query && strtolower($actual_username) === strtolower($username_query)) {
             $user_rank = $rank;
             $user_counts = intval($row['total_counts']);
             $user_level = intval($row['level']);
