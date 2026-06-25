@@ -18,6 +18,19 @@ if (!$data || !isset($data['username']) || !isset($data['sessions'])) {
 }
 
 $username = $conn->real_escape_string($data['username']);
+$device_token = isset($data['device_token']) ? $conn->real_escape_string($data['device_token']) : '';
+
+$user_res = $conn->query("SELECT id FROM users WHERE username = '$username' LIMIT 1");
+if (!$user_res || $user_res->num_rows == 0) {
+    // Auto-register user if missing
+    $conn->query("INSERT IGNORE INTO users (username, device_token, level, total_counts, is_bot, ads_disabled) VALUES ('$username', '$device_token', 1, 0, 0, 0)");
+    $user_res = $conn->query("SELECT id FROM users WHERE username = '$username' LIMIT 1");
+    if (!$user_res || $user_res->num_rows == 0) {
+        echo json_encode(["success" => false, "message" => "User not found and could not be auto-registered"]);
+        exit();
+    }
+}
+
 $sessions = $data['sessions']; // Array of {duration_seconds: int, date: string}
 
 $successCount = 0;

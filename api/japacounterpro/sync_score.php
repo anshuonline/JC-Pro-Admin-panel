@@ -25,8 +25,13 @@ $sessions = isset($data['sessions']) ? $data['sessions'] : [];
 // Find user
 $user_res = $conn->query("SELECT id FROM users WHERE username = '$username' LIMIT 1");
 if (!$user_res || $user_res->num_rows == 0) {
-    echo json_encode(["success" => false, "message" => "User not found"]);
-    exit();
+    // Auto-register user if missing
+    $conn->query("INSERT IGNORE INTO users (username, device_token, level, total_counts, is_bot, ads_disabled) VALUES ('$username', '$device_token', $level, 0, 0, 0)");
+    $user_res = $conn->query("SELECT id FROM users WHERE username = '$username' LIMIT 1");
+    if (!$user_res || $user_res->num_rows == 0) {
+        echo json_encode(["success" => false, "message" => "User not found and could not be auto-registered"]);
+        exit();
+    }
 }
 
 $user_row = $user_res->fetch_assoc();
@@ -58,7 +63,7 @@ if (!empty($sessions)) {
     
     // Insert ONLY what Calendar says — nothing more, nothing less
     $total = 0;
-    $stmt = $conn->prepare("INSERT INTO daily_counts (user_id, date, daily_count) VALUES (?, ?, ?)");
+    $stmt = $conn->prepare("INSERT INTO daily_counts (user_id, date, daily_count) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE daily_count = VALUES(daily_count)");
     foreach ($sessions as $session) {
         if (isset($session['date']) && isset($session['count'])) {
             $date = $conn->real_escape_string($session['date']);
