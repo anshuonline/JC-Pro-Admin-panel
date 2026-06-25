@@ -16,6 +16,11 @@ ignore_user_abort(true);
 
 echo "Starting Bot Routine...<br>";
 
+if (file_exists('bots_paused.txt')) {
+    echo "Routine aborted: Bots are currently PAUSED.<br>";
+    exit;
+}
+
 $limit = 4000;
 if (file_exists('bot_limit.txt')) {
     $val = (int)file_get_contents('bot_limit.txt');
