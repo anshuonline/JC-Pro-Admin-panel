@@ -48,18 +48,21 @@ if ($res && $res->num_rows > 0) {
         $actual_username = $row['username'];
         $display_username = (isset($row['is_private']) && $row['is_private'] == 1) ? 'Anonymous' : $actual_username;
 
-        $leaderboard_data[] = [
-            "rank" => $rank,
-            "username" => $display_username,
-            "total_counts" => intval($row['total_counts']),
-            "level" => intval($row['level'])
-        ];
-        
+        $is_current = false;
         if ($username_query && strtolower($actual_username) === strtolower($username_query)) {
             $user_rank = $rank;
             $user_counts = intval($row['total_counts']);
             $user_level = intval($row['level']);
+            $is_current = true;
         }
+
+        $leaderboard_data[] = [
+            "rank" => $rank,
+            "username" => $display_username,
+            "total_counts" => intval($row['total_counts']),
+            "level" => intval($row['level']),
+            "is_current_user" => $is_current
+        ];
         
         $rank++;
     }
