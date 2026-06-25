@@ -73,21 +73,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_dates'])) {
 // Ab uski zaroorat nahi hai kyunki Leaderboard automatically naye mahine ke Start/End Date ke hisaab se 0 se chalu ho jata hai.
 // Isliye maine database wipe karne ka khatarnak code hamesha ke liye hata diya hai.
 
-// Fetch Top 100 Users
-$leaderboard_data = [];
-// YAHAN NAYA LOGIC HAI:
-// Admin panel ka table bhi ab sirf current mahine (Start aur End Date ke beech) ke daily_counts ko SUM karta hai.
-// Isse Admin ko bilkul wahi live result dikhta hai jo app mein users ko dikh raha hota hai.
+$search = isset($_GET['search']) ? trim($_GET['search']) : '';
+
 $leaderboard_res = $conn->query("SELECT u.username, SUM(dc.daily_count) as total_counts, MAX(u.level) as level 
         FROM users u 
         JOIN daily_counts dc ON u.id = dc.user_id 
         WHERE dc.date >= DATE('$challenge_start') AND dc.date <= DATE('$challenge_end')
         GROUP BY u.id 
         HAVING total_counts > 0
-        ORDER BY total_counts DESC LIMIT 100");
+        ORDER BY total_counts DESC");
+
+$leaderboard_data = [];
 if ($leaderboard_res && $leaderboard_res->num_rows > 0) {
+    $current_rank = 1;
     while($row = $leaderboard_res->fetch_assoc()) {
-        $leaderboard_data[] = $row;
+        $row['rank'] = $current_rank;
+        
+        if (!empty($search)) {
+            // Search by username or exact rank
+            if (stripos($row['username'], $search) !== false || (string)$current_rank === $search) {
+                $leaderboard_data[] = $row;
+            }
+        } else {
+            // No search, just show top 100
+            if ($current_rank <= 100) {
+                $leaderboard_data[] = $row;
+            }
+        }
+        $current_rank++;
     }
 }
 
@@ -174,12 +187,23 @@ include 'includes/header.php';
 
 <!-- Leaderboard Rankings Table -->
 <div class="bg-white rounded-lg shadow-sm border border-slate-200 overflow-hidden mb-8">
-    <div class="p-6 border-b border-slate-200 bg-slate-50 flex justify-between items-center">
+    <div class="p-6 border-b border-slate-200 bg-slate-50 flex flex-col md:flex-row justify-between items-center gap-4">
         <div>
-            <h3 class="text-lg font-bold text-slate-800"><i class="fa-solid fa-trophy mr-2 text-yellow-500"></i> Current Rankings (Top 100)</h3>
+            <h3 class="text-lg font-bold text-slate-800"><i class="fa-solid fa-trophy mr-2 text-yellow-500"></i> Current Rankings <?php echo empty($search) ? '(Top 100)' : '(Search Results)'; ?></h3>
             <p class="text-sm text-slate-500">Live preview of the global leaderboard.</p>
         </div>
-        <span class="bg-blue-100 text-blue-800 text-xs font-bold px-3 py-1 rounded-full"><?php echo count($leaderboard_data); ?> Active Users</span>
+        
+        <form method="GET" class="flex w-full md:w-auto gap-2">
+            <input type="text" name="search" value="<?php echo htmlspecialchars($search); ?>" placeholder="Search username or rank..." class="w-full md:w-64 border border-slate-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm">
+            <button type="submit" class="bg-slate-800 hover:bg-slate-900 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
+                Search
+            </button>
+            <?php if(!empty($search)): ?>
+            <a href="leaderboard_manager.php" class="bg-slate-200 hover:bg-slate-300 text-slate-700 px-4 py-2 rounded-lg text-sm font-medium transition-colors">
+                Clear
+            </a>
+            <?php endif; ?>
+        </form>
     </div>
     
     <?php if (count($leaderboard_data) > 0): ?>
