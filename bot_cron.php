@@ -93,6 +93,58 @@ $conn->query("DELETE FROM live_sessions WHERE last_heartbeat < NOW() - INTERVAL 
 // 3. Delete daily_counts older than 60 days (User request to save DB space)
 $conn->query("DELETE FROM daily_counts WHERE date < DATE_SUB(CURDATE(), INTERVAL 60 DAY)");
 
+// ==========================================
+// BACKGROUND IP LOCATION SYNC
+// ==========================================
+echo "<br>Starting IP Location Sync...<br>";
+
+// Ensure city and state columns exist
+$check_city = $conn->query("SHOW COLUMNS FROM users LIKE 'city'");
+if ($check_city && $check_city->num_rows == 0) {
+    $conn->query("ALTER TABLE users ADD COLUMN city VARCHAR(100) NULL, ADD COLUMN state VARCHAR(100) NULL");
+}
+
+// Get up to 100 unique IPs that don't have a city yet
+$ip_res = $conn->query("SELECT DISTINCT ip_address FROM users WHERE ip_address IS NOT NULL AND ip_address != '' AND city IS NULL LIMIT 100");
+if ($ip_res && $ip_res->num_rows > 0) {
+    $ips_to_sync = [];
+    while ($row = $ip_res->fetch_assoc()) {
+        $ips_to_sync[] = $row['ip_address'];
+    }
+    
+    // Call ip-api.com batch endpoint
+    $ch = curl_init('http://ip-api.com/batch');
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_POST, true);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($ips_to_sync));
+    curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
+    curl_setopt($ch, CURLOPT_TIMEOUT, 10);
+    $response = curl_exec($ch);
+    curl_close($ch);
+    
+    if ($response) {
+        $locations = json_decode($response, true);
+        if (is_array($locations)) {
+            foreach ($locations as $loc) {
+                if (isset($loc['query']) && $loc['status'] === 'success') {
+                    $ip = $conn->real_escape_string($loc['query']);
+                    $city = isset($loc['city']) ? $conn->real_escape_string($loc['city']) : 'Unknown';
+                    $state = isset($loc['regionName']) ? $conn->real_escape_string($loc['regionName']) : 'Unknown';
+                    
+                    // Update all users with this IP
+                    $conn->query("UPDATE users SET city = '$city', state = '$state' WHERE ip_address = '$ip' AND city IS NULL");
+                } else if (isset($loc['query']) && $loc['status'] === 'fail') {
+                    $ip = $conn->real_escape_string($loc['query']);
+                    $conn->query("UPDATE users SET city = 'Unknown', state = 'Unknown' WHERE ip_address = '$ip' AND city IS NULL");
+                }
+            }
+            echo "Synced locations for " . count($locations) . " IPs.<br>";
+        }
+    }
+} else {
+    echo "No new IPs to sync.<br>";
+}
+
 echo "Routine and Cleanups Completed.";
 ?>
 
