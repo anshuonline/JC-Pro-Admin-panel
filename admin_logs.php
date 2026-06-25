@@ -62,9 +62,13 @@ include 'includes/header.php';
                                     <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-bold bg-green-50 text-green-700 border border-green-200/60">
                                         <i class="fa-solid fa-arrow-right-to-bracket"></i> LOGIN
                                     </span>
-                                <?php else: ?>
+                                <?php elseif ($log['action'] === 'LOGOUT'): ?>
                                     <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-bold bg-slate-100 text-slate-600 border border-slate-200/60">
                                         <i class="fa-solid fa-arrow-right-from-bracket"></i> LOGOUT
+                                    </span>
+                                <?php else: ?>
+                                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-200/60 max-w-xs truncate" title="<?php echo htmlspecialchars($log['action']); ?>">
+                                        <i class="fa-solid fa-eye"></i> <?php echo htmlspecialchars($log['action']); ?>
                                     </span>
                                 <?php endif; ?>
                             </td>
