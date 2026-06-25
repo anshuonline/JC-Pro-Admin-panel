@@ -22,8 +22,13 @@ $device_token = isset($data['device_token']) ? $conn->real_escape_string($data['
 // Each session = { "date": "2026-06-22", "count": 109 }
 $sessions = isset($data['sessions']) ? $data['sessions'] : [];
 
-// Safe Auto-Register
-$conn->query("INSERT IGNORE INTO users (username) VALUES ('$username')");
+// Safe Auto-Register with all required fields to avoid strict mode errors
+$dt = $device_token ? $device_token : '';
+$lvl = $level ? $level : 1;
+$stmt = $conn->prepare("INSERT IGNORE INTO users (username, device_token, level, total_counts, is_bot, bot_mantra, ads_disabled, last_active, created_at) VALUES (?, ?, ?, 0, 0, 0, 0, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)");
+$stmt->bind_param("ssi", $username, $dt, $lvl);
+$stmt->execute();
+$stmt->close();
 
 // Find user ID (will exist now)
 $user_res = $conn->query("SELECT id FROM users WHERE username = '$username' LIMIT 1");
