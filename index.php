@@ -28,6 +28,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // Check if it matches md5, or plain text, or password_verify
             if (md5($password) === $dbPass || $password === $dbPass || password_verify($password, $dbPass)) {
                 $_SESSION['admin_logged_in'] = true;
+                $_SESSION['admin_username'] = $username;
+                log_admin_action($conn, $username, 'LOGIN');
                 header("Location: dashboard.php");
                 exit();
             } else {
@@ -42,6 +44,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $stmt->fetch();
                     if (md5($password) === $dbPass || $password === $dbPass || password_verify($password, $dbPass)) {
                         $_SESSION['admin_logged_in'] = true;
+                        $_SESSION['admin_username'] = $username;
+                        log_admin_action($conn, $username, 'LOGIN');
                         header("Location: dashboard.php");
                         exit();
                     } else {
