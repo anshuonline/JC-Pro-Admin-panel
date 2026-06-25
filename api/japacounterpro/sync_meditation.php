@@ -20,18 +20,6 @@ if (!$data || !isset($data['username']) || !isset($data['sessions'])) {
 $username = $conn->real_escape_string($data['username']);
 $sessions = $data['sessions']; // Array of {duration_seconds: int, date: string}
 
-// Auto-register user if they don't exist
-$stmt = $conn->prepare("INSERT IGNORE INTO users (username, device_token, level, total_counts, is_bot, bot_mantra, ads_disabled, last_active, created_at) VALUES (?, '', 1, 0, 0, 0, 0, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)");
-$stmt->bind_param("s", $username);
-$stmt->execute();
-$stmt->close();
-
-$user_check = $conn->query("SELECT id FROM users WHERE username = '$username' LIMIT 1");
-if (!$user_check || $user_check->num_rows == 0) {
-    echo json_encode(["status" => "error", "message" => "Database error: Could not create user"]);
-    exit();
-}
-
 $successCount = 0;
 
 foreach ($sessions as $session) {
