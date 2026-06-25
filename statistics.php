@@ -19,12 +19,21 @@ for ($i = 29; $i >= 0; $i--) {
     $new_users_daily[] = ['d' => $date, 'c' => isset($temp_new[$date]) ? $temp_new[$date] : 0];
 }
 
+$res_yw = $conn->query("SELECT YEARWEEK(CURDATE(), 1) as cur_yw");
+$cur_yw = $res_yw->fetch_assoc()['cur_yw'];
+$today_str = date('Y-m-d');
+
 $new_users_weekly = [];
 $res = $conn->query("SELECT YEARWEEK(created_at, 1) as yw, MAX(DATE(created_at)) as d, COUNT(id) as c 
                      FROM users 
                      WHERE created_at >= DATE_SUB(CURDATE(), INTERVAL 12 WEEK) 
                      GROUP BY YEARWEEK(created_at, 1) ORDER BY yw ASC");
-if ($res) while ($row = $res->fetch_assoc()) $new_users_weekly[] = $row;
+if ($res) {
+    while ($row = $res->fetch_assoc()) {
+        if ($row['yw'] == $cur_yw) $row['d'] = $today_str;
+        $new_users_weekly[] = $row;
+    }
+}
 
 $new_users_monthly = [];
 $res = $conn->query("SELECT DATE_FORMAT(created_at, '%Y-%m') as ym, COUNT(id) as c 
@@ -51,7 +60,12 @@ $res = $conn->query("SELECT YEARWEEK(date, 1) as yw, MAX(date) as d, COUNT(DISTI
                      FROM daily_counts 
                      WHERE date >= DATE_SUB(CURDATE(), INTERVAL 12 WEEK) 
                      GROUP BY YEARWEEK(date, 1) ORDER BY yw ASC");
-if ($res) while ($row = $res->fetch_assoc()) $active_weekly[] = $row;
+if ($res) {
+    while ($row = $res->fetch_assoc()) {
+        if ($row['yw'] == $cur_yw) $row['d'] = $today_str;
+        $active_weekly[] = $row;
+    }
+}
 
 $active_monthly = [];
 $res = $conn->query("SELECT DATE_FORMAT(date, '%Y-%m') as ym, COUNT(DISTINCT user_id) as c 
