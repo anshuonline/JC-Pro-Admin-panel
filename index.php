@@ -115,8 +115,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <i class="fa-solid fa-lock text-slate-400"></i>
                     </div>
                     <input type="password" name="password" id="password" required
-                        class="block w-full pl-10 pr-3 py-3 border border-slate-200/60 rounded-xl bg-white/50 text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 focus:bg-white transition-all shadow-sm"
+                        class="block w-full pl-10 pr-10 py-3 border border-slate-200/60 rounded-xl bg-white/50 text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 focus:bg-white transition-all shadow-sm"
                         placeholder="••••••••">
+                    <button type="button" onclick="togglePassword()" class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-slate-600 focus:outline-none transition-colors">
+                        <i class="fa-solid fa-eye" id="togglePasswordIcon"></i>
+                    </button>
                 </div>
             </div>
 
@@ -127,5 +130,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </form>
     </div>
 
+    <script>
+        function togglePassword() {
+            const pwd = document.getElementById('password');
+            const icon = document.getElementById('togglePasswordIcon');
+            if (pwd.type === 'password') {
+                pwd.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                pwd.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        }
+    </script>
 </body>
 </html>
