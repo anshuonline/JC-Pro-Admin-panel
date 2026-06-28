@@ -20,7 +20,7 @@ for ($i = 29; $i >= 0; $i--) {
 }
 
 $new_users_weekly = [];
-$res = $conn->query("SELECT YEARWEEK(created_at, 1) as yw, MIN(DATE(created_at)) as d, COUNT(id) as c 
+$res = $conn->query("SELECT YEARWEEK(created_at, 1) as yw, STR_TO_DATE(CONCAT(YEARWEEK(created_at, 1), ' Monday'), '%X%V %W') as d, COUNT(id) as c 
                      FROM users 
                      WHERE created_at >= DATE_SUB(CURDATE(), INTERVAL 12 WEEK) 
                      GROUP BY YEARWEEK(created_at, 1) ORDER BY yw ASC");
@@ -47,7 +47,7 @@ for ($i = 29; $i >= 0; $i--) {
 }
 
 $active_weekly = [];
-$res = $conn->query("SELECT YEARWEEK(date, 1) as yw, MIN(date) as d, COUNT(DISTINCT user_id) as c 
+$res = $conn->query("SELECT YEARWEEK(date, 1) as yw, STR_TO_DATE(CONCAT(YEARWEEK(date, 1), ' Monday'), '%X%V %W') as d, COUNT(DISTINCT user_id) as c 
                      FROM daily_counts 
                      WHERE date >= DATE_SUB(CURDATE(), INTERVAL 12 WEEK) 
                      GROUP BY YEARWEEK(date, 1) ORDER BY yw ASC");
