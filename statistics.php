@@ -20,10 +20,10 @@ for ($i = 29; $i >= 0; $i--) {
 }
 
 $new_users_weekly = [];
-$res = $conn->query("SELECT YEARWEEK(created_at, 1) as yw, STR_TO_DATE(CONCAT(YEARWEEK(created_at, 1), ' Monday'), '%X%V %W') as d, COUNT(id) as c 
+$res = $conn->query("SELECT DATE(DATE_ADD(created_at, INTERVAL -WEEKDAY(created_at) DAY)) as d, COUNT(id) as c 
                      FROM users 
                      WHERE created_at >= DATE_SUB(CURDATE(), INTERVAL 12 WEEK) 
-                     GROUP BY YEARWEEK(created_at, 1) ORDER BY yw ASC");
+                     GROUP BY d ORDER BY d ASC");
 if ($res) while ($row = $res->fetch_assoc()) $new_users_weekly[] = $row;
 
 $new_users_monthly = [];
@@ -47,10 +47,10 @@ for ($i = 29; $i >= 0; $i--) {
 }
 
 $active_weekly = [];
-$res = $conn->query("SELECT YEARWEEK(date, 1) as yw, STR_TO_DATE(CONCAT(YEARWEEK(date, 1), ' Monday'), '%X%V %W') as d, COUNT(DISTINCT user_id) as c 
+$res = $conn->query("SELECT DATE(DATE_ADD(date, INTERVAL -WEEKDAY(date) DAY)) as d, COUNT(DISTINCT user_id) as c 
                      FROM daily_counts 
                      WHERE date >= DATE_SUB(CURDATE(), INTERVAL 12 WEEK) 
-                     GROUP BY YEARWEEK(date, 1) ORDER BY yw ASC");
+                     GROUP BY d ORDER BY d ASC");
 if ($res) while ($row = $res->fetch_assoc()) $active_weekly[] = $row;
 
 $active_monthly = [];
