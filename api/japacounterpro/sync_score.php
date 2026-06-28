@@ -62,26 +62,11 @@ if ($device_token) {
 }
 $conn->query("UPDATE users SET $updates WHERE id = $user_id");
 
-// Step 2: Calendar Sync — only if sessions are provided
-// This is the ONLY way daily_counts gets written. Calendar is the source of truth.
+// Step 2: Calendar Sync — Merge safely to prevent wiping data on app reinstall
 if (!empty($sessions)) {
-    // Fetch current challenge dates
-    $cfg_res = $conn->query("SELECT challenge_start, challenge_end FROM leaderboard_config LIMIT 1");
-    if ($cfg_res && $cfg_res->num_rows > 0) {
-        $cfg_row = $cfg_res->fetch_assoc();
-        $c_start = $conn->real_escape_string(date('Y-m-d', strtotime($cfg_row['challenge_start'])));
-        $c_end = $conn->real_escape_string(date('Y-m-d', strtotime($cfg_row['challenge_end'])));
-        
-        // NUKE all existing daily_counts for this user ONLY within the current challenge period
-        $conn->query("DELETE FROM daily_counts WHERE user_id = $user_id AND date >= '$c_start' AND date <= '$c_end'");
-    } else {
-        // Fallback if config is missing
-        $conn->query("DELETE FROM daily_counts WHERE user_id = $user_id");
-    }
-    
-    // Insert ONLY what Calendar says — nothing more, nothing less
-    $total = 0;
-    $stmt = $conn->prepare("INSERT INTO daily_counts (user_id, date, daily_count) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE daily_count = VALUES(daily_count)");
+    // We use GREATEST() to ensure that if the app is cleared and sends a smaller count, 
+    // the server preserves its higher count.
+    $stmt = $conn->prepare("INSERT INTO daily_counts (user_id, date, daily_count) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE daily_count = GREATEST(daily_count, VALUES(daily_count))");
     foreach ($sessions as $session) {
         if (isset($session['date']) && isset($session['count'])) {
             $date = $conn->real_escape_string($session['date']);
@@ -89,13 +74,17 @@ if (!empty($sessions)) {
             if ($count > 0) {
                 $stmt->bind_param("isi", $user_id, $date, $count);
                 $stmt->execute();
-                $total += $count;
             }
         }
     }
     $stmt->close();
     
-    // Update total_counts to match Calendar SUM (server & calendar are now identical)
+    // Update total_counts to match the safe merged server SUM
+    $sum_res = $conn->query("SELECT SUM(daily_count) as t FROM daily_counts WHERE user_id = $user_id");
+    $total = 0;
+    if ($sum_res && $row = $sum_res->fetch_assoc()) {
+        $total = (int)$row['t'];
+    }
     $conn->query("UPDATE users SET total_counts = $total WHERE id = $user_id");
 }
 
