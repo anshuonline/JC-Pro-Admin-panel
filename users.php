@@ -100,139 +100,151 @@ if ($res) {
 include 'includes/header.php';
 ?>
 
-<div class="mb-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-    <div>
-        <h1 class="text-2xl font-bold text-slate-900 tracking-tight">Users</h1>
-        <p class="text-slate-500 text-sm mt-1 font-medium">Manage registered users in the app.</p>
-    </div>
-    
-    <form method="GET" action="users.php" class="relative w-full md:w-64">
-        <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-            <i class="fa-solid fa-search text-slate-400"></i>
-        </div>
-        <input type="text" name="search" value="<?php echo htmlspecialchars($search); ?>" 
-            class="block w-full pl-10 pr-3 py-2.5 border border-slate-200/60 rounded-xl bg-white/60 backdrop-blur-md text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:bg-white transition-all shadow-[0_2px_10px_rgb(0,0,0,0.02)]"
-            placeholder="Search username...">
-    </form>
-</div>
+<div class="bg-[#000000] min-h-[calc(100vh-6rem)] rounded-[2.5rem] p-6 md:p-8 -mt-4 -mx-2 md:-mx-4 shadow-[0_0_60px_rgba(0,0,0,0.8)] text-white relative overflow-hidden border border-white/5">
+    <!-- Subtle background glows for AMOLED feel -->
+    <div class="absolute top-0 left-1/4 w-96 h-96 bg-blue-600/10 rounded-full blur-[120px] pointer-events-none"></div>
+    <div class="absolute bottom-0 right-1/4 w-96 h-96 bg-purple-600/10 rounded-full blur-[120px] pointer-events-none"></div>
 
-<?php if (isset($msg)): ?>
-    <div class="bg-green-500/10 border border-green-500 text-green-500 px-4 py-3 rounded-lg mb-6 text-sm flex items-center gap-2">
-        <i class="fa-solid fa-check-circle"></i>
-        <?php echo htmlspecialchars($msg); ?>
-    </div>
-<?php endif; ?>
-
-<?php if (isset($err)): ?>
-    <div class="bg-red-500/10 border border-red-500 text-red-500 px-4 py-3 rounded-lg mb-6 text-sm flex items-center gap-2">
-        <i class="fa-solid fa-circle-exclamation"></i>
-        <?php echo htmlspecialchars($err); ?>
-    </div>
-<?php endif; ?>
-
-<?php if(empty($users)): ?>
-    <div class="bg-white/60 backdrop-blur-xl border border-white rounded-2xl shadow-[0_4px_24px_rgb(0,0,0,0.02)] p-12 text-center text-slate-500 w-full">
-        <i class="fa-solid fa-users-slash text-4xl mb-3 block opacity-30"></i>
-        <span class="font-medium">No users found matching your criteria.</span>
-    </div>
-<?php else: ?>
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-        <?php foreach($users as $user): ?>
-            <div class="bg-white/80 backdrop-blur-xl border border-slate-200/60 shadow-sm rounded-2xl p-6 transition-all hover:shadow-lg hover:-translate-y-1 group">
-                <div class="flex justify-between items-start mb-5">
-                    <div class="flex items-center gap-3">
-                        <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 text-white flex items-center justify-center font-bold text-xl shadow-inner group-hover:scale-105 transition-transform">
-                            <?php echo strtoupper(substr($user['username'], 0, 1)); ?>
-                        </div>
-                        <div>
-                            <div class="flex items-center gap-2">
-                                <h3 class="font-bold text-slate-800 text-lg leading-tight truncate max-w-[120px]" title="<?php echo htmlspecialchars($user['username']); ?>">
-                                    <?php echo htmlspecialchars($user['username']); ?>
-                                </h3>
-                                <button type="button" onclick="editUsername(<?php echo $user['id']; ?>, '<?php echo addslashes(htmlspecialchars($user['username'])); ?>')" class="text-blue-500 hover:text-blue-700 focus:outline-none" title="Edit Username">
-                                    <i class="fa-solid fa-pen text-xs"></i>
-                                </button>
-                            </div>
-                            <p class="text-[11px] text-slate-400 font-bold uppercase tracking-wider mt-0.5">
-                                ID: #<?php echo $user['id']; ?> 
-                                <?php if(!empty($user['ip_address'])): ?>
-                                    &bull; <span class="normal-case">IP: <?php echo htmlspecialchars($user['ip_address']); ?></span>
-                                <?php endif; ?>
-                            </p>
-                        </div>
-                    </div>
-                    <span class="bg-slate-100 text-slate-600 py-1 px-2.5 rounded-full text-xs font-bold border border-slate-200/60">
-                        Lvl <?php echo $user['level']; ?>
-                    </span>
-                </div>
-                
-                <div class="grid grid-cols-2 gap-3 mb-5">
-                    <div class="bg-slate-50/70 rounded-xl p-3 border border-slate-100/80">
-                        <p class="text-[10px] uppercase font-bold text-slate-400 tracking-wider mb-1 flex items-center gap-1.5"><i class="fa-solid fa-calculator text-slate-300"></i> Counts</p>
-                        <p class="font-mono font-bold text-slate-700 text-lg"><?php echo formatNumberShort($user['total_counts']); ?></p>
-                    </div>
-                    <div class="bg-slate-50/70 rounded-xl p-3 border border-slate-100/80">
-                        <p class="text-[10px] uppercase font-bold text-slate-400 tracking-wider mb-1 flex items-center gap-1.5"><i class="fa-solid fa-clock-rotate-left text-slate-300"></i> Active</p>
-                        <p class="font-semibold text-slate-600 text-xs mt-1"><?php echo date('M d, Y', strtotime($user['last_active'])); ?></p>
-                    </div>
-                </div>
-
-                <div class="border-t border-slate-100 pt-4 mt-auto">
-                    <div class="flex flex-col gap-2">
-                        <form method="POST" action="" class="w-full">
-                            <input type="hidden" name="action" value="toggle_ads">
-                            <input type="hidden" name="user_id" value="<?php echo $user['id']; ?>">
-                            <?php $ads_disabled = isset($user['ads_disabled']) ? $user['ads_disabled'] : 0; ?>
-                            <input type="hidden" name="current_status" value="<?php echo $ads_disabled; ?>">
-                            
-                            <button type="submit" class="w-full py-2.5 text-xs font-bold rounded-xl border transition-all shadow-sm flex items-center justify-center gap-2 <?php echo $ads_disabled ? 'bg-red-50 text-red-600 border-red-200 hover:bg-red-100' : 'bg-emerald-50 text-emerald-600 border-emerald-200 hover:bg-emerald-100'; ?>">
-                                <i class="fa-solid <?php echo $ads_disabled ? 'fa-ban' : 'fa-check-circle'; ?>"></i>
-                                <?php echo $ads_disabled ? 'Ads Disabled' : 'Ads Enabled'; ?>
-                            </button>
-                        </form>
-
-                        <?php if (empty($user['google_uid'])): ?>
-                        <button type="button" onclick="linkEmail(<?php echo $user['id']; ?>)" class="w-full py-2.5 text-xs font-bold rounded-xl border transition-all shadow-sm flex items-center justify-center gap-2 bg-blue-50 text-blue-600 border-blue-200 hover:bg-blue-100">
-                            <i class="fa-brands fa-google"></i>
-                            Link Google Email
-                        </button>
-                        <?php else: ?>
-                        <div class="flex items-center gap-1 w-full">
-                            <div class="flex-1 py-2.5 text-[10px] font-bold rounded-xl border shadow-sm flex items-center justify-center gap-2 bg-slate-50 text-slate-500 border-slate-200 overflow-hidden px-2">
-                                <i class="fa-solid fa-link shrink-0"></i>
-                                <span class="truncate"><?php echo htmlspecialchars($user['email']); ?></span>
-                            </div>
-                            <button type="button" onclick="unlinkEmail(<?php echo $user['id']; ?>, '<?php echo addslashes(htmlspecialchars($user['email'])); ?>')" class="py-2.5 px-3 text-xs font-bold rounded-xl border shadow-sm bg-red-50 text-red-600 border-red-200 hover:bg-red-100 transition-all focus:outline-none" title="Unlink Account">
-                                <i class="fa-solid fa-link-slash"></i>
-                            </button>
-                        </div>
-                        <?php endif; ?>
-                    </div>
-                </div>
+    <div class="relative z-10">
+        <div class="mb-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+            <div>
+                <h1 class="text-3xl font-bold text-white tracking-tight">Users</h1>
+                <p class="text-gray-400 text-sm mt-1.5 font-medium">Manage registered users in the app.</p>
             </div>
-        <?php endforeach; ?>
-    </div>
-<?php endif; ?>
-    
-    <!-- Pagination -->
-    <?php if ($total_pages > 1): ?>
-    <div class="px-6 py-4 border-t border-slate-100/60 bg-white/40 flex items-center justify-between">
-        <span class="text-sm text-slate-500 font-medium">
-            Showing <span class="font-bold text-slate-800"><?php echo $offset + 1; ?></span> to 
-            <span class="font-bold text-slate-800"><?php echo min($offset + $per_page, $total_rows); ?></span> of 
-            <span class="font-bold text-slate-800"><?php echo $total_rows; ?></span> entries
-        </span>
-        <div class="flex items-center space-x-2">
-            <?php if ($page > 1): ?>
-                <a href="?page=<?php echo $page - 1; ?>&search=<?php echo urlencode($search); ?>" class="px-3.5 py-2 bg-white border border-slate-200 text-slate-700 rounded-xl hover:bg-slate-50 hover:text-blue-600 text-sm font-semibold transition-colors shadow-sm">Prev</a>
-            <?php endif; ?>
             
-            <?php if ($page < $total_pages): ?>
-                <a href="?page=<?php echo $page + 1; ?>&search=<?php echo urlencode($search); ?>" class="px-3.5 py-2 bg-white border border-slate-200 text-slate-700 rounded-xl hover:bg-slate-50 hover:text-blue-600 text-sm font-semibold transition-colors shadow-sm">Next</a>
-            <?php endif; ?>
+            <form method="GET" action="users.php" class="relative w-full md:w-72 group">
+                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                    <i class="fa-solid fa-search text-gray-500 group-focus-within:text-blue-400 transition-colors"></i>
+                </div>
+                <input type="text" name="search" value="<?php echo htmlspecialchars($search); ?>" 
+                    class="block w-full pl-11 pr-4 py-3 border border-white/10 rounded-2xl bg-white/5 backdrop-blur-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 focus:bg-white/10 transition-all duration-300 shadow-lg"
+                    placeholder="Search username or #ID...">
+            </form>
         </div>
+
+        <?php if (isset($msg)): ?>
+            <div class="bg-[#064e3b]/40 backdrop-blur-md border border-[#059669]/30 text-[#34d399] px-5 py-4 rounded-2xl mb-8 text-sm flex items-center gap-3 shadow-lg">
+                <i class="fa-solid fa-check-circle text-lg"></i>
+                <span class="font-medium"><?php echo htmlspecialchars($msg); ?></span>
+            </div>
+        <?php endif; ?>
+
+        <?php if (isset($err)): ?>
+            <div class="bg-[#7f1d1d]/40 backdrop-blur-md border border-[#dc2626]/30 text-[#f87171] px-5 py-4 rounded-2xl mb-8 text-sm flex items-center gap-3 shadow-lg">
+                <i class="fa-solid fa-circle-exclamation text-lg"></i>
+                <span class="font-medium"><?php echo htmlspecialchars($err); ?></span>
+            </div>
+        <?php endif; ?>
+
+        <?php if(empty($users)): ?>
+            <div class="bg-white/5 backdrop-blur-2xl border border-white/10 rounded-[2rem] p-16 text-center text-gray-400 w-full shadow-2xl flex flex-col items-center justify-center">
+                <div class="w-20 h-20 bg-white/5 rounded-full flex items-center justify-center mb-5 border border-white/10">
+                    <i class="fa-solid fa-users-slash text-3xl opacity-50"></i>
+                </div>
+                <span class="font-medium text-lg">No users found matching your criteria.</span>
+            </div>
+        <?php else: ?>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                <?php foreach($users as $user): ?>
+                    <div class="bg-[#0a0a0a]/80 backdrop-blur-3xl border border-white/5 rounded-[2rem] p-6 transition-all duration-300 hover:border-white/20 hover:bg-[#111111] hover:shadow-[0_8px_40px_rgba(0,0,0,0.8)] group flex flex-col relative overflow-hidden">
+                        <!-- Card subtle glow -->
+                        <div class="absolute -top-10 -right-10 w-32 h-32 bg-blue-500/5 rounded-full blur-[30px] group-hover:bg-blue-500/10 transition-colors"></div>
+                        
+                        <div class="flex justify-between items-start mb-6 relative z-10">
+                            <div class="flex items-center gap-3.5">
+                                <div class="w-12 h-12 rounded-[1.2rem] bg-gradient-to-br from-blue-600 to-indigo-700 text-white flex items-center justify-center font-bold text-xl shadow-[0_4px_15px_rgba(59,130,246,0.3)] group-hover:scale-105 transition-transform duration-300">
+                                    <?php echo strtoupper(substr($user['username'], 0, 1)); ?>
+                                </div>
+                                <div>
+                                    <div class="flex items-center gap-2">
+                                        <h3 class="font-semibold text-white text-[17px] leading-tight truncate max-w-[120px] tracking-tight" title="<?php echo htmlspecialchars($user['username']); ?>">
+                                            <?php echo htmlspecialchars($user['username']); ?>
+                                        </h3>
+                                        <button type="button" onclick="editUsername(<?php echo $user['id']; ?>, '<?php echo addslashes(htmlspecialchars($user['username'])); ?>')" class="text-gray-500 hover:text-white focus:outline-none transition-colors" title="Edit Username">
+                                            <i class="fa-solid fa-pen text-[10px]"></i>
+                                        </button>
+                                    </div>
+                                    <p class="text-[11px] text-gray-500 font-medium uppercase tracking-wider mt-1">
+                                        ID: #<?php echo $user['id']; ?> 
+                                        <?php if(!empty($user['ip_address'])): ?>
+                                            <span class="text-gray-700 mx-1">&bull;</span><span class="normal-case opacity-70">IP: <?php echo htmlspecialchars($user['ip_address']); ?></span>
+                                        <?php endif; ?>
+                                    </p>
+                                </div>
+                            </div>
+                            <span class="bg-white/10 text-gray-300 py-1 px-3 rounded-full text-[10px] font-bold tracking-wider border border-white/5 backdrop-blur-md">
+                                LVL <?php echo $user['level']; ?>
+                            </span>
+                        </div>
+                        
+                        <div class="grid grid-cols-2 gap-3 mb-6 relative z-10">
+                            <div class="bg-white/5 rounded-[1.25rem] p-3.5 border border-white/5 transition-colors group-hover:bg-white/10">
+                                <p class="text-[10px] uppercase font-bold text-gray-500 tracking-wider mb-1.5 flex items-center gap-1.5"><i class="fa-solid fa-calculator text-gray-600"></i> Counts</p>
+                                <p class="font-mono font-medium text-white text-lg tracking-tight"><?php echo formatNumberShort($user['total_counts']); ?></p>
+                            </div>
+                            <div class="bg-white/5 rounded-[1.25rem] p-3.5 border border-white/5 transition-colors group-hover:bg-white/10">
+                                <p class="text-[10px] uppercase font-bold text-gray-500 tracking-wider mb-1.5 flex items-center gap-1.5"><i class="fa-solid fa-clock-rotate-left text-gray-600"></i> Active</p>
+                                <p class="font-medium text-gray-300 text-xs mt-1.5"><?php echo date('M d, Y', strtotime($user['last_active'])); ?></p>
+                            </div>
+                        </div>
+
+                        <div class="border-t border-white/5 pt-5 mt-auto relative z-10">
+                            <div class="flex flex-col gap-2.5">
+                                <form method="POST" action="" class="w-full">
+                                    <input type="hidden" name="action" value="toggle_ads">
+                                    <input type="hidden" name="user_id" value="<?php echo $user['id']; ?>">
+                                    <?php $ads_disabled = isset($user['ads_disabled']) ? $user['ads_disabled'] : 0; ?>
+                                    <input type="hidden" name="current_status" value="<?php echo $ads_disabled; ?>">
+                                    
+                                    <button type="submit" class="w-full py-3 text-xs font-semibold rounded-[1.25rem] border transition-all duration-300 active:scale-[0.98] flex items-center justify-center gap-2 <?php echo $ads_disabled ? 'bg-[#3f1616]/40 text-[#f87171] border-[#7f1d1d]/50 hover:bg-[#7f1d1d]/40' : 'bg-[#064e3b]/30 text-[#34d399] border-[#059669]/30 hover:bg-[#064e3b]/60'; ?>">
+                                        <i class="fa-solid <?php echo $ads_disabled ? 'fa-ban' : 'fa-check-circle'; ?>"></i>
+                                        <?php echo $ads_disabled ? 'Ads Disabled' : 'Ads Enabled'; ?>
+                                    </button>
+                                </form>
+
+                                <?php if (empty($user['google_uid'])): ?>
+                                <button type="button" onclick="linkEmail(<?php echo $user['id']; ?>)" class="w-full py-3 text-xs font-semibold rounded-[1.25rem] border transition-all duration-300 active:scale-[0.98] flex items-center justify-center gap-2 bg-[#0f172a]/80 text-[#60a5fa] border-[#1e3a8a]/50 hover:bg-[#1e3a8a]/60">
+                                    <i class="fa-brands fa-google"></i>
+                                    Link Google Email
+                                </button>
+                                <?php else: ?>
+                                <div class="flex items-center gap-2 w-full">
+                                    <div class="flex-1 py-3 text-[11px] font-medium rounded-[1.25rem] border flex items-center justify-center gap-2 bg-white/5 text-gray-400 border-white/10 overflow-hidden px-3 backdrop-blur-sm">
+                                        <i class="fa-solid fa-link shrink-0 text-gray-500"></i>
+                                        <span class="truncate"><?php echo htmlspecialchars($user['email']); ?></span>
+                                    </div>
+                                    <button type="button" onclick="unlinkEmail(<?php echo $user['id']; ?>, '<?php echo addslashes(htmlspecialchars($user['email'])); ?>')" class="py-3 px-4 text-xs font-semibold rounded-[1.25rem] border bg-[#3f1616]/40 text-[#f87171] border-[#7f1d1d]/50 hover:bg-[#7f1d1d]/40 transition-all duration-300 active:scale-[0.92] focus:outline-none" title="Unlink Account">
+                                        <i class="fa-solid fa-link-slash"></i>
+                                    </button>
+                                </div>
+                                <?php endif; ?>
+                            </div>
+                        </div>
+                    </div>
+                <?php endforeach; ?>
+            </div>
+        <?php endif; ?>
+        
+        <!-- Pagination -->
+        <?php if ($total_pages > 1): ?>
+        <div class="px-6 py-5 mt-8 rounded-[2rem] border border-white/5 bg-white/5 backdrop-blur-xl flex flex-col md:flex-row items-center justify-between gap-4 shadow-xl">
+            <span class="text-sm text-gray-400 font-medium">
+                Showing <span class="font-bold text-white"><?php echo $offset + 1; ?></span> to 
+                <span class="font-bold text-white"><?php echo min($offset + $per_page, $total_rows); ?></span> of 
+                <span class="font-bold text-white"><?php echo $total_rows; ?></span> entries
+            </span>
+            <div class="flex items-center space-x-2">
+                <?php if ($page > 1): ?>
+                    <a href="?page=<?php echo $page - 1; ?>&search=<?php echo urlencode($search); ?>" class="px-5 py-2.5 bg-white/10 border border-white/10 text-white rounded-2xl hover:bg-white/20 text-sm font-semibold transition-all duration-300 active:scale-95 backdrop-blur-md">Prev</a>
+                <?php endif; ?>
+                
+                <?php if ($page < $total_pages): ?>
+                    <a href="?page=<?php echo $page + 1; ?>&search=<?php echo urlencode($search); ?>" class="px-5 py-2.5 bg-white/10 border border-white/10 text-white rounded-2xl hover:bg-white/20 text-sm font-semibold transition-all duration-300 active:scale-95 backdrop-blur-md">Next</a>
+                <?php endif; ?>
+            </div>
+        </div>
+        <?php endif; ?>
     </div>
-    <?php endif; ?>
 </div>
 
 <!-- Hidden Form for Username Update -->
