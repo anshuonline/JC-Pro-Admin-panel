@@ -68,32 +68,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     $msg = "Premium subscription cancelled successfully.";
 }
 
-// Handle gift premium
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'gift_premium') {
-    $user_id = (int)$_POST['user_id'];
-    // Ensure has_gift column exists
-    $check_column_gift = $conn->query("SHOW COLUMNS FROM users LIKE 'has_gift'");
-    if ($check_column_gift && $check_column_gift->num_rows == 0) {
-        $conn->query("ALTER TABLE users ADD COLUMN has_gift TINYINT(1) DEFAULT 0");
-    }
-    $conn->query("UPDATE users SET has_gift = 1 WHERE id = $user_id");
-    $msg = "Premium gifted successfully! User can claim it from their app settings.";
-}
-
 // Search and Pagination
 $search = $_GET['search'] ?? '';
-$filter = $_GET['filter'] ?? 'all';
 $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
 $per_page = 20;
 $offset = ($page - 1) * $per_page;
 
-$where_conditions = [];
-
-if ($filter === 'premium') {
-    $where_conditions[] = "is_premium = 1";
-} elseif ($filter === 'free') {
-    $where_conditions[] = "is_premium = 0";
-}
+$where_conditions = ["is_premium = 1"];
 
 if ($search) {
     $search_esc = $conn->real_escape_string($search);
@@ -134,23 +115,17 @@ include 'includes/header.php';
     <div class="relative z-10">
         <div class="mb-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
             <div>
-                <h1 class="text-3xl font-bold text-white tracking-tight">Users</h1>
-                <p class="text-gray-400 text-sm mt-1.5 font-medium">Manage registered users in the app.</p>
+                <h1 class="text-3xl font-bold text-amber-400 tracking-tight"><i class="fa-solid fa-crown mr-2"></i> Premium Members</h1>
+                <p class="text-gray-400 text-sm mt-1.5 font-medium">Manage users who have purchased a premium subscription.</p>
             </div>
             
             <div class="flex flex-col md:flex-row items-center gap-4">
-                <div class="flex bg-white/5 rounded-2xl p-1 border border-white/10">
-                    <a href="?search=<?php echo urlencode($search); ?>&filter=all" class="px-4 py-2 rounded-xl text-sm font-medium transition-all <?php echo $filter === 'all' ? 'bg-white/10 text-white' : 'text-gray-400 hover:text-white'; ?>">All</a>
-                    <a href="?search=<?php echo urlencode($search); ?>&filter=premium" class="px-4 py-2 rounded-xl text-sm font-medium transition-all flex items-center gap-2 <?php echo $filter === 'premium' ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30' : 'text-gray-400 hover:text-white'; ?>"><i class="fa-solid fa-crown text-[10px]"></i> Premium</a>
-                    <a href="?search=<?php echo urlencode($search); ?>&filter=free" class="px-4 py-2 rounded-xl text-sm font-medium transition-all <?php echo $filter === 'free' ? 'bg-white/10 text-white' : 'text-gray-400 hover:text-white'; ?>">Free</a>
-                </div>
-                <form method="GET" action="users.php" class="relative w-full md:w-72 group">
-                    <input type="hidden" name="filter" value="<?php echo htmlspecialchars($filter); ?>">
+                <form method="GET" action="premium.php" class="relative w-full md:w-72 group">
                     <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                        <i class="fa-solid fa-search text-gray-500 group-focus-within:text-blue-400 transition-colors"></i>
+                        <i class="fa-solid fa-search text-gray-500 group-focus-within:text-amber-400 transition-colors"></i>
                     </div>
                     <input type="text" name="search" value="<?php echo htmlspecialchars($search); ?>" 
-                        class="block w-full pl-11 pr-4 py-3 border border-white/10 rounded-2xl bg-white/5 backdrop-blur-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 focus:bg-white/10 transition-all duration-300 shadow-lg"
+                        class="block w-full pl-11 pr-4 py-3 border border-white/10 rounded-2xl bg-white/5 backdrop-blur-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-amber-500/50 focus:border-amber-500/50 focus:bg-white/10 transition-all duration-300 shadow-lg"
                         placeholder="Search username or #ID...">
                 </form>
             </div>
@@ -206,10 +181,13 @@ include 'includes/header.php';
                                         <?php if(!empty($user['ip_address'])): ?>
                                             <span class="text-gray-700 mx-1">&bull;</span><span class="normal-case opacity-70">IP: <?php echo htmlspecialchars($user['ip_address']); ?></span>
                                         <?php endif; ?>
-                                        <?php if(isset($user['is_premium']) && $user['is_premium'] && !empty($user['premium_since'])): ?>
-                                            <span class="text-gray-700 mx-1">&bull;</span><span class="normal-case text-amber-500/80 font-bold">Premium: <?php echo date('M d, Y', strtotime($user['premium_since'])); ?></span>
+                                        <?php if(!empty($user['premium_since'])): ?>
+                                            <span class="text-gray-700 mx-1">&bull;</span><span class="normal-case text-amber-500/80 font-bold">Since: <?php echo date('M d, Y', strtotime($user['premium_since'])); ?></span>
                                         <?php endif; ?>
                                     </p>
+                                    <?php if(!empty($user['device_token'])): ?>
+                                        <p class="text-[9px] text-gray-600 mt-1 truncate max-w-[180px]" title="<?php echo htmlspecialchars($user['device_token']); ?>">Device: <?php echo htmlspecialchars($user['device_token']); ?></p>
+                                    <?php endif; ?>
                                 </div>
                             </div>
                             <span class="bg-white/10 text-gray-300 py-1 px-3 rounded-full text-[10px] font-bold tracking-wider border border-white/5 backdrop-blur-md">
@@ -230,62 +208,13 @@ include 'includes/header.php';
 
                         <div class="border-t border-white/5 pt-5 mt-auto relative z-10">
                             <div class="flex flex-col gap-2.5">
-                                <?php if (isset($user['is_premium']) && $user['is_premium']): ?>
                                 <form method="POST" action="" class="w-full mb-1">
                                     <input type="hidden" name="action" value="cancel_premium">
                                     <input type="hidden" name="user_id" value="<?php echo $user['id']; ?>">
                                     <button type="submit" onclick="return confirm('Are you sure you want to cancel this user\'s premium subscription?');" class="w-full py-2 text-[10px] font-semibold rounded-[1.25rem] border transition-all duration-300 bg-amber-500/10 text-amber-400 border-amber-500/20 hover:bg-amber-500/20 flex items-center justify-center gap-2">
-                                        <i class="fa-solid fa-crown text-amber-400/70"></i> Cancel Premium
+                                        <i class="fa-solid fa-ban text-amber-400/70"></i> Revoke Premium
                                     </button>
                                 </form>
-                                <?php endif; ?>
-                                
-                                <?php if (isset($user['is_premium']) && $user['is_premium']): ?>
-                                    <div class="w-full py-3 text-xs font-semibold rounded-[1.25rem] border flex items-center justify-center gap-2 bg-[#3f1616]/40 text-[#f87171] border-[#7f1d1d]/50">
-                                        <i class="fa-solid fa-ban"></i>
-                                        Ads Disabled (Premium)
-                                    </div>
-                                <?php else: ?>
-                                    <div class="flex gap-2 w-full mb-1">
-                                        <form method="POST" action="" class="w-1/2">
-                                            <input type="hidden" name="action" value="toggle_ads">
-                                            <input type="hidden" name="user_id" value="<?php echo $user['id']; ?>">
-                                            <?php $ads_disabled = isset($user['ads_disabled']) ? $user['ads_disabled'] : 0; ?>
-                                            <input type="hidden" name="current_status" value="<?php echo $ads_disabled; ?>">
-                                            <button type="submit" class="w-full py-2.5 text-[10px] font-semibold rounded-[1.25rem] border transition-all duration-300 active:scale-[0.98] flex items-center justify-center gap-1.5 <?php echo $ads_disabled ? 'bg-[#3f1616]/40 text-[#f87171] border-[#7f1d1d]/50 hover:bg-[#7f1d1d]/40' : 'bg-[#064e3b]/30 text-[#34d399] border-[#059669]/30 hover:bg-[#064e3b]/60'; ?>">
-                                                <i class="fa-solid <?php echo $ads_disabled ? 'fa-ban' : 'fa-check-circle'; ?>"></i>
-                                                <?php echo $ads_disabled ? 'Ads Disabled' : 'Ads Enabled'; ?>
-                                            </button>
-                                        </form>
-                                        
-                                        <form method="POST" action="" class="w-1/2">
-                                            <input type="hidden" name="action" value="gift_premium">
-                                            <input type="hidden" name="user_id" value="<?php echo $user['id']; ?>">
-                                            <?php $has_gift = isset($user['has_gift']) ? $user['has_gift'] : 0; ?>
-                                            <button type="submit" <?php echo $has_gift ? 'disabled' : ''; ?> onclick="return confirm('Gift Premium to this user?');" class="w-full py-2.5 text-[10px] font-semibold rounded-[1.25rem] border transition-all duration-300 active:scale-[0.98] flex items-center justify-center gap-1.5 <?php echo $has_gift ? 'bg-purple-500/10 text-purple-400 border-purple-500/20 opacity-50 cursor-not-allowed' : 'bg-purple-600/20 text-purple-400 border-purple-500/30 hover:bg-purple-600/30'; ?>">
-                                                <i class="fa-solid fa-gift"></i>
-                                                <?php echo $has_gift ? 'Gift Pending' : 'Gift Premium'; ?>
-                                            </button>
-                                        </form>
-                                    </div>
-                                <?php endif; ?>
-
-                                <?php if (empty($user['google_uid'])): ?>
-                                <button type="button" onclick="linkEmail(<?php echo $user['id']; ?>)" class="w-full py-3 text-xs font-semibold rounded-[1.25rem] border transition-all duration-300 active:scale-[0.98] flex items-center justify-center gap-2 bg-[#0f172a]/80 text-[#60a5fa] border-[#1e3a8a]/50 hover:bg-[#1e3a8a]/60">
-                                    <i class="fa-brands fa-google"></i>
-                                    Link Google Email
-                                </button>
-                                <?php else: ?>
-                                <div class="flex items-center gap-2 w-full">
-                                    <div class="flex-1 py-3 text-[11px] font-medium rounded-[1.25rem] border flex items-center justify-center gap-2 bg-white/5 text-gray-400 border-white/10 overflow-hidden px-3 backdrop-blur-sm">
-                                        <i class="fa-solid fa-link shrink-0 text-gray-500"></i>
-                                        <span class="truncate"><?php echo htmlspecialchars($user['email']); ?></span>
-                                    </div>
-                                    <button type="button" onclick="unlinkEmail(<?php echo $user['id']; ?>, '<?php echo addslashes(htmlspecialchars($user['email'])); ?>')" class="py-3 px-4 text-xs font-semibold rounded-[1.25rem] border bg-[#3f1616]/40 text-[#f87171] border-[#7f1d1d]/50 hover:bg-[#7f1d1d]/40 transition-all duration-300 active:scale-[0.92] focus:outline-none" title="Unlink Account">
-                                        <i class="fa-solid fa-link-slash"></i>
-                                    </button>
-                                </div>
-                                <?php endif; ?>
                             </div>
                         </div>
                     </div>

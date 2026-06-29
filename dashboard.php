@@ -6,6 +6,7 @@ check_auth();
 // Fetch statistics
 $stats = [
     'users' => 0,
+    'premium_members' => 0,
     'total_counts' => 0,
     'challenges' => 0,
     'pages' => 0,
@@ -13,10 +14,11 @@ $stats = [
 ];
 
 // Total Users and Counts
-$res = $conn->query("SELECT COUNT(*) as u_count, SUM(total_counts) as t_counts FROM users");
+$res = $conn->query("SELECT COUNT(*) as u_count, SUM(total_counts) as t_counts, SUM(CASE WHEN is_premium = 1 THEN 1 ELSE 0 END) as p_count FROM users");
 if ($res && $row = $res->fetch_assoc()) {
     $stats['users'] = $row['u_count'] ?: 0;
     $stats['total_counts'] = $row['t_counts'] ?: 0;
+    $stats['premium_members'] = $row['p_count'] ?: 0;
 }
 
 // Total Challenges
@@ -162,7 +164,7 @@ body.amoled-theme h1.text-2xl {
     </div>
 </div>
 
-<div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-6 mb-8">
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
     <!-- Stat Card 1 -->
     <div class="mui-card bg-white p-6 relative overflow-hidden group">
         <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
@@ -172,6 +174,18 @@ body.amoled-theme h1.text-2xl {
         <p class="text-4xl font-bold text-slate-800 tracking-tight" id="dash-users"><?php echo formatNumberShort($stats['users']); ?></p>
         <div class="mt-4 flex items-center text-sm font-medium">
             <span class="text-orange-500 flex items-center bg-orange-100 px-2 py-1 rounded-md text-xs"><i class="fa-solid fa-arrow-trend-up mr-1.5"></i> Registered</span>
+        </div>
+    </div>
+
+    <!-- Stat Card: Premium Members -->
+    <div class="mui-card bg-white p-6 relative overflow-hidden group">
+        <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+            <i class="fa-solid fa-crown text-6xl text-amber-400"></i>
+        </div>
+        <h3 class="text-slate-500 text-sm font-semibold mb-1 uppercase tracking-wider">Premium Members</h3>
+        <p class="text-4xl font-bold text-slate-800 tracking-tight" id="dash-premium"><?php echo formatNumberShort($stats['premium_members']); ?></p>
+        <div class="mt-4 flex items-center text-sm font-medium">
+            <a href="premium.php" class="text-amber-500 hover:text-amber-400 transition-colors flex items-center bg-amber-500/10 px-2 py-1 rounded-md text-xs">View Members <i class="fa-solid fa-arrow-right ml-1"></i></a>
         </div>
     </div>
 
@@ -255,6 +269,8 @@ async function refreshDashboard() {
         const data = await res.json();
         if (data.stats) {
             document.getElementById('dash-users').textContent = formatNumberShort(data.stats.users || 0);
+            const premiumEl = document.getElementById('dash-premium');
+            if (premiumEl) premiumEl.textContent = formatNumberShort(data.stats.premium_members || 0);
             document.getElementById('dash-total').textContent = formatNumberShort(data.stats.total_counts || 0);
             document.getElementById('dash-today').textContent = formatNumberShort(data.stats.today_counts || 0);
             document.getElementById('dash-pages').textContent = formatNumberShort(data.stats.pages || 0);
