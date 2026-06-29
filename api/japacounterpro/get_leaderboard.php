@@ -6,6 +6,12 @@ require_once '../../config.php';
 
 $username_query = isset($_GET['username']) ? $conn->real_escape_string($_GET['username']) : null;
 
+// Ensure profile_picture column exists
+$check_column_pp = $conn->query("SHOW COLUMNS FROM users LIKE 'profile_picture'");
+if ($check_column_pp && $check_column_pp->num_rows == 0) {
+    $conn->query("ALTER TABLE users ADD COLUMN profile_picture VARCHAR(500) DEFAULT NULL");
+}
+
 // Fetch config
 $status = 'ACTIVE';
 $challenge_start = date('Y-m-01 00:00:00');
