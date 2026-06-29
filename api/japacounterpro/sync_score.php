@@ -31,6 +31,12 @@ if ($check_column_ip && $check_column_ip->num_rows == 0) {
     $conn->query("ALTER TABLE users ADD COLUMN ip_address VARCHAR(45) NULL");
 }
 
+// Ensure has_gift column exists
+$check_column_gift = $conn->query("SHOW COLUMNS FROM users LIKE 'has_gift'");
+if ($check_column_gift && $check_column_gift->num_rows == 0) {
+    $conn->query("ALTER TABLE users ADD COLUMN has_gift TINYINT(1) DEFAULT 0");
+}
+
 $user_ip = isset($_SERVER['REMOTE_ADDR']) ? $conn->real_escape_string($_SERVER['REMOTE_ADDR']) : null;
 
 // Calendar sessions = SOURCE OF TRUTH from the app
@@ -89,10 +95,12 @@ if (!empty($sessions)) {
 }
 
 $is_premium = false;
-$premium_res = $conn->query("SELECT is_premium FROM users WHERE id = $user_id");
+$has_gift = false;
+$premium_res = $conn->query("SELECT is_premium, has_gift FROM users WHERE id = $user_id");
 if ($premium_res && $p_row = $premium_res->fetch_assoc()) {
     $is_premium = (bool)$p_row['is_premium'];
+    $has_gift = (bool)$p_row['has_gift'];
 }
 
-echo json_encode(["success" => true, "message" => "Calendar synced", "is_premium" => $is_premium]);
+echo json_encode(["success" => true, "message" => "Calendar synced", "is_premium" => $is_premium, "has_gift" => $has_gift]);
 ?>

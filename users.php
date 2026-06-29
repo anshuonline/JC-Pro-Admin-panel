@@ -68,6 +68,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     $msg = "Premium subscription cancelled successfully.";
 }
 
+// Handle gift premium
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'gift_premium') {
+    $user_id = (int)$_POST['user_id'];
+    // Ensure has_gift column exists
+    $check_column_gift = $conn->query("SHOW COLUMNS FROM users LIKE 'has_gift'");
+    if ($check_column_gift && $check_column_gift->num_rows == 0) {
+        $conn->query("ALTER TABLE users ADD COLUMN has_gift TINYINT(1) DEFAULT 0");
+    }
+    $conn->query("UPDATE users SET has_gift = 1 WHERE id = $user_id");
+    $msg = "Premium gifted successfully! User can claim it from their app settings.";
+}
+
 // Search and Pagination
 $search = $_GET['search'] ?? '';
 $filter = $_GET['filter'] ?? 'all';
@@ -231,17 +243,28 @@ include 'includes/header.php';
                                         Ads Disabled (Premium)
                                     </div>
                                 <?php else: ?>
-                                    <form method="POST" action="" class="w-full">
-                                        <input type="hidden" name="action" value="toggle_ads">
-                                        <input type="hidden" name="user_id" value="<?php echo $user['id']; ?>">
-                                        <?php $ads_disabled = isset($user['ads_disabled']) ? $user['ads_disabled'] : 0; ?>
-                                        <input type="hidden" name="current_status" value="<?php echo $ads_disabled; ?>">
+                                    <div class="flex gap-2 w-full mb-1">
+                                        <form method="POST" action="" class="w-1/2">
+                                            <input type="hidden" name="action" value="toggle_ads">
+                                            <input type="hidden" name="user_id" value="<?php echo $user['id']; ?>">
+                                            <?php $ads_disabled = isset($user['ads_disabled']) ? $user['ads_disabled'] : 0; ?>
+                                            <input type="hidden" name="current_status" value="<?php echo $ads_disabled; ?>">
+                                            <button type="submit" class="w-full py-2.5 text-[10px] font-semibold rounded-[1.25rem] border transition-all duration-300 active:scale-[0.98] flex items-center justify-center gap-1.5 <?php echo $ads_disabled ? 'bg-[#3f1616]/40 text-[#f87171] border-[#7f1d1d]/50 hover:bg-[#7f1d1d]/40' : 'bg-[#064e3b]/30 text-[#34d399] border-[#059669]/30 hover:bg-[#064e3b]/60'; ?>">
+                                                <i class="fa-solid <?php echo $ads_disabled ? 'fa-ban' : 'fa-check-circle'; ?>"></i>
+                                                <?php echo $ads_disabled ? 'Ads Disabled' : 'Ads Enabled'; ?>
+                                            </button>
+                                        </form>
                                         
-                                        <button type="submit" class="w-full py-3 text-xs font-semibold rounded-[1.25rem] border transition-all duration-300 active:scale-[0.98] flex items-center justify-center gap-2 <?php echo $ads_disabled ? 'bg-[#3f1616]/40 text-[#f87171] border-[#7f1d1d]/50 hover:bg-[#7f1d1d]/40' : 'bg-[#064e3b]/30 text-[#34d399] border-[#059669]/30 hover:bg-[#064e3b]/60'; ?>">
-                                            <i class="fa-solid <?php echo $ads_disabled ? 'fa-ban' : 'fa-check-circle'; ?>"></i>
-                                            <?php echo $ads_disabled ? 'Ads Disabled' : 'Ads Enabled'; ?>
-                                        </button>
-                                    </form>
+                                        <form method="POST" action="" class="w-1/2">
+                                            <input type="hidden" name="action" value="gift_premium">
+                                            <input type="hidden" name="user_id" value="<?php echo $user['id']; ?>">
+                                            <?php $has_gift = isset($user['has_gift']) ? $user['has_gift'] : 0; ?>
+                                            <button type="submit" <?php echo $has_gift ? 'disabled' : ''; ?> onclick="return confirm('Gift Premium to this user?');" class="w-full py-2.5 text-[10px] font-semibold rounded-[1.25rem] border transition-all duration-300 active:scale-[0.98] flex items-center justify-center gap-1.5 <?php echo $has_gift ? 'bg-purple-500/10 text-purple-400 border-purple-500/20 opacity-50 cursor-not-allowed' : 'bg-purple-600/20 text-purple-400 border-purple-500/30 hover:bg-purple-600/30'; ?>">
+                                                <i class="fa-solid fa-gift"></i>
+                                                <?php echo $has_gift ? 'Gift Pending' : 'Gift Premium'; ?>
+                                            </button>
+                                        </form>
+                                    </div>
                                 <?php endif; ?>
 
                                 <?php if (empty($user['google_uid'])): ?>
