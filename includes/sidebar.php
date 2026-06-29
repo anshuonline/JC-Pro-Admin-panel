@@ -106,21 +106,23 @@ $currentPage = basename($_SERVER['PHP_SELF']);
 <div id="mobileOverlay" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-10 hidden transition-opacity"></div>
 
 <script>
-    // Simple sidebar toggle for mobile
-    const sidebar = document.getElementById('sidebar');
-    const mobileMenuBtn = document.getElementById('mobileMenuBtn');
-    const closeSidebar = document.getElementById('closeSidebar');
-    const mobileOverlay = document.getElementById('mobileOverlay');
+    document.addEventListener('DOMContentLoaded', function() {
+        const sidebar = document.getElementById('sidebar');
+        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+        const closeSidebar = document.getElementById('closeSidebar');
+        const mobileOverlay = document.getElementById('mobileOverlay');
 
-    function toggleSidebar() {
-        sidebar.classList.toggle('hidden');
-        sidebar.classList.toggle('absolute');
-        sidebar.classList.toggle('h-full');
-        mobileOverlay.classList.toggle('hidden');
-    }
+        function toggleSidebar() {
+            sidebar.classList.toggle('hidden');
+            sidebar.classList.toggle('flex');
+            sidebar.classList.toggle('absolute');
+            sidebar.classList.toggle('h-full');
+            mobileOverlay.classList.toggle('hidden');
+        }
 
-    mobileMenuBtn?.addEventListener('click', toggleSidebar);
-    closeSidebar?.addEventListener('click', toggleSidebar);
-    mobileOverlay?.addEventListener('click', toggleSidebar);
+        if (mobileMenuBtn) mobileMenuBtn.addEventListener('click', toggleSidebar);
+        if (closeSidebar) closeSidebar.addEventListener('click', toggleSidebar);
+        if (mobileOverlay) mobileOverlay.addEventListener('click', toggleSidebar);
+    });
 </script>
 
