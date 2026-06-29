@@ -82,9 +82,9 @@ if ($search) {
         $id_search = (int)substr(trim($search), 1);
         $where_conditions[] = "id = " . $id_search;
     } elseif (is_numeric(trim($search))) {
-        $where_conditions[] = "(username LIKE '%$search_esc%' OR id = " . (int)trim($search) . ")";
+        $where_conditions[] = "(username = '$search_esc' OR id = " . (int)trim($search) . ")";
     } else {
-        $where_conditions[] = "username LIKE '%$search_esc%'";
+        $where_conditions[] = "username = '$search_esc'";
     }
 }
 
