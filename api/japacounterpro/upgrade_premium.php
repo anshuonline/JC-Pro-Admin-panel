@@ -38,6 +38,12 @@ $stmt = $conn->prepare("UPDATE users SET is_premium = 1, premium_since = NOW() W
 $stmt->bind_param("s", $username);
 
 if ($stmt->execute()) {
+    if ($stmt->affected_rows == 0) {
+        $check = $conn->query("SELECT id FROM users WHERE username = '$username'");
+        if ($check->num_rows == 0) {
+             $conn->query("INSERT IGNORE INTO users (username, is_premium, premium_since) VALUES ('$username', 1, NOW())");
+        }
+    }
     echo json_encode(["success" => true, "message" => "User upgraded to premium"]);
 } else {
     echo json_encode(["success" => false, "message" => "Database error: " . $conn->error]);
