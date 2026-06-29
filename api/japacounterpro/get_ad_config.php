@@ -22,10 +22,10 @@ if ($res && $res->num_rows > 0) {
 // Check user specific setting
 if (isset($_GET['username']) && !empty($_GET['username'])) {
     $username = $conn->real_escape_string($_GET['username']);
-    $user_res = $conn->query("SELECT ads_disabled FROM users WHERE username = '$username'");
+    $user_res = $conn->query("SELECT ads_disabled, is_premium FROM users WHERE username = '$username'");
     if ($user_res && $user_res->num_rows > 0) {
         $user_data = $user_res->fetch_assoc();
-        $response['user_ads_disabled'] = (bool)$user_data['ads_disabled'];
+        $response['user_ads_disabled'] = (bool)$user_data['ads_disabled'] || (bool)$user_data['is_premium'];
     }
 }
 

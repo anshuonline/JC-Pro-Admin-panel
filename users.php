@@ -225,17 +225,24 @@ include 'includes/header.php';
                                 </form>
                                 <?php endif; ?>
                                 
-                                <form method="POST" action="" class="w-full">
-                                    <input type="hidden" name="action" value="toggle_ads">
-                                    <input type="hidden" name="user_id" value="<?php echo $user['id']; ?>">
-                                    <?php $ads_disabled = isset($user['ads_disabled']) ? $user['ads_disabled'] : 0; ?>
-                                    <input type="hidden" name="current_status" value="<?php echo $ads_disabled; ?>">
-                                    
-                                    <button type="submit" class="w-full py-3 text-xs font-semibold rounded-[1.25rem] border transition-all duration-300 active:scale-[0.98] flex items-center justify-center gap-2 <?php echo $ads_disabled ? 'bg-[#3f1616]/40 text-[#f87171] border-[#7f1d1d]/50 hover:bg-[#7f1d1d]/40' : 'bg-[#064e3b]/30 text-[#34d399] border-[#059669]/30 hover:bg-[#064e3b]/60'; ?>">
-                                        <i class="fa-solid <?php echo $ads_disabled ? 'fa-ban' : 'fa-check-circle'; ?>"></i>
-                                        <?php echo $ads_disabled ? 'Ads Disabled' : 'Ads Enabled'; ?>
-                                    </button>
-                                </form>
+                                <?php if (isset($user['is_premium']) && $user['is_premium']): ?>
+                                    <div class="w-full py-3 text-xs font-semibold rounded-[1.25rem] border flex items-center justify-center gap-2 bg-[#3f1616]/40 text-[#f87171] border-[#7f1d1d]/50">
+                                        <i class="fa-solid fa-ban"></i>
+                                        Ads Disabled (Premium)
+                                    </div>
+                                <?php else: ?>
+                                    <form method="POST" action="" class="w-full">
+                                        <input type="hidden" name="action" value="toggle_ads">
+                                        <input type="hidden" name="user_id" value="<?php echo $user['id']; ?>">
+                                        <?php $ads_disabled = isset($user['ads_disabled']) ? $user['ads_disabled'] : 0; ?>
+                                        <input type="hidden" name="current_status" value="<?php echo $ads_disabled; ?>">
+                                        
+                                        <button type="submit" class="w-full py-3 text-xs font-semibold rounded-[1.25rem] border transition-all duration-300 active:scale-[0.98] flex items-center justify-center gap-2 <?php echo $ads_disabled ? 'bg-[#3f1616]/40 text-[#f87171] border-[#7f1d1d]/50 hover:bg-[#7f1d1d]/40' : 'bg-[#064e3b]/30 text-[#34d399] border-[#059669]/30 hover:bg-[#064e3b]/60'; ?>">
+                                            <i class="fa-solid <?php echo $ads_disabled ? 'fa-ban' : 'fa-check-circle'; ?>"></i>
+                                            <?php echo $ads_disabled ? 'Ads Disabled' : 'Ads Enabled'; ?>
+                                        </button>
+                                    </form>
+                                <?php endif; ?>
 
                                 <?php if (empty($user['google_uid'])): ?>
                                 <button type="button" onclick="linkEmail(<?php echo $user['id']; ?>)" class="w-full py-3 text-xs font-semibold rounded-[1.25rem] border transition-all duration-300 active:scale-[0.98] flex items-center justify-center gap-2 bg-[#0f172a]/80 text-[#60a5fa] border-[#1e3a8a]/50 hover:bg-[#1e3a8a]/60">
