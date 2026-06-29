@@ -34,19 +34,8 @@ if ($check_column2 && $check_column2->num_rows == 0) {
     $conn->query("ALTER TABLE users ADD COLUMN purchase_token VARCHAR(255) UNIQUE DEFAULT NULL");
 }
 
-// Check if token belongs to someone else
-$check_sql = "SELECT username FROM users WHERE purchase_token = '$purchase_token' LIMIT 1";
-$result = $conn->query($check_sql);
-if ($result->num_rows > 0) {
-    $row = $result->fetch_assoc();
-    if ($row['username'] !== $username) {
-        echo json_encode(["success" => false, "message" => "Purchase already claimed by another account"]);
-        exit;
-    }
-}
-
-$stmt = $conn->prepare("UPDATE users SET is_premium = 1, premium_since = NOW(), purchase_token = ? WHERE username = ?");
-$stmt->bind_param("ss", $purchase_token, $username);
+$stmt = $conn->prepare("UPDATE users SET is_premium = 1, premium_since = NOW() WHERE username = ?");
+$stmt->bind_param("s", $username);
 
 if ($stmt->execute()) {
     echo json_encode(["success" => true, "message" => "User upgraded to premium"]);
