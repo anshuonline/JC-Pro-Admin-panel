@@ -1,7 +1,7 @@
 <?php
 $currentPage = basename($_SERVER['PHP_SELF']);
 ?>
-<aside class="w-64 bg-white/60 backdrop-blur-2xl border-r border-slate-200/60 hidden md:flex md:flex-col shadow-[4px_0_24px_rgb(0,0,0,0.02)] z-20 transition-transform duration-300" id="sidebar">
+<aside class="w-64 bg-white/60 backdrop-blur-2xl border-r border-slate-200/60 hidden flex-col md:flex shadow-[4px_0_24px_rgb(0,0,0,0.02)] z-50 transition-transform duration-300" id="sidebar">
     <div class="h-16 flex items-center px-6 border-b border-slate-200/60">
         <img src="logo.png" alt="JC Pro Logo" class="w-8 h-8 mr-3 rounded-full shadow-sm border border-slate-200 bg-white">
         <span class="text-slate-800 text-lg font-bold tracking-tight">JC Pro</span>
@@ -116,6 +116,8 @@ $currentPage = basename($_SERVER['PHP_SELF']);
             sidebar.classList.toggle('hidden');
             sidebar.classList.toggle('flex');
             sidebar.classList.toggle('absolute');
+            sidebar.classList.toggle('top-0');
+            sidebar.classList.toggle('left-0');
             sidebar.classList.toggle('h-full');
             mobileOverlay.classList.toggle('hidden');
         }
