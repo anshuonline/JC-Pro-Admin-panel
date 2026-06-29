@@ -88,5 +88,11 @@ if (!empty($sessions)) {
     $conn->query("UPDATE users SET total_counts = $total WHERE id = $user_id");
 }
 
-echo json_encode(["success" => true, "message" => "Calendar synced"]);
+$is_premium = false;
+$premium_res = $conn->query("SELECT is_premium FROM users WHERE id = $user_id");
+if ($premium_res && $p_row = $premium_res->fetch_assoc()) {
+    $is_premium = (bool)$p_row['is_premium'];
+}
+
+echo json_encode(["success" => true, "message" => "Calendar synced", "is_premium" => $is_premium]);
 ?>

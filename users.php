@@ -61,27 +61,41 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     $msg = "Google account unlinked successfully.";
 }
 
+// Handle cancel premium
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'cancel_premium') {
+    $user_id = (int)$_POST['user_id'];
+    $conn->query("UPDATE users SET is_premium = 0, premium_since = NULL WHERE id = $user_id");
+    $msg = "Premium subscription cancelled successfully.";
+}
+
 // Search and Pagination
 $search = $_GET['search'] ?? '';
+$filter = $_GET['filter'] ?? 'all';
 $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
 $per_page = 20;
 $offset = ($page - 1) * $per_page;
 
-$where_clause = "";
+$where_conditions = [];
+
+if ($filter === 'premium') {
+    $where_conditions[] = "is_premium = 1";
+} elseif ($filter === 'free') {
+    $where_conditions[] = "is_premium = 0";
+}
+
 if ($search) {
     $search_esc = $conn->real_escape_string($search);
     if (strpos(trim($search), '#') === 0) {
-        // Strict ID search (e.g., "#15")
         $id_search = (int)substr(trim($search), 1);
-        $where_clause = "WHERE id = " . $id_search;
+        $where_conditions[] = "id = " . $id_search;
     } elseif (is_numeric(trim($search))) {
-        // Both Username and ID
-        $where_clause = "WHERE username LIKE '%$search_esc%' OR id = " . (int)trim($search);
+        $where_conditions[] = "(username LIKE '%$search_esc%' OR id = " . (int)trim($search) . ")";
     } else {
-        // Only Username
-        $where_clause = "WHERE username LIKE '%$search_esc%'";
+        $where_conditions[] = "username LIKE '%$search_esc%'";
     }
 }
+
+$where_clause = count($where_conditions) > 0 ? "WHERE " . implode(" AND ", $where_conditions) : "";
 
 // Total rows
 $total_res = $conn->query("SELECT COUNT(*) as cnt FROM users $where_clause");
@@ -112,14 +126,22 @@ include 'includes/header.php';
                 <p class="text-gray-400 text-sm mt-1.5 font-medium">Manage registered users in the app.</p>
             </div>
             
-            <form method="GET" action="users.php" class="relative w-full md:w-72 group">
-                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                    <i class="fa-solid fa-search text-gray-500 group-focus-within:text-blue-400 transition-colors"></i>
+            <div class="flex flex-col md:flex-row items-center gap-4">
+                <div class="flex bg-white/5 rounded-2xl p-1 border border-white/10">
+                    <a href="?search=<?php echo urlencode($search); ?>&filter=all" class="px-4 py-2 rounded-xl text-sm font-medium transition-all <?php echo $filter === 'all' ? 'bg-white/10 text-white' : 'text-gray-400 hover:text-white'; ?>">All</a>
+                    <a href="?search=<?php echo urlencode($search); ?>&filter=premium" class="px-4 py-2 rounded-xl text-sm font-medium transition-all flex items-center gap-2 <?php echo $filter === 'premium' ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30' : 'text-gray-400 hover:text-white'; ?>"><i class="fa-solid fa-crown text-[10px]"></i> Premium</a>
+                    <a href="?search=<?php echo urlencode($search); ?>&filter=free" class="px-4 py-2 rounded-xl text-sm font-medium transition-all <?php echo $filter === 'free' ? 'bg-white/10 text-white' : 'text-gray-400 hover:text-white'; ?>">Free</a>
                 </div>
-                <input type="text" name="search" value="<?php echo htmlspecialchars($search); ?>" 
-                    class="block w-full pl-11 pr-4 py-3 border border-white/10 rounded-2xl bg-white/5 backdrop-blur-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 focus:bg-white/10 transition-all duration-300 shadow-lg"
-                    placeholder="Search username or #ID...">
-            </form>
+                <form method="GET" action="users.php" class="relative w-full md:w-72 group">
+                    <input type="hidden" name="filter" value="<?php echo htmlspecialchars($filter); ?>">
+                    <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                        <i class="fa-solid fa-search text-gray-500 group-focus-within:text-blue-400 transition-colors"></i>
+                    </div>
+                    <input type="text" name="search" value="<?php echo htmlspecialchars($search); ?>" 
+                        class="block w-full pl-11 pr-4 py-3 border border-white/10 rounded-2xl bg-white/5 backdrop-blur-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 focus:bg-white/10 transition-all duration-300 shadow-lg"
+                        placeholder="Search username or #ID...">
+                </form>
+            </div>
         </div>
 
         <?php if (isset($msg)): ?>
@@ -160,7 +182,10 @@ include 'includes/header.php';
                                         <h3 class="font-semibold text-white text-[17px] leading-tight truncate max-w-[120px] tracking-tight" title="<?php echo htmlspecialchars($user['username']); ?>">
                                             <?php echo htmlspecialchars($user['username']); ?>
                                         </h3>
-                                        <button type="button" onclick="editUsername(<?php echo $user['id']; ?>, '<?php echo addslashes(htmlspecialchars($user['username'])); ?>')" class="text-gray-500 hover:text-white focus:outline-none transition-colors" title="Edit Username">
+                                        <?php if (isset($user['is_premium']) && $user['is_premium']): ?>
+                                            <i class="fa-solid fa-crown text-amber-400 text-sm drop-shadow-[0_0_8px_rgba(251,191,36,0.8)] ml-1" title="Premium User since <?php echo htmlspecialchars($user['premium_since'] ?? 'N/A'); ?>"></i>
+                                        <?php endif; ?>
+                                        <button type="button" onclick="editUsername(<?php echo $user['id']; ?>, '<?php echo addslashes(htmlspecialchars($user['username'])); ?>')" class="text-gray-500 hover:text-white focus:outline-none transition-colors ml-1" title="Edit Username">
                                             <i class="fa-solid fa-pen text-[10px]"></i>
                                         </button>
                                     </div>
@@ -190,6 +215,16 @@ include 'includes/header.php';
 
                         <div class="border-t border-white/5 pt-5 mt-auto relative z-10">
                             <div class="flex flex-col gap-2.5">
+                                <?php if (isset($user['is_premium']) && $user['is_premium']): ?>
+                                <form method="POST" action="" class="w-full mb-1">
+                                    <input type="hidden" name="action" value="cancel_premium">
+                                    <input type="hidden" name="user_id" value="<?php echo $user['id']; ?>">
+                                    <button type="submit" onclick="return confirm('Are you sure you want to cancel this user\'s premium subscription?');" class="w-full py-2 text-[10px] font-semibold rounded-[1.25rem] border transition-all duration-300 bg-amber-500/10 text-amber-400 border-amber-500/20 hover:bg-amber-500/20 flex items-center justify-center gap-2">
+                                        <i class="fa-solid fa-crown text-amber-400/70"></i> Cancel Premium
+                                    </button>
+                                </form>
+                                <?php endif; ?>
+                                
                                 <form method="POST" action="" class="w-full">
                                     <input type="hidden" name="action" value="toggle_ads">
                                     <input type="hidden" name="user_id" value="<?php echo $user['id']; ?>">

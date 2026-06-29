@@ -18,7 +18,7 @@ $email = $conn->real_escape_string($data['email']);
 $device_token = isset($data['device_token']) ? $conn->real_escape_string($data['device_token']) : '';
 
 // Check if user exists by google_uid
-$stmt = $conn->prepare("SELECT username, total_counts, level FROM users WHERE google_uid = ?");
+$stmt = $conn->prepare("SELECT username, total_counts, level, is_premium FROM users WHERE google_uid = ?");
 $stmt->bind_param("s", $google_uid);
 $stmt->execute();
 $res = $stmt->get_result();
@@ -39,7 +39,8 @@ if ($res->num_rows > 0) {
         "is_new_user" => false,
         "username" => $user['username'],
         "total_counts" => $user['total_counts'],
-        "level" => $user['level']
+        "level" => $user['level'],
+        "is_premium" => (bool)$user['is_premium']
     ]);
 } else {
     // New Google user, auto-generate a username from email for now
@@ -62,7 +63,7 @@ if ($res->num_rows > 0) {
     }
     
     // Insert new user
-    $insert = $conn->prepare("INSERT INTO users (username, google_uid, email, device_token, total_counts, level) VALUES (?, ?, ?, ?, 0, 0)");
+    $insert = $conn->prepare("INSERT INTO users (username, google_uid, email, device_token, total_counts, level, is_premium) VALUES (?, ?, ?, ?, 0, 0, 0)");
     $insert->bind_param("ssss", $username, $google_uid, $email, $device_token);
     
     if ($insert->execute()) {
@@ -71,7 +72,8 @@ if ($res->num_rows > 0) {
             "is_new_user" => true,
             "username" => $username,
             "total_counts" => 0,
-            "level" => 0
+            "level" => 0,
+            "is_premium" => false
         ]);
     } else {
         echo json_encode(["success" => false, "message" => "Database error: " . $conn->error]);
