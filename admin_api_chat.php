@@ -8,9 +8,13 @@ $action = $_POST['action'] ?? ($_GET['action'] ?? '');
 
 switch ($action) {
     case 'get_chats':
-        $sql = "SELECT c.id, c.message, c.created_at, c.google_uid, u.username, u.profile_picture, u.level, u.is_premium, u.is_chat_banned 
+        $sql = "SELECT c.id, c.message, c.created_at, c.google_uid, c.reply_to_id,
+                       u.username, u.profile_picture, u.level, u.is_premium, u.is_chat_banned,
+                       rc.message as reply_message, ru.username as reply_username 
                 FROM global_chat c
                 JOIN users u ON c.google_uid COLLATE utf8mb4_unicode_ci = u.google_uid COLLATE utf8mb4_unicode_ci
+                LEFT JOIN global_chat rc ON c.reply_to_id = rc.id
+                LEFT JOIN users ru ON rc.google_uid COLLATE utf8mb4_unicode_ci = ru.google_uid COLLATE utf8mb4_unicode_ci
                 ORDER BY c.id DESC LIMIT 100";
         $res = $conn->query($sql);
         if (!$res) {

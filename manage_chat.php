@@ -153,10 +153,24 @@ check_auth();
                 </button>
             `;
             
+            let replyHtml = '';
+            if (chat.reply_to_id) {
+                const rName = chat.reply_username || 'Unknown';
+                const rMsg = chat.reply_message ? (chat.reply_message.substring(0, 30) + (chat.reply_message.length > 30 ? '...' : '')) : 'Deleted message';
+                replyHtml = `
+                    <div class="flex items-center gap-1 text-[11px] text-slate-500 mb-1 bg-slate-100 rounded px-2 py-0.5 w-fit border border-slate-200">
+                        <i class="fa-solid fa-reply text-[9px] text-orange-400"></i>
+                        <span class="font-bold text-slate-600">${rName}</span>
+                        <span class="truncate max-w-[200px]">${rMsg}</span>
+                    </div>
+                `;
+            }
+            
             html += `
                 <div class="flex gap-3 hover:bg-white/50 p-2 rounded-lg transition-colors group">
-                    <img src="${profileUrl}" alt="${chat.username}" class="w-10 h-10 rounded-full bg-slate-200 object-cover shrink-0">
+                    <img src="${profileUrl}" alt="${chat.username}" class="w-10 h-10 rounded-full bg-slate-200 object-cover shrink-0 ${chat.reply_to_id ? 'mt-4' : ''}">
                     <div class="flex-1 min-w-0">
+                        ${replyHtml}
                         <div class="flex items-baseline justify-between mb-0.5">
                             <div class="flex items-center gap-2">
                                 <span class="font-bold text-sm ${isAdmin ? 'text-orange-600' : 'text-slate-800'}">${chat.username}</span>
