@@ -25,7 +25,7 @@ if ($check_column_pp && $check_column_pp->num_rows == 0) {
 }
 
 // Check if user exists by google_uid
-$stmt = $conn->prepare("SELECT username, total_counts, level, is_premium FROM users WHERE google_uid = ?");
+$stmt = $conn->prepare("SELECT username, total_counts, level, is_premium, is_mod FROM users WHERE google_uid = ?");
 $stmt->bind_param("s", $google_uid);
 $stmt->execute();
 $res = $stmt->get_result();
@@ -53,7 +53,8 @@ if ($res->num_rows > 0) {
         "username" => $user['username'],
         "total_counts" => $user['total_counts'],
         "level" => $user['level'],
-        "is_premium" => (bool)$user['is_premium']
+        "is_premium" => (bool)$user['is_premium'],
+        "is_mod" => (bool)($user['is_mod'] ?? false)
     ]);
 } else {
     // New Google user, auto-generate a username from email for now
@@ -86,7 +87,8 @@ if ($res->num_rows > 0) {
             "username" => $username,
             "total_counts" => 0,
             "level" => 0,
-            "is_premium" => false
+            "is_premium" => false,
+            "is_mod" => false
         ]);
     } else {
         echo json_encode(["success" => false, "message" => "Database error: " . $conn->error]);

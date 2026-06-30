@@ -80,6 +80,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     $msg = "Premium gifted successfully! User can claim it from their app settings.";
 }
 
+// Handle toggle mod
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'toggle_mod') {
+    $user_id = (int)$_POST['user_id'];
+    $current_mod = (int)$_POST['current_mod'];
+    $new_mod = $current_mod === 1 ? 0 : 1;
+    $conn->query("UPDATE users SET is_mod = $new_mod WHERE id = $user_id");
+    $msg = $new_mod === 1 ? "User promoted to Moderator!" : "User demoted from Moderator.";
+}
+
 // Search and Pagination
 $search = $_GET['search'] ?? '';
 $filter = $_GET['filter'] ?? 'all';
@@ -197,6 +206,9 @@ include 'includes/header.php';
                                         <?php if (isset($user['is_premium']) && $user['is_premium']): ?>
                                             <i class="fa-solid fa-crown text-amber-400 text-sm drop-shadow-[0_0_8px_rgba(251,191,36,0.8)] ml-1" title="Premium User since <?php echo htmlspecialchars($user['premium_since'] ?? 'N/A'); ?>"></i>
                                         <?php endif; ?>
+                                        <?php if (isset($user['is_mod']) && $user['is_mod']): ?>
+                                            <span class="bg-[#059669]/20 text-[#34d399] border border-[#059669]/30 text-[9px] px-1.5 py-0.5 rounded ml-1 font-bold tracking-wider uppercase">Mod</span>
+                                        <?php endif; ?>
                                         <button type="button" onclick="editUsername(<?php echo $user['id']; ?>, '<?php echo addslashes(htmlspecialchars($user['username'])); ?>')" class="text-gray-500 hover:text-white focus:outline-none transition-colors ml-1" title="Edit Username">
                                             <i class="fa-solid fa-pen text-[10px]"></i>
                                         </button>
@@ -268,6 +280,16 @@ include 'includes/header.php';
                                             </button>
                                         </form>
                                     </div>
+                                    <form method="POST" action="" class="w-full mb-1">
+                                        <input type="hidden" name="action" value="toggle_mod">
+                                        <input type="hidden" name="user_id" value="<?php echo $user['id']; ?>">
+                                        <?php $is_mod = isset($user['is_mod']) ? $user['is_mod'] : 0; ?>
+                                        <input type="hidden" name="current_mod" value="<?php echo $is_mod; ?>">
+                                        <button type="submit" onclick="return confirm('Toggle Moderator status for this user?');" class="w-full py-2.5 text-[10px] font-semibold rounded-[1.25rem] border transition-all duration-300 active:scale-[0.98] flex items-center justify-center gap-1.5 <?php echo $is_mod ? 'bg-[#064e3b]/30 text-[#34d399] border-[#059669]/30 hover:bg-[#064e3b]/60' : 'bg-white/5 text-gray-300 border-white/10 hover:bg-white/10'; ?>">
+                                            <i class="fa-solid fa-shield-halved"></i>
+                                            <?php echo $is_mod ? 'Remove Moderator' : 'Make Moderator'; ?>
+                                        </button>
+                                    </form>
                                 <?php endif; ?>
 
                                 <?php if (empty($user['google_uid'])): ?>

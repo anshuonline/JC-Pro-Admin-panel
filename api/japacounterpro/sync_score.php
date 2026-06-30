@@ -96,11 +96,13 @@ if (!empty($sessions)) {
 
 $is_premium = false;
 $has_gift = false;
-$premium_res = $conn->query("SELECT is_premium, has_gift FROM users WHERE id = $user_id");
+$is_mod = false;
+$premium_res = $conn->query("SELECT is_premium, has_gift, is_mod FROM users WHERE id = $user_id");
 if ($premium_res && $p_row = $premium_res->fetch_assoc()) {
     $is_premium = (bool)$p_row['is_premium'];
     $has_gift = (bool)$p_row['has_gift'];
+    $is_mod = (bool)($p_row['is_mod'] ?? false);
 }
 
-echo json_encode(["success" => true, "message" => "Calendar synced", "is_premium" => $is_premium, "has_gift" => $has_gift]);
+echo json_encode(["success" => true, "message" => "Calendar synced", "is_premium" => $is_premium, "has_gift" => $has_gift, "is_mod" => $is_mod]);
 ?>

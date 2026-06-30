@@ -5,7 +5,7 @@ header('Access-Control-Allow-Origin: *');
 require_once '../../config.php';
 
 // Fetch last 100 messages
-$sql = "SELECT c.id, c.message, c.created_at, c.google_uid, u.username, u.profile_picture, u.level, u.is_premium 
+$sql = "SELECT c.id, c.message, c.created_at, c.google_uid, u.username, u.profile_picture, u.level, u.is_premium, u.is_mod 
         FROM global_chat c
         JOIN users u ON c.google_uid COLLATE utf8mb4_unicode_ci = u.google_uid COLLATE utf8mb4_unicode_ci
         ORDER BY c.id DESC LIMIT 20";
@@ -31,6 +31,7 @@ if ($res->num_rows > 0) {
             "profile_url" => $row['profile_picture'],
             "level" => (int)$row['level'],
             "is_premium" => (bool)$row['is_premium'],
+            "is_mod" => (bool)($row['is_mod'] ?? false),
             "timestamp" => strtotime($row['created_at']) * 1000 // Send in ms for Android
         ];
     }
