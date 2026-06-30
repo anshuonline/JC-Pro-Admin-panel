@@ -46,18 +46,33 @@ function get_fcm_access_token($json_key_path) {
 }
 
 function send_fcm_notification($device_token, $title, $body) {
-    if (empty($device_token)) return false;
+    $log_file = __DIR__ . '/../fcm_log.txt';
+    file_put_contents($log_file, "[" . date('Y-m-d H:i:s') . "] Starting FCM to token: " . substr($device_token, 0, 10) . "...\n", FILE_APPEND);
+
+    if (empty($device_token)) {
+        file_put_contents($log_file, "Error: Token empty\n", FILE_APPEND);
+        return false;
+    }
     
     $json_key_path = __DIR__ . '/../firebase-service-account.json';
-    if (!file_exists($json_key_path)) return false;
+    if (!file_exists($json_key_path)) {
+        file_put_contents($log_file, "Error: JSON key not found at $json_key_path\n", FILE_APPEND);
+        return false;
+    }
     
     $key_content = file_get_contents($json_key_path);
     $key_data = json_decode($key_content, true);
     $project_id = $key_data['project_id'] ?? '';
-    if (empty($project_id)) return false;
+    if (empty($project_id)) {
+        file_put_contents($log_file, "Error: Project ID missing in JSON\n", FILE_APPEND);
+        return false;
+    }
 
     $access_token = get_fcm_access_token($json_key_path);
-    if (!$access_token) return false;
+    if (!$access_token) {
+        file_put_contents($log_file, "Error: Failed to generate access token\n", FILE_APPEND);
+        return false;
+    }
     
     $url = 'https://fcm.googleapis.com/v1/projects/' . $project_id . '/messages:send';
     
@@ -85,7 +100,10 @@ function send_fcm_notification($device_token, $title, $body) {
     curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($fields));
     
     $result = curl_exec($ch);
+    $error = curl_error($ch);
     curl_close($ch);
+    
+    file_put_contents($log_file, "CURL Error: $error\nResult: $result\n", FILE_APPEND);
     
     return $result;
 }
