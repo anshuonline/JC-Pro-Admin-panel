@@ -60,9 +60,16 @@ if ($banned_res && $banned_res->num_rows > 0) {
     }
 }
 
+$reply_to_id = isset($data['reply_to_id']) && is_numeric($data['reply_to_id']) ? (int)$data['reply_to_id'] : null;
+
 // Insert message
-$insert = $conn->prepare("INSERT INTO global_chat (google_uid, message) VALUES (?, ?)");
-$insert->bind_param("ss", $google_uid, $message);
+if ($reply_to_id !== null) {
+    $insert = $conn->prepare("INSERT INTO global_chat (google_uid, message, reply_to_id) VALUES (?, ?, ?)");
+    $insert->bind_param("ssi", $google_uid, $message, $reply_to_id);
+} else {
+    $insert = $conn->prepare("INSERT INTO global_chat (google_uid, message) VALUES (?, ?)");
+    $insert->bind_param("ss", $google_uid, $message);
+}
 
 if ($insert->execute()) {
     echo json_encode(["success" => true]);
