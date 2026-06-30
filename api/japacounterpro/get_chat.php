@@ -32,7 +32,7 @@ if ($before_id !== null) {
     $where_clause = "WHERE c.id < $before_id";
 }
 
-$sql = "SELECT c.id, c.message, c.created_at, c.google_uid, c.reply_to_id, 
+$sql = "SELECT c.id, c.message, UNIX_TIMESTAMP(c.created_at) as created_ts, c.google_uid, c.reply_to_id, 
                u.username, u.profile_picture, u.level, u.is_premium, u.is_mod,
                rc.message AS reply_message, ru.username AS reply_username
         FROM global_chat c
@@ -67,7 +67,7 @@ if ($res->num_rows > 0) {
             "reply_to_id" => $row['reply_to_id'] ? (int)$row['reply_to_id'] : null,
             "reply_message" => $row['reply_message'] ? $row['reply_message'] : null,
             "reply_username" => $row['reply_username'] ? $row['reply_username'] : null,
-            "timestamp" => strtotime($row['created_at']) * 1000 // Send in ms for Android
+            "timestamp" => (int)$row['created_ts'] * 1000 // Send in ms for Android
         ];
     }
 }
