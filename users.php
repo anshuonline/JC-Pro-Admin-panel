@@ -280,17 +280,18 @@ include 'includes/header.php';
                                             </button>
                                         </form>
                                     </div>
-                                    <form method="POST" action="" class="w-full mb-1">
-                                        <input type="hidden" name="action" value="toggle_mod">
-                                        <input type="hidden" name="user_id" value="<?php echo $user['id']; ?>">
-                                        <?php $is_mod = isset($user['is_mod']) ? $user['is_mod'] : 0; ?>
-                                        <input type="hidden" name="current_mod" value="<?php echo $is_mod; ?>">
-                                        <button type="submit" onclick="return confirm('Toggle Moderator status for this user?');" class="w-full py-2.5 text-[10px] font-semibold rounded-[1.25rem] border transition-all duration-300 active:scale-[0.98] flex items-center justify-center gap-1.5 <?php echo $is_mod ? 'bg-[#064e3b]/30 text-[#34d399] border-[#059669]/30 hover:bg-[#064e3b]/60' : 'bg-white/5 text-gray-300 border-white/10 hover:bg-white/10'; ?>">
-                                            <i class="fa-solid fa-shield-halved"></i>
-                                            <?php echo $is_mod ? 'Remove Moderator' : 'Make Moderator'; ?>
-                                        </button>
-                                    </form>
                                 <?php endif; ?>
+                                
+                                <form method="POST" action="" class="w-full mb-1 mt-1">
+                                    <input type="hidden" name="action" value="toggle_mod">
+                                    <input type="hidden" name="user_id" value="<?php echo $user['id']; ?>">
+                                    <?php $is_mod = isset($user['is_mod']) ? $user['is_mod'] : 0; ?>
+                                    <input type="hidden" name="current_mod" value="<?php echo $is_mod; ?>">
+                                    <button type="submit" onclick="return confirm('Toggle Moderator status for this user?');" class="w-full py-2.5 text-[10px] font-semibold rounded-[1.25rem] border transition-all duration-300 active:scale-[0.98] flex items-center justify-center gap-1.5 <?php echo $is_mod ? 'bg-[#064e3b]/30 text-[#34d399] border-[#059669]/30 hover:bg-[#064e3b]/60' : 'bg-white/5 text-gray-300 border-white/10 hover:bg-white/10'; ?>">
+                                        <i class="fa-solid fa-shield-halved"></i>
+                                        <?php echo $is_mod ? 'Remove Moderator' : 'Make Moderator'; ?>
+                                    </button>
+                                </form>
 
                                 <?php if (empty($user['google_uid'])): ?>
                                 <button type="button" onclick="linkEmail(<?php echo $user['id']; ?>)" class="w-full py-3 text-xs font-semibold rounded-[1.25rem] border transition-all duration-300 active:scale-[0.98] flex items-center justify-center gap-2 bg-[#0f172a]/80 text-[#60a5fa] border-[#1e3a8a]/50 hover:bg-[#1e3a8a]/60">
@@ -301,9 +302,9 @@ include 'includes/header.php';
                                 <div class="flex items-center gap-2 w-full">
                                     <div class="flex-1 py-3 text-[11px] font-medium rounded-[1.25rem] border flex items-center justify-center gap-2 bg-white/5 text-gray-400 border-white/10 overflow-hidden px-3 backdrop-blur-sm">
                                         <i class="fa-solid fa-link shrink-0 text-gray-500"></i>
-                                        <span class="truncate"><?php echo htmlspecialchars($user['email']); ?></span>
+                                        <span class="truncate"><?php echo htmlspecialchars($user['email'] ?? ''); ?></span>
                                     </div>
-                                    <button type="button" onclick="unlinkEmail(<?php echo $user['id']; ?>, '<?php echo addslashes(htmlspecialchars($user['email'])); ?>')" class="py-3 px-4 text-xs font-semibold rounded-[1.25rem] border bg-[#3f1616]/40 text-[#f87171] border-[#7f1d1d]/50 hover:bg-[#7f1d1d]/40 transition-all duration-300 active:scale-[0.92] focus:outline-none" title="Unlink Account">
+                                    <button type="button" onclick="unlinkEmail(<?php echo $user['id']; ?>, '<?php echo addslashes(htmlspecialchars($user['email'] ?? '')); ?>')" class="py-3 px-4 text-xs font-semibold rounded-[1.25rem] border bg-[#3f1616]/40 text-[#f87171] border-[#7f1d1d]/50 hover:bg-[#7f1d1d]/40 transition-all duration-300 active:scale-[0.92] focus:outline-none" title="Unlink Account">
                                         <i class="fa-solid fa-link-slash"></i>
                                     </button>
                                 </div>
