@@ -72,6 +72,41 @@ if ($res->num_rows > 0) {
     }
 }
 
+// Fetch reactions for the loaded messages
+if (!empty($messages)) {
+    $msg_ids = array_map(function($m) { return $m['id']; }, $messages);
+    $ids_str = implode(',', $msg_ids);
+    
+    $react_res = $conn->query("
+        SELECT r.message_id, r.emoji, u.username 
+        FROM message_reactions r 
+        JOIN users u ON r.google_uid COLLATE utf8mb4_unicode_ci = u.google_uid COLLATE utf8mb4_unicode_ci 
+        WHERE r.message_id IN ($ids_str)
+    ");
+    
+    $reactions_map = [];
+    if ($react_res && $react_res->num_rows > 0) {
+        while ($r = $react_res->fetch_assoc()) {
+            $m_id = $r['message_id'];
+            $emoji = $r['emoji'];
+            $username = $r['username'];
+            
+            if (!isset($reactions_map[$m_id])) {
+                $reactions_map[$m_id] = [];
+            }
+            if (!isset($reactions_map[$m_id][$emoji])) {
+                $reactions_map[$m_id][$emoji] = [];
+            }
+            $reactions_map[$m_id][$emoji][] = $username;
+        }
+    }
+    
+    foreach ($messages as &$m) {
+        $m_id = $m['id'];
+        $m['reactions'] = isset($reactions_map[$m_id]) ? (object)$reactions_map[$m_id] : new stdClass();
+    }
+}
+
 // Reverse the array so it is ordered by oldest to newest for UI
 $messages = array_reverse($messages);
 
