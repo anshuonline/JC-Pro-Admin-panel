@@ -129,6 +129,50 @@ if ($insert->execute()) {
         }
     }
 
+    // Process Gemini Bot Mentions
+    $bot_mention = '@' . BOT_USERNAME;
+    if (stripos($message, $bot_mention) !== false) {
+        $clean_msg = trim(str_ireplace($bot_mention, '', $message));
+        if (empty($clean_msg)) $clean_msg = "Hello";
+        
+        $prompt = "You are " . BOT_USERNAME . ", a friendly spiritual guide in a meditation app (JapaCounter). You reply in Hinglish or English. Keep your responses short (max 2 sentences), funny, and helpful. User " . $user['username'] . " says: " . $clean_msg;
+        
+        $gemini_url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=" . GEMINI_API_KEY;
+        $postData = json_encode([
+            "contents" => [
+                [
+                    "parts" => [
+                        ["text" => $prompt]
+                    ]
+                ]
+            ]
+        ]);
+        
+        $ch = curl_init($gemini_url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $postData);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 6); // Max 6 seconds
+        $api_response = curl_exec($ch);
+        curl_close($ch);
+        
+        if ($api_response) {
+            $json_res = json_decode($api_response, true);
+            if (isset($json_res['candidates'][0]['content']['parts'][0]['text'])) {
+                $bot_reply = trim($json_res['candidates'][0]['content']['parts'][0]['text']);
+                // Clean markdown formatting to look normal in chat
+                $bot_reply = str_replace(['**', '*'], '', $bot_reply);
+                
+                $bot_uid = $conn->real_escape_string(BOT_GOOGLE_UID);
+                $bot_reply_safe = $conn->real_escape_string($bot_reply);
+                $new_msg_id = $insert->insert_id;
+                
+                $conn->query("INSERT INTO global_chat (google_uid, message, reply_to_id) VALUES ('$bot_uid', '$bot_reply_safe', $new_msg_id)");
+            }
+        }
+    }
+
     echo json_encode(["success" => true]);
 } else {
     echo json_encode(["success" => false, "message" => "Failed to send message: " . $conn->error]);
