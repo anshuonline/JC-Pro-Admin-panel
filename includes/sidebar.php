@@ -25,6 +25,11 @@ $currentPage = basename($_SERVER['PHP_SELF']);
                 Users
             </a>
 
+            <a href="manage_chat.php" class="<?php echo $currentPage == 'manage_chat.php' ? 'bg-orange-50 text-orange-700 shadow-sm border border-orange-200' : 'text-slate-600 hover:bg-slate-100/80 hover:text-slate-900 border border-transparent'; ?> group flex items-center px-3 py-2.5 text-sm font-semibold rounded-xl transition-all duration-200">
+                <i class="fa-solid fa-comments mr-3 w-5 text-center <?php echo $currentPage == 'manage_chat.php' ? 'text-orange-600' : 'text-slate-400 group-hover:text-orange-600'; ?>"></i>
+                Global Chat
+            </a>
+
             <a href="premium.php" class="<?php echo $currentPage == 'premium.php' ? 'bg-amber-50 text-amber-700 shadow-sm border border-amber-200' : 'text-slate-600 hover:bg-slate-100/80 hover:text-slate-900 border border-transparent'; ?> group flex items-center px-3 py-2.5 text-sm font-semibold rounded-xl transition-all duration-200">
                 <i class="fa-solid fa-crown mr-3 w-5 text-center <?php echo $currentPage == 'premium.php' ? 'text-amber-600' : 'text-slate-400 group-hover:text-amber-500'; ?>"></i>
                 Premium Members
