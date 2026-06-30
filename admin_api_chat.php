@@ -10,7 +10,7 @@ switch ($action) {
     case 'get_chats':
         $sql = "SELECT c.id, c.message, c.created_at, c.google_uid, u.username, u.profile_picture, u.level, u.is_premium, u.is_chat_banned 
                 FROM global_chat c
-                JOIN users u ON c.google_uid = u.google_uid
+                JOIN users u ON c.google_uid COLLATE utf8mb4_unicode_ci = u.google_uid COLLATE utf8mb4_unicode_ci
                 ORDER BY c.id DESC LIMIT 100";
         $res = $conn->query($sql);
         if (!$res) {

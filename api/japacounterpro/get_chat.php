@@ -7,7 +7,7 @@ require_once '../../config.php';
 // Fetch last 100 messages
 $sql = "SELECT c.id, c.message, c.created_at, u.username, u.profile_picture, u.level, u.is_premium 
         FROM global_chat c
-        JOIN users u ON c.google_uid = u.google_uid
+        JOIN users u ON c.google_uid COLLATE utf8mb4_unicode_ci = u.google_uid COLLATE utf8mb4_unicode_ci
         ORDER BY c.id DESC LIMIT 100";
         
 $res = $conn->query($sql);
