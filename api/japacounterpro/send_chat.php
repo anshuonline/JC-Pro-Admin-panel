@@ -83,6 +83,7 @@ if ($reply_to_id !== null) {
 }
 
 if ($insert->execute()) {
+    $new_msg_id = $insert->insert_id;
     // Send FCM Notification if it's a reply
     if ($reply_to_id !== null) {
         $get_original_user = $conn->prepare("
