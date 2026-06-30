@@ -8,7 +8,7 @@ require_once '../../config.php';
 $sql = "SELECT c.id, c.message, c.created_at, u.username, u.profile_picture, u.level, u.is_premium 
         FROM global_chat c
         JOIN users u ON c.google_uid COLLATE utf8mb4_unicode_ci = u.google_uid COLLATE utf8mb4_unicode_ci
-        ORDER BY c.id DESC LIMIT 100";
+        ORDER BY c.id DESC LIMIT 20";
         
 $res = $conn->query($sql);
 if (!$res) {
