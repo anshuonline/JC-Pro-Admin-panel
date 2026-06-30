@@ -89,10 +89,48 @@ switch ($action) {
     case 'ban_user':
         $uid = $conn->real_escape_string($_POST['google_uid'] ?? '');
         if (!empty($uid) && $uid !== 'admin_uid') {
-            $conn->query("UPDATE users SET is_chat_banned = NOT is_chat_banned WHERE google_uid = '$uid'");
-            echo json_encode(['success' => true]);
+            $userRes = $conn->query("SELECT is_chat_banned, username FROM users WHERE google_uid = '$uid'");
+            if ($userRes && $userRes->num_rows > 0) {
+                $userRow = $userRes->fetch_assoc();
+                $was_banned = $userRow['is_chat_banned'];
+                $username = $userRow['username'];
+                
+                $conn->query("UPDATE users SET is_chat_banned = NOT is_chat_banned WHERE google_uid = '$uid'");
+                
+                if (!$was_banned) { // They just got banned
+                    $sys_msg = $conn->real_escape_string("$username is permanently banned from global chat.");
+                    $conn->query("INSERT INTO global_chat (google_uid, message) VALUES ('system', '$sys_msg')");
+                }
+                echo json_encode(['success' => true]);
+            } else {
+                echo json_encode(['success' => false, 'message' => 'User not found']);
+            }
         } else {
             echo json_encode(['success' => false, 'message' => 'Invalid UID']);
+        }
+        break;
+
+    case 'mute_user':
+        $uid = $conn->real_escape_string($_POST['google_uid'] ?? '');
+        $duration = (int)($_POST['duration'] ?? 0); // duration in hours
+        if (!empty($uid) && $uid !== 'admin_uid' && $duration > 0) {
+            $userRes = $conn->query("SELECT username FROM users WHERE google_uid = '$uid'");
+            if ($userRes && $userRes->num_rows > 0) {
+                $username = $userRes->fetch_assoc()['username'];
+                $muted_until = date('Y-m-d H:i:s', strtotime("+$duration hours"));
+                
+                $conn->query("UPDATE users SET chat_muted_until = '$muted_until' WHERE google_uid = '$uid'");
+                
+                $duration_str = $duration == 1 ? "1 hour" : ($duration == 24 ? "24 hours" : ($duration == 168 ? "7 days" : "$duration hours"));
+                $sys_msg = $conn->real_escape_string("$username is muted from the chat for $duration_str.");
+                $conn->query("INSERT INTO global_chat (google_uid, message) VALUES ('system', '$sys_msg')");
+                
+                echo json_encode(['success' => true]);
+            } else {
+                echo json_encode(['success' => false, 'message' => 'User not found']);
+            }
+        } else {
+            echo json_encode(['success' => false, 'message' => 'Invalid parameters']);
         }
         break;
 

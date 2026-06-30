@@ -4,6 +4,26 @@ header('Access-Control-Allow-Origin: *');
 
 require_once '../../config.php';
 
+$user_status = null;
+if (isset($_GET['uid']) && !empty($_GET['uid'])) {
+    $uid = $conn->real_escape_string($_GET['uid']);
+    $userRes = $conn->query("SELECT is_chat_banned, chat_muted_until FROM users WHERE google_uid = '$uid'");
+    if ($userRes && $userRes->num_rows > 0) {
+        $userRow = $userRes->fetch_assoc();
+        $is_banned = (bool)$userRow['is_chat_banned'];
+        $muted_until = $userRow['chat_muted_until'];
+        
+        if (!empty($muted_until) && strtotime($muted_until) <= time()) {
+            $muted_until = null;
+        }
+        
+        $user_status = [
+            "is_banned" => $is_banned,
+            "muted_until" => $muted_until ? strtotime($muted_until) * 1000 : null
+        ];
+    }
+}
+
 // Fetch last 100 messages
 $sql = "SELECT c.id, c.message, c.created_at, c.google_uid, c.reply_to_id, 
                u.username, u.profile_picture, u.level, u.is_premium, u.is_mod,
@@ -47,8 +67,14 @@ if ($res->num_rows > 0) {
 // Reverse the array so it is ordered by oldest to newest for UI
 $messages = array_reverse($messages);
 
-echo json_encode([
+$response = [
     "success" => true,
     "data" => $messages
-]);
+];
+
+if ($user_status !== null) {
+    $response["user_status"] = $user_status;
+}
+
+echo json_encode($response);
 ?>

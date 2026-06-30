@@ -27,7 +27,7 @@ if (strlen($message) > 1000) {
 }
 
 // Check if user exists and if they are banned
-$stmt = $conn->prepare("SELECT id, is_chat_banned FROM users WHERE google_uid = ?");
+$stmt = $conn->prepare("SELECT id, is_chat_banned, chat_muted_until FROM users WHERE google_uid = ?");
 $stmt->bind_param("s", $google_uid);
 $stmt->execute();
 $res = $stmt->get_result();
@@ -39,8 +39,18 @@ if ($res->num_rows == 0) {
 
 $user = $res->fetch_assoc();
 if ($user['is_chat_banned']) {
-    echo json_encode(["success" => false, "message" => "You have been banned from global chat."]);
+    echo json_encode(["success" => false, "message" => "You have been permanently banned from global chat."]);
     exit;
+}
+
+if (!empty($user['chat_muted_until'])) {
+    $muted_until = strtotime($user['chat_muted_until']);
+    if ($muted_until > time()) {
+        $remaining = ceil(($muted_until - time()) / 60);
+        $time_str = $remaining > 60 ? ceil($remaining/60) . " hours" : $remaining . " mins";
+        echo json_encode(["success" => false, "message" => "You are muted from chat. Expires in $time_str."]);
+        exit;
+    }
 }
 
 // Fetch banned words and filter message

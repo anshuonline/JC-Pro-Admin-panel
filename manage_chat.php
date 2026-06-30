@@ -153,6 +153,15 @@ check_auth();
                 </button>
             `;
             
+            const muteBtnHtml = isAdmin ? '' : `
+                <select onchange="if(this.value) muteUser('${chat.google_uid}', this.value); this.value='';" class="text-xs px-2 py-1 rounded bg-slate-200 text-slate-600 hover:bg-slate-300 outline-none cursor-pointer" title="Mute User">
+                    <option value="">Mute</option>
+                    <option value="1">1 Hour</option>
+                    <option value="24">24 Hours</option>
+                    <option value="168">7 Days</option>
+                </select>
+            `;
+            
             let replyHtml = '';
             if (chat.reply_to_id) {
                 const rName = chat.reply_username || 'Unknown';
@@ -178,10 +187,11 @@ check_auth();
                                 ${isAdmin ? '<span class="text-[10px] font-bold text-white bg-orange-500 px-1.5 py-0.5 rounded">ADMIN</span>' : ''}
                                 <span class="text-xs text-slate-400">${timeStr}</span>
                             </div>
-                            <div class="opacity-0 group-hover:opacity-100 transition-opacity flex gap-2">
-                                <button onclick="replyTo(${chat.id}, '${chat.username.replace(/'/g, "\\'")}', '${chat.message.replace(/'/g, "\\'").substring(0,20)}')" class="text-xs px-2 py-1 rounded bg-blue-100 text-blue-600 hover:bg-blue-200 transition-colors" title="Reply">
+                            <div class="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                <button onclick="replyTo(${chat.id}, '${chat.username.replace(/'/g, "\\'")}', '${chat.message.replace(/'/g, "\\'").substring(0,20)}')" class="text-xs px-2 py-1 rounded bg-orange-100 text-orange-600 hover:bg-orange-200 transition-colors" title="Reply to Message">
                                     <i class="fa-solid fa-reply"></i>
                                 </button>
+                                ${muteBtnHtml}
                                 ${banBtnHtml}
                                 <button onclick="deleteChat(${chat.id})" class="text-xs px-2 py-1 rounded bg-red-100 text-red-600 hover:bg-red-200 transition-colors" title="Delete Message">
                                     <i class="fa-solid fa-trash"></i>
@@ -265,21 +275,50 @@ check_auth();
         }
     }
 
-    async function toggleBan(googleUid) {
-        const formData = new FormData();
-        formData.append('action', 'ban_user');
-        formData.append('google_uid', googleUid);
-
+    async function toggleBan(google_uid) {
+        if (!confirm('Toggle ban for this user?')) return;
+        
         try {
-            const res = await fetch('admin_api_chat.php', { method: 'POST', body: formData });
+            const fd = new FormData();
+            fd.append('action', 'ban_user');
+            fd.append('google_uid', google_uid);
+            
+            const res = await fetch('admin_api_chat.php', { method: 'POST', body: fd });
             const data = await res.json();
+            
             if (data.success) {
                 fetchChats();
             } else {
-                alert('Error banning: ' + data.message);
+                alert('Error: ' + data.message);
             }
         } catch (e) {
-            alert('Request failed');
+            console.error(e);
+            alert('Failed to ban/unban user');
+        }
+    }
+
+    async function muteUser(google_uid, duration) {
+        const hours = parseInt(duration);
+        const durationStr = hours === 1 ? '1 Hour' : (hours === 24 ? '24 Hours' : '7 Days');
+        if (!confirm('Mute this user for ' + durationStr + '?')) return;
+        
+        try {
+            const fd = new FormData();
+            fd.append('action', 'mute_user');
+            fd.append('google_uid', google_uid);
+            fd.append('duration', duration);
+            
+            const res = await fetch('admin_api_chat.php', { method: 'POST', body: fd });
+            const data = await res.json();
+            
+            if (data.success) {
+                fetchChats();
+            } else {
+                alert('Error: ' + data.message);
+            }
+        } catch (e) {
+            console.error(e);
+            alert('Failed to mute user');
         }
     }
 
