@@ -28,14 +28,44 @@ switch ($action) {
 
     case 'send_chat':
         $message = trim($_POST['message'] ?? '');
+        $reply_to_id = isset($_POST['reply_to_id']) && is_numeric($_POST['reply_to_id']) ? (int)$_POST['reply_to_id'] : null;
+        
         if (empty($message)) {
             echo json_encode(['success' => false, 'message' => 'Empty message']);
             exit;
         }
         $admin_uid = 'admin_uid';
-        $insert = $conn->prepare("INSERT INTO global_chat (google_uid, message) VALUES (?, ?)");
-        $insert->bind_param("ss", $admin_uid, $message);
+        
+        if ($reply_to_id !== null) {
+            $insert = $conn->prepare("INSERT INTO global_chat (google_uid, message, reply_to_id) VALUES (?, ?, ?)");
+            $insert->bind_param("ssi", $admin_uid, $message, $reply_to_id);
+        } else {
+            $insert = $conn->prepare("INSERT INTO global_chat (google_uid, message) VALUES (?, ?)");
+            $insert->bind_param("ss", $admin_uid, $message);
+        }
+        
         if ($insert->execute()) {
+            if ($reply_to_id !== null) {
+                $get_original_user = $conn->prepare("
+                    SELECT u.device_token, c.message 
+                    FROM global_chat c 
+                    JOIN users u ON c.google_uid COLLATE utf8mb4_unicode_ci = u.google_uid COLLATE utf8mb4_unicode_ci
+                    WHERE c.id = ?
+                ");
+                $get_original_user->bind_param("i", $reply_to_id);
+                $get_original_user->execute();
+                $res_user = $get_original_user->get_result();
+                
+                if ($res_user->num_rows > 0) {
+                    $row = $res_user->fetch_assoc();
+                    $device_token = $row['device_token'];
+                    if (!empty($device_token)) {
+                        $title = "Admin replied to you";
+                        $body = "Global Chat: " . $message;
+                        send_fcm_notification($device_token, $title, $body);
+                    }
+                }
+            }
             echo json_encode(['success' => true]);
         } else {
             echo json_encode(['success' => false, 'message' => $conn->error]);

@@ -34,6 +34,16 @@ check_auth();
             </div>
             
             <div class="bg-white rounded-b-2xl shadow-sm border border-slate-200 border-t-0 p-4">
+                <div id="replyBanner" class="hidden flex items-center justify-between bg-slate-100 p-2 rounded-t-xl border border-slate-200 border-b-0">
+                    <div class="flex items-center gap-2 overflow-hidden">
+                        <i class="fa-solid fa-reply text-orange-500 text-sm"></i>
+                        <span id="replyUsername" class="text-sm font-bold text-slate-700"></span>
+                        <span id="replyMessageSnippet" class="text-xs text-slate-500 truncate whitespace-nowrap"></span>
+                    </div>
+                    <button type="button" onclick="cancelReply()" class="text-slate-400 hover:text-red-500 px-2">
+                        <i class="fa-solid fa-times"></i>
+                    </button>
+                </div>
                 <form id="chatForm" class="flex gap-2">
                     <input type="text" id="chatMessage" class="flex-1 px-4 py-2 rounded-xl border border-slate-200 focus:border-orange-500 focus:ring-2 focus:ring-orange-200 outline-none transition-all" placeholder="Type a message as Admin..." required autocomplete="off">
                     <button type="submit" class="bg-slate-800 hover:bg-slate-900 text-white font-bold py-2 px-6 rounded-xl transition-colors shadow-sm">
@@ -69,6 +79,7 @@ check_auth();
 <script>
     let chatPollingInterval;
     let isAutoScroll = true;
+    let currentReplyId = null;
 
     document.addEventListener('DOMContentLoaded', () => {
         fetchChats();
@@ -154,6 +165,9 @@ check_auth();
                                 <span class="text-xs text-slate-400">${timeStr}</span>
                             </div>
                             <div class="opacity-0 group-hover:opacity-100 transition-opacity flex gap-2">
+                                <button onclick="replyTo(${chat.id}, '${chat.username.replace(/'/g, "\\'")}', '${chat.message.replace(/'/g, "\\'").substring(0,20)}')" class="text-xs px-2 py-1 rounded bg-blue-100 text-blue-600 hover:bg-blue-200 transition-colors" title="Reply">
+                                    <i class="fa-solid fa-reply"></i>
+                                </button>
                                 ${banBtnHtml}
                                 <button onclick="deleteChat(${chat.id})" class="text-xs px-2 py-1 rounded bg-red-100 text-red-600 hover:bg-red-200 transition-colors" title="Delete Message">
                                     <i class="fa-solid fa-trash"></i>
@@ -172,6 +186,19 @@ check_auth();
         }
     }
 
+    function replyTo(id, username, message) {
+        currentReplyId = id;
+        document.getElementById('replyUsername').innerText = 'Replying to ' + username + ':';
+        document.getElementById('replyMessageSnippet').innerText = message + (message.length >= 20 ? '...' : '');
+        document.getElementById('replyBanner').classList.remove('hidden');
+        document.getElementById('chatMessage').focus();
+    }
+
+    function cancelReply() {
+        currentReplyId = null;
+        document.getElementById('replyBanner').classList.add('hidden');
+    }
+
     async function sendChat() {
         const input = document.getElementById('chatMessage');
         const message = input.value.trim();
@@ -181,12 +208,16 @@ check_auth();
         const formData = new FormData();
         formData.append('action', 'send_chat');
         formData.append('message', message);
+        if (currentReplyId !== null) {
+            formData.append('reply_to_id', currentReplyId);
+        }
 
         try {
             const res = await fetch('admin_api_chat.php', { method: 'POST', body: formData });
             const data = await res.json();
             if (data.success) {
                 input.value = '';
+                cancelReply();
                 isAutoScroll = true; // Force scroll to bottom when sending
                 fetchChats();
             } else {
