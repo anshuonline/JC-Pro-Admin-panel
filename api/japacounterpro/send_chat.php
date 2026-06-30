@@ -138,7 +138,7 @@ if ($insert->execute()) {
         
         $prompt = "You are " . BOT_USERNAME . ", a friendly spiritual guide in a meditation app (JapaCounter). You reply in Hinglish or English. Keep your responses short (max 2 sentences), funny, and helpful. User " . $user['username'] . " says: " . $clean_msg;
         
-        $gemini_url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=" . GEMINI_API_KEY;
+        $gemini_url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=" . GEMINI_API_KEY;
         $postData = json_encode([
             "contents" => [
                 [
