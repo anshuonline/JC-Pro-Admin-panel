@@ -94,6 +94,80 @@ $conn->query("DELETE FROM live_sessions WHERE last_heartbeat < NOW() - INTERVAL 
 $conn->query("DELETE FROM daily_counts WHERE date < DATE_SUB(CURDATE(), INTERVAL 60 DAY)");
 
 // ==========================================
+// BACKGROUND AI CHAT SIMULATION
+// ==========================================
+// Ensure all bots have a google_uid so they can chat in global_chat
+$conn->query("UPDATE users SET google_uid = CONCAT('bot_', id) WHERE is_bot = 1 AND (google_uid IS NULL OR google_uid = '')");
+
+// 60% chance to simulate a chat between two bots per cron run
+if (rand(1, 100) <= 60) {
+    require_once 'api/japacounterpro/bot_config.php';
+    if (defined('GEMINI_API_KEY')) {
+        $chat_bots = $conn->query("SELECT google_uid, username FROM users WHERE is_bot = 1 ORDER BY RAND() LIMIT 2");
+        if ($chat_bots && $chat_bots->num_rows == 2) {
+            $bot1 = $chat_bots->fetch_assoc();
+            $bot2 = $chat_bots->fetch_assoc();
+            
+            $prompt = "You are two friends, {$bot1['username']} and {$bot2['username']}, casually chatting on a meditation app (JapaCounter) global chat. Generate a short 2-message conversation in Hinglish discussing chanting, daily life, or greeting each other. Keep it very natural and max 1 sentence each. Format exactly like this with no other text or markdown:\n{$bot1['username']}: <message>\n{$bot2['username']}: <message>";
+            
+            $gemini_url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=" . GEMINI_API_KEY;
+            $postData = json_encode([
+                "contents" => [
+                    [
+                        "parts" => [
+                            ["text" => $prompt]
+                        ]
+                    ]
+                ]
+            ]);
+            
+            $ch = curl_init($gemini_url);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
+            curl_setopt($ch, CURLOPT_POST, true);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, $postData);
+            curl_setopt($ch, CURLOPT_TIMEOUT, 15);
+            $api_response = curl_exec($ch);
+            curl_close($ch);
+            
+            if ($api_response) {
+                $json_res = json_decode($api_response, true);
+                if (isset($json_res['candidates'][0]['content']['parts'][0]['text'])) {
+                    $chat_text = trim($json_res['candidates'][0]['content']['parts'][0]['text']);
+                    $lines = explode("\n", $chat_text);
+                    foreach ($lines as $line) {
+                        $line = trim($line);
+                        if (empty($line)) continue;
+                        
+                        $bot_uid = null;
+                        $msg = "";
+                        
+                        // Check which bot is speaking (case insensitive)
+                        if (stripos($line, $bot1['username'] . ":") === 0) {
+                            $bot_uid = $bot1['google_uid'];
+                            $msg = trim(substr($line, strlen($bot1['username']) + 1));
+                        } elseif (stripos($line, $bot2['username'] . ":") === 0) {
+                            $bot_uid = $bot2['google_uid'];
+                            $msg = trim(substr($line, strlen($bot2['username']) + 1));
+                        }
+                        
+                        if ($bot_uid && !empty($msg)) {
+                            // Strip any bold markdown ** just in case
+                            $msg = str_replace("**", "", $msg);
+                            $msg_safe = $conn->real_escape_string($msg);
+                            $conn->query("INSERT INTO global_chat (google_uid, message) VALUES ('$bot_uid', '$msg_safe')");
+                            sleep(rand(3, 7)); // Realistic typing delay between messages
+                        }
+                    }
+                    echo "AI Chat Simulated between {$bot1['username']} and {$bot2['username']}.<br>";
+                }
+            }
+        }
+    }
+}
+
+
+// ==========================================
 // BACKGROUND IP LOCATION SYNC
 // ==========================================
 echo "<br>Starting IP Location Sync...<br>";
