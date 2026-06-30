@@ -170,6 +170,21 @@ switch ($action) {
         echo json_encode(['success' => true]);
         break;
 
+    case 'get_restricted_users':
+        $sql = "SELECT google_uid, username, profile_picture, is_chat_banned, chat_muted_until 
+                FROM users 
+                WHERE is_chat_banned = 1 OR chat_muted_until > NOW() 
+                ORDER BY username ASC";
+        $res = $conn->query($sql);
+        $users = [];
+        if ($res && $res->num_rows > 0) {
+            while ($row = $res->fetch_assoc()) {
+                $users[] = $row;
+            }
+        }
+        echo json_encode(['success' => true, 'data' => $users]);
+        break;
+
     default:
         echo json_encode(['success' => false, 'message' => 'Unknown action']);
 }

@@ -11,9 +11,14 @@ check_auth();
 </script>
 
 <div class="max-w-7xl mx-auto">
-    <div class="mb-8">
-        <h1 class="text-2xl md:text-3xl font-bold text-slate-800 tracking-tight">Global Chat Moderation</h1>
-        <p class="text-slate-500 mt-1 text-sm md:text-base">Monitor real-time messages, ban spammers, and manage banned words.</p>
+    <div class="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+            <h1 class="text-2xl md:text-3xl font-bold text-slate-800 tracking-tight">Global Chat Moderation</h1>
+            <p class="text-slate-500 mt-1 text-sm md:text-base">Monitor real-time messages, ban spammers, and manage banned words.</p>
+        </div>
+        <button onclick="openRestrictedModal()" class="bg-slate-800 hover:bg-slate-900 text-white font-bold py-2.5 px-5 rounded-xl transition-colors shadow-sm text-sm shrink-0">
+            <i class="fa-solid fa-users-slash mr-2"></i> Restricted Users
+        </button>
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -71,6 +76,21 @@ check_auth();
                     </button>
                     <div id="wordsStatus" class="mt-3 text-sm font-medium text-center hidden"></div>
                 </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Restricted Users Modal -->
+<div id="restrictedModal" class="fixed inset-0 bg-slate-900/50 hidden z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl shadow-xl w-full max-w-2xl flex flex-col max-h-[80vh]">
+        <div class="flex justify-between items-center p-6 border-b border-slate-200">
+            <h2 class="text-xl font-bold text-slate-800"><i class="fa-solid fa-users-slash text-red-500 mr-2"></i> Muted & Banned Users</h2>
+            <button onclick="closeRestrictedModal()" class="text-slate-400 hover:text-red-500 transition-colors"><i class="fa-solid fa-times text-xl"></i></button>
+        </div>
+        <div class="p-6 overflow-y-auto flex-1">
+            <div id="restrictedUsersList" class="space-y-3">
+                <div class="text-center text-slate-400 text-sm py-8">Loading...</div>
             </div>
         </div>
     </div>
@@ -347,6 +367,64 @@ check_auth();
         } catch (e) {
             console.error(e);
             alert('Failed to unmute user');
+        }
+    }
+
+    function openRestrictedModal() {
+        document.getElementById('restrictedModal').classList.remove('hidden');
+        fetchRestrictedUsers();
+    }
+    
+    function closeRestrictedModal() {
+        document.getElementById('restrictedModal').classList.add('hidden');
+    }
+    
+    async function fetchRestrictedUsers() {
+        const list = document.getElementById('restrictedUsersList');
+        list.innerHTML = '<div class="text-center text-slate-400 text-sm py-8">Loading...</div>';
+        
+        try {
+            const res = await fetch('admin_api_chat.php?action=get_restricted_users');
+            const data = await res.json();
+            
+            if (data.success) {
+                if (data.data.length === 0) {
+                    list.innerHTML = '<div class="text-center text-slate-400 text-sm py-8">No restricted users found.</div>';
+                    return;
+                }
+                
+                let html = '';
+                data.data.forEach(user => {
+                    const isBanned = user.is_chat_banned == 1;
+                    const isMuted = user.chat_muted_until && new Date(user.chat_muted_until) > new Date();
+                    const profileUrl = user.profile_picture || 'https://ui-avatars.com/api/?name=' + user.username;
+                    
+                    let statusBadge = '';
+                    if (isBanned) statusBadge = '<span class="bg-red-100 text-red-700 px-2 py-0.5 rounded text-xs font-bold">Banned</span>';
+                    else if (isMuted) statusBadge = `<span class="bg-orange-100 text-orange-700 px-2 py-0.5 rounded text-xs font-bold">Muted till ${new Date(user.chat_muted_until).toLocaleString()}</span>`;
+                    
+                    html += `
+                    <div class="flex items-center justify-between p-3 border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors">
+                        <div class="flex items-center gap-3">
+                            <img src="${profileUrl}" alt="${user.username}" class="w-10 h-10 rounded-full object-cover bg-slate-200">
+                            <div>
+                                <div class="font-bold text-slate-800 text-sm">${user.username}</div>
+                                <div class="mt-0.5">${statusBadge}</div>
+                            </div>
+                        </div>
+                        <div class="flex gap-2">
+                            ${isMuted ? `<button onclick="unmuteUser('${user.google_uid}'); setTimeout(fetchRestrictedUsers, 500);" class="text-xs px-3 py-1.5 bg-orange-100 text-orange-700 hover:bg-orange-200 rounded font-medium transition-colors border border-orange-200">Unmute</button>` : ''}
+                            ${isBanned ? `<button onclick="toggleBan('${user.google_uid}'); setTimeout(fetchRestrictedUsers, 500);" class="text-xs px-3 py-1.5 bg-red-100 text-red-700 hover:bg-red-200 rounded font-medium transition-colors border border-red-200">Unban</button>` : ''}
+                        </div>
+                    </div>
+                    `;
+                });
+                list.innerHTML = html;
+            } else {
+                list.innerHTML = '<div class="text-center text-red-500 text-sm py-8">Error loading users.</div>';
+            }
+        } catch(e) {
+            list.innerHTML = '<div class="text-center text-red-500 text-sm py-8">Failed to fetch.</div>';
         }
     }
 
