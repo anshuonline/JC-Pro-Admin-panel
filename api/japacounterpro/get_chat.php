@@ -24,7 +24,14 @@ if (isset($_GET['uid']) && !empty($_GET['uid'])) {
     }
 }
 
-// Fetch last 100 messages
+// Fetch last 50 messages
+$before_id = isset($_GET['before_id']) && is_numeric($_GET['before_id']) ? (int)$_GET['before_id'] : null;
+
+$where_clause = "";
+if ($before_id !== null) {
+    $where_clause = "WHERE c.id < $before_id";
+}
+
 $sql = "SELECT c.id, c.message, c.created_at, c.google_uid, c.reply_to_id, 
                u.username, u.profile_picture, u.level, u.is_premium, u.is_mod,
                rc.message AS reply_message, ru.username AS reply_username
@@ -32,7 +39,8 @@ $sql = "SELECT c.id, c.message, c.created_at, c.google_uid, c.reply_to_id,
         JOIN users u ON c.google_uid COLLATE utf8mb4_unicode_ci = u.google_uid COLLATE utf8mb4_unicode_ci
         LEFT JOIN global_chat rc ON c.reply_to_id = rc.id
         LEFT JOIN users ru ON rc.google_uid COLLATE utf8mb4_unicode_ci = ru.google_uid COLLATE utf8mb4_unicode_ci
-        ORDER BY c.id DESC LIMIT 100";
+        $where_clause
+        ORDER BY c.id DESC LIMIT 50";
         
 $res = $conn->query($sql);
 if (!$res) {

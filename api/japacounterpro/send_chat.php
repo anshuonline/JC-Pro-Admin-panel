@@ -106,6 +106,29 @@ if ($insert->execute()) {
         }
     }
 
+
+    // Process Mentions
+    preg_match_all('/@([a-zA-Z0-9_]+)/', $message, $matches);
+    if (!empty($matches[1])) {
+        $mentioned_usernames = array_unique($matches[1]);
+        foreach ($mentioned_usernames as $m_user) {
+            $m_user_safe = $conn->real_escape_string($m_user);
+            
+            if (strtolower($m_user_safe) === strtolower($user['username'])) continue;
+            
+            $get_m = $conn->query("SELECT device_token FROM users WHERE username = '$m_user_safe'");
+            if ($get_m && $get_m->num_rows > 0) {
+                $m_row = $get_m->fetch_assoc();
+                $device_token = $m_row['device_token'];
+                if (!empty($device_token)) {
+                    $title = $user['username'] . " mentioned you";
+                    $body = "Global Chat: " . $message;
+                    send_fcm_notification($device_token, $title, $body);
+                }
+            }
+        }
+    }
+
     echo json_encode(["success" => true]);
 } else {
     echo json_encode(["success" => false, "message" => "Failed to send message: " . $conn->error]);
