@@ -32,7 +32,7 @@ $sql = "SELECT c.id, c.message, c.created_at, c.google_uid, c.reply_to_id,
         JOIN users u ON c.google_uid COLLATE utf8mb4_unicode_ci = u.google_uid COLLATE utf8mb4_unicode_ci
         LEFT JOIN global_chat rc ON c.reply_to_id = rc.id
         LEFT JOIN users ru ON rc.google_uid COLLATE utf8mb4_unicode_ci = ru.google_uid COLLATE utf8mb4_unicode_ci
-        ORDER BY c.id DESC LIMIT 20";
+        ORDER BY c.id DESC LIMIT 100";
         
 $res = $conn->query($sql);
 if (!$res) {
