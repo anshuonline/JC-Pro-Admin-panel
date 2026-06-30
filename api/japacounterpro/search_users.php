@@ -3,6 +3,7 @@ header('Content-Type: application/json');
 header('Access-Control-Allow-Origin: *');
 
 require_once '../../config.php';
+require_once 'bot_config.php';
 
 $query = isset($_GET['q']) ? $conn->real_escape_string($_GET['q']) : '';
 
