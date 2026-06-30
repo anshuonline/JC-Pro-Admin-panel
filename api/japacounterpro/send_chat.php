@@ -87,7 +87,7 @@ if ($insert->execute()) {
     // Send FCM Notification if it's a reply
     if ($reply_to_id !== null) {
         $get_original_user = $conn->prepare("
-            SELECT u.device_token, c.message 
+            SELECT u.device_token, u.google_uid, c.message 
             FROM global_chat c 
             JOIN users u ON c.google_uid COLLATE utf8mb4_unicode_ci = u.google_uid COLLATE utf8mb4_unicode_ci
             WHERE c.id = ?
@@ -98,12 +98,14 @@ if ($insert->execute()) {
         
         if ($res_user->num_rows > 0) {
             $row = $res_user->fetch_assoc();
-            $device_token = $row['device_token'];
-            if (!empty($device_token)) {
-                $snippet = strlen($row['message']) > 20 ? substr($row['message'], 0, 20) . '...' : $row['message'];
-                $title = $user['username'] . " replied to you";
-                $body = "Global Chat: " . $message;
-                send_fcm_notification($device_token, $title, $body);
+            if ($row['google_uid'] !== $google_uid) {
+                $device_token = $row['device_token'];
+                if (!empty($device_token)) {
+                    $snippet = strlen($row['message']) > 20 ? substr($row['message'], 0, 20) . '...' : $row['message'];
+                    $title = $user['username'] . " replied to you";
+                    $body = "Global Chat: " . $message;
+                    send_fcm_notification($device_token, $title, $body);
+                }
             }
         }
     }
