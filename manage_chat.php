@@ -153,14 +153,20 @@ check_auth();
                 </button>
             `;
             
-            const muteBtnHtml = isAdmin ? '' : `
+            const isMuted = chat.chat_muted_until && new Date(chat.chat_muted_until) > new Date();
+            
+            const muteBtnHtml = isAdmin ? '' : (isMuted ? `
+                <button onclick="unmuteUser('${chat.google_uid}')" class="text-xs px-2 py-1 rounded bg-orange-100 text-orange-600 hover:bg-orange-200 transition-colors" title="Unmute User">
+                    <i class="fa-solid fa-volume-high"></i> Unmute
+                </button>
+            ` : `
                 <select onchange="if(this.value) muteUser('${chat.google_uid}', this.value); this.value='';" class="text-xs px-2 py-1 rounded bg-slate-200 text-slate-600 hover:bg-slate-300 outline-none cursor-pointer" title="Mute User">
                     <option value="">Mute</option>
                     <option value="1">1 Hour</option>
                     <option value="24">24 Hours</option>
                     <option value="168">7 Days</option>
                 </select>
-            `;
+            `);
             
             let replyHtml = '';
             if (chat.reply_to_id) {
@@ -319,6 +325,28 @@ check_auth();
         } catch (e) {
             console.error(e);
             alert('Failed to mute user');
+        }
+    }
+
+    async function unmuteUser(google_uid) {
+        if (!confirm('Unmute this user?')) return;
+        
+        try {
+            const fd = new FormData();
+            fd.append('action', 'unmute_user');
+            fd.append('google_uid', google_uid);
+            
+            const res = await fetch('admin_api_chat.php', { method: 'POST', body: fd });
+            const data = await res.json();
+            
+            if (data.success) {
+                fetchChats();
+            } else {
+                alert('Error: ' + data.message);
+            }
+        } catch (e) {
+            console.error(e);
+            alert('Failed to unmute user');
         }
     }
 

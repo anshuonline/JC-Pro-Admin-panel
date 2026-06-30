@@ -9,7 +9,7 @@ $action = $_POST['action'] ?? ($_GET['action'] ?? '');
 switch ($action) {
     case 'get_chats':
         $sql = "SELECT c.id, c.message, c.created_at, c.google_uid, c.reply_to_id,
-                       u.username, u.profile_picture, u.level, u.is_premium, u.is_chat_banned,
+                       u.username, u.profile_picture, u.level, u.is_premium, u.is_chat_banned, u.chat_muted_until,
                        rc.message as reply_message, ru.username as reply_username 
                 FROM global_chat c
                 JOIN users u ON c.google_uid COLLATE utf8mb4_unicode_ci = u.google_uid COLLATE utf8mb4_unicode_ci
@@ -123,6 +123,27 @@ switch ($action) {
                 
                 $duration_str = $duration == 1 ? "1 hour" : ($duration == 24 ? "24 hours" : ($duration == 168 ? "7 days" : "$duration hours"));
                 $sys_msg = $conn->real_escape_string("$username is muted from the chat for $duration_str.");
+                $conn->query("INSERT INTO global_chat (google_uid, message) VALUES ('system', '$sys_msg')");
+                
+                echo json_encode(['success' => true]);
+            } else {
+                echo json_encode(['success' => false, 'message' => 'User not found']);
+            }
+        } else {
+            echo json_encode(['success' => false, 'message' => 'Invalid parameters']);
+        }
+        break;
+
+    case 'unmute_user':
+        $uid = $conn->real_escape_string($_POST['google_uid'] ?? '');
+        if (!empty($uid) && $uid !== 'admin_uid') {
+            $userRes = $conn->query("SELECT username FROM users WHERE google_uid = '$uid'");
+            if ($userRes && $userRes->num_rows > 0) {
+                $username = $userRes->fetch_assoc()['username'];
+                
+                $conn->query("UPDATE users SET chat_muted_until = NULL WHERE google_uid = '$uid'");
+                
+                $sys_msg = $conn->real_escape_string("$username has been unmuted.");
                 $conn->query("INSERT INTO global_chat (google_uid, message) VALUES ('system', '$sys_msg')");
                 
                 echo json_encode(['success' => true]);
