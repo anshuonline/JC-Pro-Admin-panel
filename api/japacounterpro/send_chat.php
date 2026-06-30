@@ -158,19 +158,24 @@ if ($insert->execute()) {
         $api_response = curl_exec($ch);
         curl_close($ch);
         
+        $bot_uid = $conn->real_escape_string(BOT_GOOGLE_UID);
         if ($api_response) {
             $json_res = json_decode($api_response, true);
             if (isset($json_res['candidates'][0]['content']['parts'][0]['text'])) {
                 $bot_reply = trim($json_res['candidates'][0]['content']['parts'][0]['text']);
                 // Clean markdown formatting to look normal in chat
-                $bot_reply = str_replace(['**', '*'], '', $bot_reply);
+                $bot_reply = str_replace("**", "", $bot_reply);
+                $bot_reply = str_replace("*", "", $bot_reply);
                 
-                $bot_uid = $conn->real_escape_string(BOT_GOOGLE_UID);
                 $bot_reply_safe = $conn->real_escape_string($bot_reply);
-                $new_msg_id = $insert->insert_id;
-                
+                $conn->query("INSERT INTO global_chat (google_uid, message, reply_to_id) VALUES ('$bot_uid', '$bot_reply_safe', $new_msg_id)");
+            } else {
+                $bot_reply_safe = "Oops! Google ke AI servers thode busy hain (High Demand). Main thodi der dhyan lagakar wapas aata hoon! 🧘‍♂️";
                 $conn->query("INSERT INTO global_chat (google_uid, message, reply_to_id) VALUES ('$bot_uid', '$bot_reply_safe', $new_msg_id)");
             }
+        } else {
+            $bot_reply_safe = "Mera connection thoda slow hai... Thodi der mein phir message karna! 🙏";
+            $conn->query("INSERT INTO global_chat (google_uid, message, reply_to_id) VALUES ('$bot_uid', '$bot_reply_safe', $new_msg_id)");
         }
     }
 
