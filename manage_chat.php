@@ -99,12 +99,21 @@ check_auth();
     async function fetchChats() {
         try {
             const res = await fetch('admin_api_chat.php?action=get_chats');
-            const data = await res.json();
-            if (data.success) {
-                renderChats(data.data);
+            const text = await res.text();
+            try {
+                const data = JSON.parse(text);
+                if (data.success) {
+                    renderChats(data.data);
+                } else {
+                    document.getElementById('chatBox').innerHTML = '<div class="text-center text-red-500 text-sm mt-10 p-4 font-bold border border-red-200 bg-red-50 rounded">Database Error: ' + data.message + '</div>';
+                }
+            } catch (e) {
+                console.error('JSON Parse Error:', text);
+                document.getElementById('chatBox').innerHTML = '<div class="text-center text-red-500 text-sm mt-10 p-4 font-bold border border-red-200 bg-red-50 rounded">Server Error:<br>' + text.substring(0, 200) + '...</div>';
             }
         } catch (e) {
             console.error('Failed to fetch chats');
+            document.getElementById('chatBox').innerHTML = '<div class="text-center text-red-500 text-sm mt-10">Network Error. Check console.</div>';
         }
     }
 

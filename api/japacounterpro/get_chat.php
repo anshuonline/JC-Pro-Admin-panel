@@ -11,9 +11,17 @@ $sql = "SELECT c.id, c.message, c.created_at, u.username, u.profile_picture, u.l
         ORDER BY c.id DESC LIMIT 100";
         
 $res = $conn->query($sql);
+if (!$res) {
+    echo json_encode([
+        "success" => false,
+        "message" => "Database Error: " . $conn->error
+    ]);
+    exit;
+}
+
 $messages = [];
 
-if ($res && $res->num_rows > 0) {
+if ($res->num_rows > 0) {
     while($row = $res->fetch_assoc()) {
         $messages[] = [
             "id" => (int)$row['id'],

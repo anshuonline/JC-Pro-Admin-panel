@@ -13,8 +13,12 @@ switch ($action) {
                 JOIN users u ON c.google_uid = u.google_uid
                 ORDER BY c.id DESC LIMIT 100";
         $res = $conn->query($sql);
+        if (!$res) {
+            echo json_encode(['success' => false, 'message' => 'Query Failed: ' . $conn->error]);
+            exit;
+        }
         $chats = [];
-        if ($res && $res->num_rows > 0) {
+        if ($res->num_rows > 0) {
             while ($row = $res->fetch_assoc()) {
                 $chats[] = $row;
             }
