@@ -4,6 +4,7 @@ header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: POST');
 
 require_once '../../config.php';
+require_once 'bot_config.php';
 
 $json = file_get_contents('php://input');
 $data = json_decode($json, true);
