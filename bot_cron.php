@@ -99,8 +99,8 @@ $conn->query("DELETE FROM daily_counts WHERE date < DATE_SUB(CURDATE(), INTERVAL
 // Ensure all bots have a google_uid so they can chat in global_chat
 $conn->query("UPDATE users SET google_uid = CONCAT('bot_', id) WHERE is_bot = 1 AND (google_uid IS NULL OR google_uid = '')");
 
-// 60% chance to simulate a chat between two bots per cron run
-if (rand(1, 100) <= 60) {
+// 60% chance to simulate a chat between two bots per cron run (DISABLED FOR NOW)
+if (false && rand(1, 100) <= 60) {
     require_once 'api/japacounterpro/bot_config.php';
     if (defined('GEMINI_API_KEY')) {
         $chat_bots = $conn->query("SELECT google_uid, username FROM users WHERE is_bot = 1 ORDER BY RAND() LIMIT 2");
